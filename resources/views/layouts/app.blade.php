@@ -20,6 +20,21 @@
 @include('components.header')
 
 <main>
+    @if(session('success'))
+        <div class="max-w-7xl mx-auto px-4 pt-4">
+            <div class="px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">{{ session('success') }}</div>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="max-w-7xl mx-auto px-4 pt-4">
+            <div class="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{{ session('error') }}</div>
+        </div>
+    @endif
+    @if(session('info'))
+        <div class="max-w-7xl mx-auto px-4 pt-4">
+            <div class="px-4 py-3 bg-blue-100 border border-blue-300 rounded-lg text-blue-700 text-sm">{{ session('info') }}</div>
+        </div>
+    @endif
     @yield('content')
 </main>
 

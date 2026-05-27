@@ -70,14 +70,24 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Enrollment
+    // Checkout & Enrollment
+    Route::get('/courses/{course}/checkout', function ($courseId) {
+        $course = \App\Models\Course::where('status', 'Active')->findOrFail($courseId);
+        $isEnrolled = \App\Models\Enrollment::where('user_id', auth()->id())
+            ->where('course_id', $course->id)->exists();
+        return view('courses.checkout', compact('course', 'isEnrolled'));
+    });
     Route::post('/enroll/{courseId}', function ($courseId) {
         $course = \App\Models\Course::where('status', 'Active')->findOrFail($courseId);
+        $isEnrolled = \App\Models\Enrollment::where('user_id', auth()->id())
+            ->where('course_id', $course->id)->exists();
+        if ($isEnrolled) {
+            return redirect('/courses/' . $course->id)->with('info', 'You are already enrolled in this course.');
+        }
         $amountPaid = $course->payment_type === 'free' ? 0 : ($course->sale_price ?? $course->price);
-        \App\Models\Enrollment::firstOrCreate([
+        \App\Models\Enrollment::create([
             'user_id' => auth()->id(),
             'course_id' => $course->id,
-        ], [
             'amount_paid' => $amountPaid,
             'status' => 'in_progress',
         ]);

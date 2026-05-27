@@ -217,12 +217,18 @@
                         </div>
                     </div>
                     @auth
-                    <form method="POST" action="/enroll/{{ $course->id }}" class="w-full">
-                        @csrf
-                        <button type="submit" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block">
+                    @php
+                        $isEnrolled = \App\Models\Enrollment::where('user_id', auth()->id())->where('course_id', $course->id)->exists();
+                    @endphp
+                    @if($isEnrolled)
+                        <a href="/dashboard/my-enrolled-course" class="w-full px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block">
+                            Go to Course
+                        </a>
+                    @else
+                        <a href="/courses/{{ $course->id }}/checkout" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block">
                             Enroll Now
-                        </button>
-                    </form>
+                        </a>
+                    @endif
                     @else
                     <a href="/login" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block">
                         Login to Enroll
