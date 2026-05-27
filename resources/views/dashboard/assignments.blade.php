@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 @section('title', 'My Assignments')
-@section('page-title', 'Assignment')
+@section('page-title', 'Assignments')
 @section('user-name', 'Student')
 @section('sidebar')@include('components.student-sidebar')@stop
 @section('content')
@@ -12,21 +12,23 @@
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Assignment</th>
                 <th class="text-left py-4 px-6 font-semibold">Course</th>
-                <th class="text-left py-4 px-6 font-semibold">Deadline</th>
+                <th class="text-left py-4 px-6 font-semibold">Score</th>
                 <th class="text-left py-4 px-6 font-semibold">Status</th>
-                <th class="text-right py-4 px-6 font-semibold">Action</th>
+                <th class="text-left py-4 px-6 font-semibold">Submitted</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=4;$i++)
+                @forelse($submissions as $i=>$s)
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">Project Milestone {{ $i }}</td>
-                    <td class="py-4 px-6 text-heading/70">Full-Stack Web Development</td>
-                    <td class="py-4 px-6 text-heading/70">2024-12-{{ str_pad(10+$i,2,'0',STR_PAD_LEFT) }}</td>
-                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $i <= 2 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ $i <= 2 ? 'Submitted' : 'Pending' }}</span></td>
-                    <td class="py-4 px-6 text-right"><a href="#" class="text-primary text-sm font-semibold hover:underline">View</a></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $s->assignment?->title ?? 'Assignment' }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $s->assignment?->course?->title ?? 'Course' }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $s->score !== null ? $s->score . '/' . $s->assignment?->total_marks : '--' }}</td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $s->status=='graded' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ ucfirst($s->status) }}</span></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $s->submitted_at->format('Y-m-d') }}</td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="6" class="py-8 text-center text-heading/50 text-sm">No submissions yet.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

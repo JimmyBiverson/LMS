@@ -69,4 +69,11 @@
         </div>
     </div>
 </div>
+<div class="mt-6 bg-white rounded-xl shadow-sm p-6">
+    <h3 class="font-bold text-heading mb-3">Course Tools</h3>
+    <div class="flex gap-3">
+        <a href="/instructor/courses/{{ $course->id }}/quizzes" class="px-4 py-2 bg-primary-50 text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-all text-sm">Manage Quizzes</a>
+        <a href="/instructor/courses/{{ $course->id }}/assignments" class="px-4 py-2 bg-secondary/20 text-secondary font-semibold rounded-lg hover:bg-secondary hover:text-white transition-all text-sm">Manage Assignments</a>
+    </div>
+</div>
 @endsection

@@ -58,12 +58,19 @@ class CourseController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'price' => ['nullable', 'numeric', 'min:0'],
+            'payment_type' => ['required', 'in:free,paid'],
+            'price' => ['required_if:payment_type,paid', 'numeric', 'min:0'],
+            'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'instructor_id' => ['nullable', 'exists:users,id'],
             'status' => ['required', 'string', 'in:Active,Draft'],
         ]);
 
         $validated['user_id'] = auth()->id();
+
+        if ($validated['payment_type'] === 'free') {
+            $validated['price'] = 0;
+            $validated['sale_price'] = null;
+        }
 
         $course = Course::create($validated);
 
@@ -88,10 +95,17 @@ class CourseController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'price' => ['nullable', 'numeric', 'min:0'],
+            'payment_type' => ['required', 'in:free,paid'],
+            'price' => ['required_if:payment_type,paid', 'numeric', 'min:0'],
+            'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'instructor_id' => ['nullable', 'exists:users,id'],
             'status' => ['required', 'string', 'in:Active,Draft'],
         ]);
+
+        if ($validated['payment_type'] === 'free') {
+            $validated['price'] = 0;
+            $validated['sale_price'] = null;
+        }
 
         $course->update($validated);
 

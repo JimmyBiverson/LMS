@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminCrudController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Instructor\CourseController as InstructorCourseController;
 use App\Http\Controllers\Organization\CourseController as OrgCourseController;
+use App\Http\Controllers\QuizController;
 use App\Http\Controllers\SupportTicketController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -12,10 +15,15 @@ use Illuminate\Support\Facades\Route;
 // Public Routes
 Route::get('/', function () {
     $courses = \App\Models\Course::with('lessons')->where('status', 'Active')->latest()->take(8)->get();
-    return view('home', compact('courses'));
+    $categories = \App\Models\Category::withCount('courses')->where('status', 'active')->latest()->take(4)->get();
+    $testimonials = \App\Models\Testimonial::where('status', 'active')->latest()->take(3)->get();
+    return view('home', compact('courses', 'categories', 'testimonials'));
 });
 Route::get('/courses', function () {
-    $courses = \App\Models\Course::with('lessons')->where('status', 'Active')->latest()->get();
+    $query = \App\Models\Course::with('lessons')->where('status', 'Active');
+    if (request('type') === 'free') $query->where('payment_type', 'free');
+    if (request('type') === 'paid') $query->where('payment_type', 'paid');
+    $courses = $query->latest()->get();
     return view('courses.index', compact('courses'));
 });
 Route::get('/courses/{slug}', function ($slug) {
@@ -24,8 +32,14 @@ Route::get('/courses/{slug}', function ($slug) {
 });
 Route::get('/instructors', fn() => view('instructors.index'));
 Route::get('/organizations', fn() => view('organizations.index'));
-Route::get('/blogs', fn() => view('blogs.index'));
-Route::get('/blogs/{slug}', fn() => view('blogs.show'));
+Route::get('/blogs', function () {
+    $blogs = \App\Models\Blog::with('category', 'author')->where('status', 'published')->latest()->get();
+    return view('blogs.index', compact('blogs'));
+});
+Route::get('/blogs/{slug}', function ($slug) {
+    $blog = \App\Models\Blog::with('category', 'author')->where('slug', $slug)->where('status', 'published')->firstOrFail();
+    return view('blogs.show', compact('blog'));
+});
 Route::get('/bundles', fn() => view('bundles.index'));
 Route::get('/bundles/{slug}', fn() => view('bundles.show'));
 Route::get('/about-us', fn() => view('about'));
@@ -59,10 +73,11 @@ Route::middleware('auth')->group(function () {
     // Enrollment
     Route::post('/enroll/{courseId}', function ($courseId) {
         $course = \App\Models\Course::findOrFail($courseId);
+        $amountPaid = $course->payment_type === 'free' ? 0 : ($course->sale_price ?? $course->price);
         \App\Models\Enrollment::firstOrCreate([
             'user_id' => auth()->id(),
             'course_id' => $course->id,
-        ], ['amount_paid' => $course->price]);
+        ], ['amount_paid' => $amountPaid]);
         return redirect('/courses/' . $course->id)->with('success', 'Enrolled successfully!');
     });
 
@@ -74,12 +89,29 @@ Route::middleware('auth')->group(function () {
 
     // Student Dashboard
     Route::middleware('role:' . User::ROLE_STUDENT)->prefix('dashboard')->name('dashboard')->group(function () {
-        Route::get('/', fn() => view('dashboard.index'));
-        Route::get('/my-enrolled-course', fn() => view('dashboard.my-enrolled-course'));
+        Route::get('/', function () {
+            $enrollments = \App\Models\Enrollment::with('course.instructor')->where('user_id', auth()->id())->latest()->get();
+            $totalEnrolled = $enrollments->count();
+            $inProgress = $enrollments->where('status', 'in_progress')->count();
+            $completed = $enrollments->where('status', 'completed')->count();
+            $latest = $enrollments->take(4);
+            return view('dashboard.index', compact('enrollments', 'totalEnrolled', 'inProgress', 'completed', 'latest'));
+        });
+        Route::get('/my-enrolled-course', function () {
+            $enrollments = \App\Models\Enrollment::with('course.instructor')->where('user_id', auth()->id())->latest()->get();
+            return view('dashboard.my-enrolled-course', compact('enrollments'));
+        });
         Route::get('/purchase-course', fn() => view('dashboard.purchase-course'));
         Route::get('/bundle-course', fn() => view('dashboard.bundle-course'));
-        Route::get('/certificate', fn() => view('dashboard.certificate'));
-        Route::get('/quizzes/my-result', fn() => view('dashboard.quizzes.my-result'));
+        Route::get('/certificate', function () {
+            $certificates = \App\Models\Certificate::with('course')->latest()->get();
+            return view('dashboard.certificate', compact('certificates'));
+        });
+        Route::get('/quizzes/my-result', [QuizController::class, 'myResults']);
+        Route::get('/quizzes/{quiz}/take', [QuizController::class, 'take']);
+        Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit']);
+        Route::get('/assignments/{assignment}/submit', [AssignmentController::class, 'submitForm']);
+        Route::post('/assignments/{assignment}/submit', [AssignmentController::class, 'submit']);
         Route::get('/assignments', fn() => view('dashboard.assignments'));
         Route::get('/course-review', fn() => view('dashboard.course-review'));
         Route::get('/offline-payment', fn() => view('dashboard.offline-payment'));
@@ -93,7 +125,11 @@ Route::middleware('auth')->group(function () {
 
     // Instructor Dashboard
     Route::middleware('role:' . User::ROLE_INSTRUCTOR)->prefix('instructor')->name('instructor.dashboard.')->group(function () {
-        Route::get('/', fn() => view('instructor.index'));
+        Route::get('/', function () {
+            $courses = \App\Models\Course::withCount('enrollments')->where('user_id', auth()->id())->latest()->get();
+            $totalStudents = \App\Models\Enrollment::whereIn('course_id', $courses->pluck('id'))->count();
+            return view('instructor.index', compact('courses', 'totalStudents'));
+        });
         Route::get('/courses', [InstructorCourseController::class, 'index']);
         Route::match(['GET', 'POST'], '/courses/create', [InstructorCourseController::class, 'create']);
         Route::post('/courses', [InstructorCourseController::class, 'store']);
@@ -102,6 +138,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/courses/{id}/lessons', [InstructorCourseController::class, 'lessons'])->name('courses.lessons');
         Route::post('/courses/{id}/lessons', [InstructorCourseController::class, 'storeLesson']);
         Route::post('/courses/{courseId}/lessons/{lessonId}/delete', [InstructorCourseController::class, 'destroyLesson'])->name('courses.lessons.delete');
+        Route::get('/courses/{course}/quizzes', [QuizController::class, 'index'])->name('courses.quizzes');
+        Route::match(['GET', 'POST'], '/courses/{course}/quizzes/create', [QuizController::class, 'create']);
+        Route::post('/courses/{course}/quizzes', [QuizController::class, 'store']);
+        Route::get('/quizzes/{quiz}/edit', [QuizController::class, 'edit'])->name('quizzes.edit');
+        Route::post('/quizzes/{quiz}', [QuizController::class, 'update']);
+        Route::post('/quizzes/{quiz}/delete', [QuizController::class, 'destroy']);
+        Route::post('/quizzes/{quiz}/questions', [QuizController::class, 'storeQuestion']);
+        Route::post('/quizzes/questions/{question}/delete', [QuizController::class, 'destroyQuestion']);
+        Route::get('/courses/{course}/assignments', [AssignmentController::class, 'index'])->name('courses.assignments');
+        Route::match(['GET', 'POST'], '/courses/{course}/assignments/create', [AssignmentController::class, 'create']);
+        Route::post('/courses/{course}/assignments', [AssignmentController::class, 'store']);
+        Route::get('/assignments/{assignment}/edit', [AssignmentController::class, 'edit'])->name('assignments.edit');
+        Route::post('/assignments/{assignment}', [AssignmentController::class, 'update']);
+        Route::post('/assignments/{assignment}/delete', [AssignmentController::class, 'destroy']);
+        Route::get('/assignments/{assignment}', [AssignmentController::class, 'show'])->name('assignments.show');
+        Route::post('/submissions/{submission}/grade', [AssignmentController::class, 'grade']);
         Route::get('/earnings', fn() => view('instructor.earnings'));
         Route::get('/students', fn() => view('instructor.students'));
         Route::get('/reviews', fn() => view('instructor.reviews'));
@@ -115,7 +167,11 @@ Route::middleware('auth')->group(function () {
 
     // Organization Dashboard
     Route::middleware('role:' . User::ROLE_ORGANIZATION)->prefix('org')->name('org.dashboard.')->group(function () {
-        Route::get('/', fn() => view('org.index'));
+        Route::get('/', function () {
+            $courses = \App\Models\Course::withCount('enrollments')->where('user_id', auth()->id())->latest()->get();
+            $totalStudents = \App\Models\Enrollment::whereIn('course_id', $courses->pluck('id'))->count();
+            return view('org.index', compact('courses', 'totalStudents'));
+        });
         Route::get('/courses', [OrgCourseController::class, 'index']);
         Route::match(['GET', 'POST'], '/courses/create', [OrgCourseController::class, 'create']);
         Route::post('/courses', [OrgCourseController::class, 'store']);
@@ -141,32 +197,70 @@ Route::middleware('auth')->group(function () {
 
     // Admin Dashboard
     Route::middleware('role:' . User::ROLE_ADMIN)->prefix('admin')->name('admin.dashboard.')->group(function () {
-        Route::get('/', fn() => view('admin.index'));
-        Route::get('/course', fn() => view('admin.course.index'));
+        Route::get('/', function () {
+            $totalStudents = \App\Models\User::where('role', 'student')->count();
+            $totalCourses = \App\Models\Course::count();
+            $totalInstructors = \App\Models\User::where('role', 'instructor')->count();
+            $totalEnrollments = \App\Models\Enrollment::count();
+            return view('admin.index', compact('totalStudents', 'totalCourses', 'totalInstructors', 'totalEnrollments'));
+        });
+        Route::get('/course', function () {
+            $courses = \App\Models\Course::with('instructor')->withCount('enrollments')->latest()->get();
+            return view('admin.course.index', compact('courses'));
+        });
         Route::get('/course/bundle', fn() => view('admin.course.bundle'));
         Route::get('/course/level', fn() => view('admin.course.level'));
         Route::get('/course/tag', fn() => view('admin.course.tag'));
-        Route::get('/category', fn() => view('admin.category'));
-        Route::get('/subject', fn() => view('admin.subject'));
-        Route::get('/instructors', fn() => view('admin.instructors'));
-        Route::get('/students', fn() => view('admin.students'));
-        Route::get('/organizations', fn() => view('admin.organizations'));
+            Route::get('/category', [AdminCrudController::class, 'categories']);
+        Route::post('/category', [AdminCrudController::class, 'storeCategory']);
+        Route::post('/category/{category}', [AdminCrudController::class, 'updateCategory']);
+        Route::post('/category/{category}/delete', [AdminCrudController::class, 'destroyCategory']);
+        Route::get('/subject', [AdminCrudController::class, 'subjects']);
+        Route::post('/subject', [AdminCrudController::class, 'storeSubject']);
+        Route::post('/subject/{subject}', [AdminCrudController::class, 'updateSubject']);
+        Route::post('/subject/{subject}/delete', [AdminCrudController::class, 'destroySubject']);
+        Route::get('/instructors', [AdminCrudController::class, 'instructors']);
+        Route::get('/students', [AdminCrudController::class, 'students']);
+        Route::get('/organizations', [AdminCrudController::class, 'organizations']);
         Route::get('/staff', fn() => view('admin.staff'));
-        Route::get('/blog', fn() => view('admin.blog.index'));
-        Route::get('/blog/category', fn() => view('admin.blog.category'));
-        Route::get('/faq', fn() => view('admin.faq'));
-        Route::get('/page', fn() => view('admin.page'));
-        Route::get('/slider', fn() => view('admin.slider'));
-        Route::get('/hero', fn() => view('admin.hero'));
-        Route::get('/testimonial', fn() => view('admin.testimonial'));
-        Route::get('/contact', fn() => view('admin.contact'));
+        Route::get('/blog', [AdminCrudController::class, 'blogs']);
+        Route::post('/blog', [AdminCrudController::class, 'storeBlog']);
+        Route::post('/blog/{blog}', [AdminCrudController::class, 'updateBlog']);
+        Route::post('/blog/{blog}/delete', [AdminCrudController::class, 'destroyBlog']);
+        Route::get('/blog/category', [AdminCrudController::class, 'blogCategories']);
+        Route::post('/blog/category', [AdminCrudController::class, 'storeBlogCategory']);
+        Route::post('/blog/category/{blogCategory}', [AdminCrudController::class, 'updateBlogCategory']);
+        Route::post('/blog/category/{blogCategory}/delete', [AdminCrudController::class, 'destroyBlogCategory']);
+        Route::get('/faq', [AdminCrudController::class, 'faqs']);
+        Route::post('/faq', [AdminCrudController::class, 'storeFaq']);
+        Route::post('/faq/{faq}', [AdminCrudController::class, 'updateFaq']);
+        Route::post('/faq/{faq}/delete', [AdminCrudController::class, 'destroyFaq']);
+        Route::get('/page', [AdminCrudController::class, 'pages']);
+        Route::post('/page', [AdminCrudController::class, 'storePage']);
+        Route::post('/page/{page}', [AdminCrudController::class, 'updatePage']);
+        Route::post('/page/{page}/delete', [AdminCrudController::class, 'destroyPage']);
+        Route::get('/slider', [AdminCrudController::class, 'sliders']);
+        Route::post('/slider', [AdminCrudController::class, 'storeSlider']);
+        Route::post('/slider/{slider}', [AdminCrudController::class, 'updateSlider']);
+        Route::post('/slider/{slider}/delete', [AdminCrudController::class, 'destroySlider']);
+        Route::get('/hero', [AdminCrudController::class, 'heros']);
+        Route::post('/hero', [AdminCrudController::class, 'storeHero']);
+        Route::post('/hero/{heroSection}', [AdminCrudController::class, 'updateHero']);
+        Route::post('/hero/{heroSection}/delete', [AdminCrudController::class, 'destroyHero']);
+        Route::get('/testimonial', [AdminCrudController::class, 'testimonials']);
+        Route::post('/testimonial', [AdminCrudController::class, 'storeTestimonial']);
+        Route::post('/testimonial/{testimonial}', [AdminCrudController::class, 'updateTestimonial']);
+        Route::post('/testimonial/{testimonial}/delete', [AdminCrudController::class, 'destroyTestimonial']);
+        Route::get('/contact', [AdminCrudController::class, 'contactMessages']);
+        Route::post('/contact/{contactMessage}/read', [AdminCrudController::class, 'markAsRead']);
         Route::get('/payment-method', fn() => view('admin.payment-method'));
         Route::get('/financial/sale', fn() => view('admin.financial.sale'));
         Route::get('/financial/offline', fn() => view('admin.financial.offline'));
         Route::get('/financial/payout-request', fn() => view('admin.financial.payout-request'));
+        Route::get('/certificate', [AdminCrudController::class, 'certificates']);
         Route::get('/certificate/create', [AdminController::class, 'certificateCreate'])->name('certificate.create');
-        Route::post('/certificate', [AdminController::class, 'storeCertificate']);
-        Route::get('/enrollment/all', fn() => view('admin.enrollment.all'));
+        Route::post('/certificate', [AdminController::class, 'storeCertificate'])->name('certificate.store');
+        Route::get('/enrollment/all', [AdminCrudController::class, 'allEnrollments']);
         Route::get('/enrollment/new-create', [AdminController::class, 'newEnrollment'])->name('enrollment.new-create');
         Route::post('/enrollment', [AdminController::class, 'storeEnrollment']);
         Route::get('/marketing/coupon', fn() => view('admin.marketing.coupon'));

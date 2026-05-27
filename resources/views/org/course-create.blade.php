@@ -22,8 +22,33 @@
                 <div><label class="block text-sm font-semibold text-heading mb-1">Category *</label><select name="category" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"><option value="">Select category</option><option value="Development" @selected(old('category') === 'Development')>Development</option><option value="Design" @selected(old('category') === 'Design')>Design</option><option value="Business" @selected(old('category') === 'Business')>Business</option></select></div>
             </div>
             <div><label class="block text-sm font-semibold text-heading mb-1">Description</label><textarea name="description" rows="5" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">{{ old('description') }}</textarea></div>
+            <div x-data="{ type: '{{ old('payment_type', 'free') }}' }">
+                <label class="block text-sm font-semibold text-heading mb-2">Payment Type</label>
+                <div class="flex gap-6 mb-4">
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="radio" name="payment_type" value="free" x-model="type" class="w-4 h-4 text-primary focus:ring-primary">
+                        <span class="text-sm font-semibold text-heading">Free</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="radio" name="payment_type" value="paid" x-model="type" class="w-4 h-4 text-primary focus:ring-primary">
+                        <span class="text-sm font-semibold text-heading">Paid</span>
+                    </label>
+                </div>
+                <div x-show="type === 'paid'" x-transition.duration.200ms class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-heading mb-1">Price *</label>
+                        <input name="price" type="number" step="0.01" value="{{ old('price') }}"
+                               :required="type === 'paid'"
+                               class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-heading mb-1">Sale Price <span class="text-heading/40 font-normal">(optional)</span></label>
+                        <input name="sale_price" type="number" step="0.01" value="{{ old('sale_price') }}"
+                               class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary" placeholder="Discounted price">
+                    </div>
+                </div>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div><label class="block text-sm font-semibold text-heading mb-1">Price</label><input name="price" type="number" step="0.01" value="{{ old('price') }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary" placeholder="0.00"></div>
                 <div><label class="block text-sm font-semibold text-heading mb-1">Instructor</label><select name="instructor_id" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"><option value="">Select Instructor</option>@isset($instructors)@foreach($instructors as $instructor)<option value="{{ $instructor->id }}" @selected(old('instructor_id') == $instructor->id)>{{ $instructor->name }}</option>@endforeach@endisset</select></div>
                 <div><label class="block text-sm font-semibold text-heading mb-1">Status</label><select name="status" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"><option value="Draft" @selected(old('status', 'Draft') === 'Draft')>Draft</option><option value="Active" @selected(old('status') === 'Active')>Active</option></select></div>
             </div>

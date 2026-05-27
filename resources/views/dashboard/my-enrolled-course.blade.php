@@ -18,24 +18,24 @@
                 <th class="text-right py-4 px-6 font-semibold">Action</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=8;$i++)
+                @forelse($enrollments as $i=>$e)
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">Full-Stack Web Development Bootcamp</td>
-                    <td class="py-4 px-6 text-heading/70">Robert Smith</td>
-                    <td class="py-4 px-6 text-heading/70">{{ $i % 2 == 0 ? '$25.50' : 'Free' }}</td>
-                    <td class="py-4 px-6"><div class="flex items-center gap-2"><div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="h-full bg-primary rounded-full" style="width:{{ $i * 12 }}%"></div></div><span class="text-xs text-heading/60">{{ $i * 12 }}%</span></div></td>
-                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $i <= 5 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ $i <= 5 ? 'Completed' : 'In Progress' }}</span></td>
-                    <td class="py-4 px-6 text-right"><a href="/courses/full-stack-bootcamp" class="text-primary text-sm font-semibold hover:underline">View</a></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $e->course?->title ?? 'Deleted Course' }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $e->course?->instructor?->name ?? 'N/A' }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $e->amount_paid > 0 ? '$'.number_format($e->amount_paid,2) : 'Free' }}</td>
+                    <td class="py-4 px-6"><div class="flex items-center gap-2"><div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="h-full bg-primary rounded-full" style="width:{{ $e->completed_at ? '100' : '30' }}%"></div></div><span class="text-xs text-heading/60">{{ $e->completed_at ? '100' : '30' }}%</span></div></td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $e->status=='completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ ucfirst(str_replace('_',' ',$e->status ?? 'in_progress')) }}</span></td>
+                    <td class="py-4 px-6 text-right"><a href="/courses/{{ $e->course_id }}" class="text-primary text-sm font-semibold hover:underline">View</a></td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="7" class="py-8 text-center text-heading/50 text-sm">You haven't enrolled in any courses yet. <a href="/courses" class="text-primary font-semibold hover:underline">Browse courses</a></td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>
-    <div class="p-6 flex items-center justify-center gap-2">
-        <span class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">1</span>
-        <a href="#" class="w-10 h-10 rounded-full bg-primary-50 text-heading/70 flex items-center justify-center text-sm font-bold hover:bg-primary hover:text-white transition-all duration-300">2</a>
-        <a href="#" class="w-10 h-10 rounded-full bg-primary-50 text-heading/70 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300"><i class="ri-arrow-right-s-line"></i></a>
-    </div>
+    @if($enrollments->hasPages())
+    <div class="p-6 flex items-center justify-center gap-2">{{ $enrollments->links() }}</div>
+    @endif
 </div>
 @endsection

@@ -59,10 +59,11 @@
             </a>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <x-category-card name="Digital Marketing" courseCount="1" url="/courses?categories=4" icon="ri-megaphone-line" />
-            <x-category-card name="UI/UX Design" courseCount="1" url="/courses?categories=3" icon="ri-pencil-ruler-line" />
-            <x-category-card name="Web Development" courseCount="3" url="/courses?categories=2" icon="ri-code-s-slash-line" />
-            <x-category-card name="Web Development" courseCount="4" url="/courses?categories=1" icon="ri-global-line" />
+            @forelse($categories as $cat)
+            <x-category-card name="{{ $cat->name }}" courseCount="{{ $cat->courses_count }}" url="/courses" icon="ri-bookmark-line" />
+            @empty
+            <x-category-card name="General" courseCount="0" url="/courses" icon="ri-bookmark-line" />
+            @endforelse
         </div>
     </div>
 </section>
@@ -86,7 +87,9 @@
             <x-course-card
                 slug="{{ $course->id }}"
                 category="{{ $course->category ?? 'General' }}"
-                price="{{ $course->price > 0 ? '$' . number_format($course->price, 2) : 'Free' }}"
+                paymentType="{{ $course->payment_type ?? 'free' }}"
+                price="{{ $course->price }}"
+                salePrice="{{ $course->sale_price }}"
                 title="{{ $course->title }}"
                 duration="{{ $course->duration ?? 'N/A' }}"
                 lessons="{{ $course->lessons->count() }}"
@@ -108,57 +111,25 @@
             </h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            @forelse($testimonials as $t)
             <div class="bg-white rounded-xl p-8 shadow-sm">
                 <div class="flex items-center gap-1 text-amber-400 mb-4">
-                    <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i>
+                    @for($s=0;$s<$t->rating;$s++)<i class="ri-star-fill"></i>@endfor
                 </div>
-                <p class="text-heading/70 leading-relaxed mb-6">
-                    The content delivery is seamless, with a mix of videos, quizzes, and assignments that keep things interesting. I also appreciate the interactive features like discussion boards and group activities, which allow me to collaborate with other learners and feel part of a community.
-                </p>
+                <p class="text-heading/70 leading-relaxed mb-6">{{ $t->content }}</p>
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center">
                         <i class="ri-user-smile-line text-primary"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-heading text-sm">Liam Martinez</h4>
-                        <p class="text-xs text-heading/60">Lead Developer</p>
+                        <h4 class="font-bold text-heading text-sm">{{ $t->name }}</h4>
+                        <p class="text-xs text-heading/60">{{ $t->position ?? 'Student' }}</p>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl p-8 shadow-sm">
-                <div class="flex items-center gap-1 text-amber-400 mb-4">
-                    <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i>
-                </div>
-                <p class="text-heading/70 leading-relaxed mb-6">
-                    One of the things I love most about this how flexible it is. I can access my courses anytime and on any device, which fits perfectly into my busy schedule. Whether I'm at home or on the go, I never miss an opportunity to learn.
-                </p>
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center">
-                        <i class="ri-user-smile-line text-primary"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-heading text-sm">Emma Johnson</h4>
-                        <p class="text-xs text-heading/60">Senior Product Manager</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl p-8 shadow-sm">
-                <div class="flex items-center gap-1 text-amber-400 mb-4">
-                    <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i>
-                </div>
-                <p class="text-heading/70 leading-relaxed mb-6">
-                    One of the things I love most about this how flexible it is. I can access my courses anytime and on any device, which fits perfectly into my busy schedule. Whether I'm at home or on the go, I never miss an opportunity to learn.
-                </p>
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center">
-                        <i class="ri-user-smile-line text-primary"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-heading text-sm">Sophia Patel</h4>
-                        <p class="text-xs text-heading/60">Marketing Specialist</p>
-                    </div>
-                </div>
-            </div>
+            @empty
+            <div class="col-span-full text-center py-12 text-heading/40">No testimonials available yet.</div>
+            @endforelse
         </div>
     </div>
 </section>
@@ -206,7 +177,9 @@
             <x-course-card
                 slug="{{ $course->id }}"
                 category="{{ $course->category ?? 'General' }}"
-                price="{{ $course->price > 0 ? '$' . number_format($course->price, 2) : 'Free' }}"
+                paymentType="{{ $course->payment_type ?? 'free' }}"
+                price="{{ $course->price }}"
+                salePrice="{{ $course->sale_price }}"
                 title="{{ $course->title }}"
                 duration="{{ $course->duration ?? 'N/A' }}"
                 lessons="{{ $course->lessons->count() }}"

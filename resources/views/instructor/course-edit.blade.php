@@ -28,8 +28,33 @@
                 </div>
             </div>
             <div><label class="block text-sm font-semibold text-heading mb-1">Description *</label><textarea name="description" rows="5" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">{{ old('description', $course->description) }}</textarea></div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div><label class="block text-sm font-semibold text-heading mb-1">Price *</label><input name="price" type="number" step="0.01" value="{{ old('price', $course->price) }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
+            <div x-data="{ type: '{{ old('payment_type', $course->payment_type ?? 'free') }}' }">
+                <label class="block text-sm font-semibold text-heading mb-2">Payment Type</label>
+                <div class="flex gap-6 mb-4">
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="radio" name="payment_type" value="free" x-model="type" class="w-4 h-4 text-primary focus:ring-primary">
+                        <span class="text-sm font-semibold text-heading">Free</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="radio" name="payment_type" value="paid" x-model="type" class="w-4 h-4 text-primary focus:ring-primary">
+                        <span class="text-sm font-semibold text-heading">Paid</span>
+                    </label>
+                </div>
+                <div x-show="type === 'paid'" x-transition.duration.200ms class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-heading mb-1">Price *</label>
+                        <input name="price" type="number" step="0.01" value="{{ old('price', $course->price) }}"
+                               :required="type === 'paid'"
+                               class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-heading mb-1">Sale Price <span class="text-heading/40 font-normal">(optional)</span></label>
+                        <input name="sale_price" type="number" step="0.01" value="{{ old('sale_price', $course->sale_price) }}"
+                               class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary" placeholder="Discounted price">
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div><label class="block text-sm font-semibold text-heading mb-1">Duration</label><input name="duration" type="text" value="{{ old('duration', $course->duration) }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary" placeholder="e.g. 12 hours"></div>
                 <div><label class="block text-sm font-semibold text-heading mb-1">Status</label>
                     <select name="status" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">

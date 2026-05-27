@@ -2,7 +2,9 @@
     'slug' => '#',
     'level' => 'Intermediate',
     'category' => 'Web Development',
-    'price' => 'Free',
+    'paymentType' => 'free',
+    'price' => 0,
+    'salePrice' => null,
     'title' => 'Course Title',
     'rating' => '0',
     'duration' => '0h',
@@ -10,6 +12,11 @@
     'students' => '0',
     'image' => null,
 ])
+
+@php
+    $isFree = $paymentType === 'free';
+    $hasSale = !$isFree && !is_null($salePrice) && $salePrice < $price;
+@endphp
 
 <div class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
     <div class="relative overflow-hidden">
@@ -19,12 +26,24 @@
         <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold bg-secondary text-heading">
             {{ $level }}
         </span>
+        @if($isFree)
+            <span class="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold bg-green-500 text-white">FREE</span>
+        @elseif($hasSale)
+            <span class="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold bg-red-500 text-white">SALE</span>
+        @endif
     </div>
     <div class="p-5">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-primary">{{ $category }}</span>
-            <span class="text-sm font-bold {{ $price == 'Free' ? 'text-green-600' : 'text-heading' }}">
-                {{ $price == 'Free' ? 'Free' : '$'.$price }}
+            <span class="text-sm font-bold {{ $isFree ? 'text-green-600' : 'text-heading' }}">
+                @if($isFree)
+                    Free
+                @elseif($hasSale)
+                    <span class="text-heading/40 line-through text-xs mr-1">${{ number_format($price, 2) }}</span>
+                    ${{ number_format($salePrice, 2) }}
+                @else
+                    ${{ number_format($price, 2) }}
+                @endif
             </span>
         </div>
         <h3 class="font-bold text-heading mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-300">

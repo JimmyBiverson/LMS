@@ -28,13 +28,20 @@ class CourseController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
+            'payment_type' => ['required', 'in:free,paid'],
+            'price' => ['required_if:payment_type,paid', 'numeric', 'min:0'],
+            'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'duration' => ['nullable', 'string', 'max:255'],
             'status' => ['required', 'string', 'in:Active,Draft,Pending'],
             'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         $validated['user_id'] = auth()->id();
+
+        if ($validated['payment_type'] === 'free') {
+            $validated['price'] = 0;
+            $validated['sale_price'] = null;
+        }
 
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
@@ -60,11 +67,18 @@ class CourseController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
+            'payment_type' => ['required', 'in:free,paid'],
+            'price' => ['required_if:payment_type,paid', 'numeric', 'min:0'],
+            'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'duration' => ['nullable', 'string', 'max:255'],
             'status' => ['required', 'string', 'in:Active,Draft,Pending'],
             'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
+
+        if ($validated['payment_type'] === 'free') {
+            $validated['price'] = 0;
+            $validated['sale_price'] = null;
+        }
 
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');

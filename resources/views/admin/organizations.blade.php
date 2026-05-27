@@ -12,14 +12,21 @@
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Name</th>
                 <th class="text-left py-4 px-6 font-semibold">Email</th>
-                <th class="text-left py-4 px-6 font-semibold">Instructors</th>
-                <th class="text-left py-4 px-6 font-semibold">Students</th>
+                <th class="text-left py-4 px-6 font-semibold">Phone</th>
                 <th class="text-left py-4 px-6 font-semibold">Status</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=4;$i++)
-                <tr class="hover:bg-gray-50"><td class="py-4 px-6 text-heading/70">{{ $i }}</td><td class="py-4 px-6 font-semibold text-heading">Organization {{ $i }}</td><td class="py-4 px-6 text-heading/70">org{{ $i }}@mail.com</td><td class="py-4 px-6 text-heading/70">{{ 2+$i }}</td><td class="py-4 px-6 text-heading/70">{{ 50+$i*20 }}</td><td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Active</span></td></tr>
-                @endfor
+                @forelse($users as $i=>$u)
+                <tr class="hover:bg-gray-50">
+                    <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $u->full_name }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $u->email }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $u->phone ?? '--' }}</td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $u->status=='active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">{{ ucfirst($u->status) }}</span></td>
+                </tr>
+                @empty
+                <tr><td colspan="5" class="py-8 text-center text-heading/50 text-sm">No organizations found.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

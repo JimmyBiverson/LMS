@@ -17,10 +17,11 @@
 <section class="py-12 lg:py-16">
     <div class="max-w-7xl mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <x-blog-card slug="the-importance-of-programming-in-our-everyday-lives" category="Programming Languages" author="Admin" date="05 Dec 2024" title="How Kindergarten Shapes Future Achievements" />
-            <x-blog-card slug="how-kindergarten-shapes-future-achievements" category="Design of Art" author="Admin" date="04 Dec 2024" title="How Kindergarten Shapes Future Achievements" />
-            <x-blog-card slug="the-power-of-lifelong-learning-never-stop-growing" category="Design of Art" author="Admin" date="27 Nov 2024" title="The Power of Lifelong Learning, Never Stop Growing" />
-            <x-blog-card slug="top-10-courses-to-boost-your-best-career-in-2025" category="Design of Art" author="Admin" date="27 Nov 2024" title="Top 10 Courses to Boost Your Best Career in 2025" />
+            @forelse($blogs as $b)
+            <x-blog-card slug="{{ $b->slug }}" category="{{ $b->category?->name ?? 'General' }}" author="{{ $b->author?->name ?? 'Admin' }}" date="{{ $b->created_at->format('d M Y') }}" title="{{ $b->title }}" />
+            @empty
+            <div class="col-span-full text-center py-12 text-heading/40">No blog posts yet.</div>
+            @endforelse
         </div>
     </div>
 </section>

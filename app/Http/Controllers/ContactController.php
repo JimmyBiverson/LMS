@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ContactMessage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -17,8 +18,7 @@ class ContactController extends Controller
             'message' => ['required', 'string'],
         ]);
 
-        $data = "Contact Inquiry\nName: {$validated['name']}\nEmail: {$validated['email']}\nPhone: {$validated['phone']}\nSubject: {$validated['subject']}\nMessage: {$validated['message']}";
-        logger($data);
+        ContactMessage::create(array_merge($validated, ['type' => 'contact']));
 
         return redirect()->route('contact')
             ->with('success', 'Your message has been sent successfully! We will get back to you soon.');
@@ -34,8 +34,7 @@ class ContactController extends Controller
             'message' => ['required', 'string'],
         ]);
 
-        $data = "Instructor Contact\nName: {$validated['name']}\nEmail: {$validated['email']}\nPhone: {$validated['phone']}\nSubject: {$validated['subject']}\nMessage: {$validated['message']}";
-        logger($data);
+        ContactMessage::create(array_merge($validated, ['type' => 'instructor_contact']));
 
         return back()->with('success', 'Your message has been sent to the instructor successfully!');
     }

@@ -15,14 +15,16 @@
                 <th class="text-right py-4 px-6 font-semibold">Action</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=2;$i++)
+                @forelse($certificates as $i=>$c)
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">Full-Stack Web Development Bootcamp</td>
-                    <td class="py-4 px-6 text-heading/70">2024-12-0{{ $i }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $c->course?->title ?? $c->title }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $c->created_at->format('Y-m-d') }}</td>
                     <td class="py-4 px-6 text-right"><a href="#" class="inline-flex items-center gap-1 px-4 py-2 bg-primary text-white text-xs font-bold rounded-full hover:opacity-90 transition-all duration-300"><i class="ri-download-line"></i> Download</a></td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="4" class="py-8 text-center text-heading/50 text-sm">You haven't earned any certificates yet. Complete a course to get one.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

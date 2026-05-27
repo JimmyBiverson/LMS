@@ -12,14 +12,21 @@
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Student</th>
                 <th class="text-left py-4 px-6 font-semibold">Course</th>
-                <th class="text-left py-4 px-6 font-semibold">Price</th>
-                <th class="text-left py-4 px-6 font-semibold">Enrolled</th>
-                <th class="text-left py-4 px-6 font-semibold">Status</th>
+                <th class="text-left py-4 px-6 font-semibold">Amount Paid</th>
+                <th class="text-left py-4 px-6 font-semibold">Enrolled At</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=5;$i++)
-                <tr class="hover:bg-gray-50"><td class="py-4 px-6 text-heading/70">{{ $i }}</td><td class="py-4 px-6 font-semibold text-heading">Student {{ $i }}</td><td class="py-4 px-6 text-heading/70">Course {{ $i }}</td><td class="py-4 px-6 text-heading/70">${{ 29+$i*10 }}</td><td class="py-4 px-6 text-heading/70">2024-12-0{{ $i }}</td><td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Active</span></td></tr>
-                @endfor
+                @forelse($enrollments as $i=>$e)
+                <tr class="hover:bg-gray-50">
+                    <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $e->user?->name ?? 'Deleted User' }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $e->course?->title ?? 'Deleted Course' }}</td>
+                    <td class="py-4 px-6 text-heading/70">${{ number_format($e->amount_paid ?? 0, 2) }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $e->created_at->format('Y-m-d H:i') }}</td>
+                </tr>
+                @empty
+                <tr><td colspan="5" class="py-8 text-center text-heading/50 text-sm">No enrollments found.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

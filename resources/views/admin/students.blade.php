@@ -12,14 +12,23 @@
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Name</th>
                 <th class="text-left py-4 px-6 font-semibold">Email</th>
-                <th class="text-left py-4 px-6 font-semibold">Courses</th>
-                <th class="text-left py-4 px-6 font-semibold">Joined</th>
+                <th class="text-left py-4 px-6 font-semibold">Phone</th>
+                <th class="text-left py-4 px-6 font-semibold">Enrolled Courses</th>
                 <th class="text-left py-4 px-6 font-semibold">Status</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=5;$i++)
-                <tr class="hover:bg-gray-50"><td class="py-4 px-6 text-heading/70">{{ $i }}</td><td class="py-4 px-6 font-semibold text-heading">Student {{ $i }}</td><td class="py-4 px-6 text-heading/70">student{{ $i }}@mail.com</td><td class="py-4 px-6 text-heading/70">{{ 1+$i }}</td><td class="py-4 px-6 text-heading/70">2024-12-0{{ $i }}</td><td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Active</span></td></tr>
-                @endfor
+                @forelse($users as $i=>$u)
+                <tr class="hover:bg-gray-50">
+                    <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $u->full_name }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $u->email }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $u->phone ?? '--' }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $u->enrollments_count ?? 0 }}</td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $u->status=='active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">{{ ucfirst($u->status) }}</span></td>
+                </tr>
+                @empty
+                <tr><td colspan="6" class="py-8 text-center text-heading/50 text-sm">No students found.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>
