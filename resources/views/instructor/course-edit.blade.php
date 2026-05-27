@@ -1,0 +1,47 @@
+@extends('layouts.dashboard')
+@section('title', 'Edit Course')
+@section('page-title', 'Edit Course')
+@section('user-name', 'Instructor')
+@section('sidebar')@include('components.instructor-sidebar')@stop
+@section('content')
+<div class="max-w-4xl">
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <h3 class="font-bold text-heading mb-6">Edit Course</h3>
+        @if (session('success'))
+            <div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm font-semibold">{{ session('success') }}</div>
+        @endif
+        @if ($errors->any())
+            <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+                <ul class="list-disc pl-4 space-y-1">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+            </div>
+        @endif
+        <form method="POST" action="{{ route('instructor.dashboard.courses.edit', $course->id) }}" enctype="multipart/form-data" class="space-y-5">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div><label class="block text-sm font-semibold text-heading mb-1">Course Title *</label><input name="title" type="text" value="{{ old('title', $course->title) }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
+                <div><label class="block text-sm font-semibold text-heading mb-1">Category *</label>
+                    <select name="category" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">
+                        @foreach(['Development','Design','Business','Marketing','Photography','Music','Health & Fitness'] as $cat)
+                            <option value="{{ $cat }}" @selected(old('category', $course->category) === $cat)>{{ $cat }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div><label class="block text-sm font-semibold text-heading mb-1">Description *</label><textarea name="description" rows="5" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">{{ old('description', $course->description) }}</textarea></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div><label class="block text-sm font-semibold text-heading mb-1">Price *</label><input name="price" type="number" step="0.01" value="{{ old('price', $course->price) }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
+                <div><label class="block text-sm font-semibold text-heading mb-1">Duration</label><input name="duration" type="text" value="{{ old('duration', $course->duration) }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary" placeholder="e.g. 12 hours"></div>
+                <div><label class="block text-sm font-semibold text-heading mb-1">Status</label>
+                    <select name="status" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">
+                        @foreach(['Active','Draft','Pending'] as $st)
+                            <option value="{{ $st }}" @selected(old('status', $course->status) === $st)>{{ $st }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div><label class="block text-sm font-semibold text-heading mb-1">Thumbnail</label><input name="thumbnail" type="file" accept="image/*" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm"></div>
+            <button type="submit" class="px-8 py-3 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300">Update Course</button>
+        </form>
+    </div>
+</div>
+@endsection

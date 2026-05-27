@@ -1,0 +1,54 @@
+<a href="/org" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org') && request()->path() == 'org' ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-dashboard-line text-lg"></i><span>Dashboard</span>
+</a>
+<div class="pt-3 mt-3 border-t border-gray-100">
+    <p class="px-3 text-xs font-semibold text-heading/40 uppercase tracking-wider mb-2">Course Manage</p>
+    <a href="/org/course" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/course') && !request()->is('org/course/create') && !request()->is('org/course/bundle') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+        <i class="ri-book-open-line text-lg"></i><span>All Courses</span>
+    </a>
+    <a href="/org/course/bundle" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/course/bundle') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+        <i class="ri-price-tag-3-line text-lg"></i><span>Bundle Course</span>
+    </a>
+    <a href="/org/course/create" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/course/create') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+        <i class="ri-add-circle-line text-lg"></i><span>Create Course</span>
+    </a>
+</div>
+<a href="/org/instructor" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/instructor') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-user-star-line text-lg"></i><span>Instructor</span>
+</a>
+<a href="/org/students" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/students') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-group-line text-lg"></i><span>Students</span>
+</a>
+<div class="pt-3 mt-3 border-t border-gray-100">
+    <p class="px-3 text-xs font-semibold text-heading/40 uppercase tracking-wider mb-2">Financial</p>
+    <a href="/org/financial/sale" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/financial/sale') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+        <i class="ri-funds-line text-lg"></i><span>Sale History</span>
+    </a>
+    <a href="/org/financial/payout" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/financial/payout') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+        <i class="ri-hand-coin-line text-lg"></i><span>Payout</span>
+    </a>
+</div>
+<a href="/org/review/course-review" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/review/*') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-star-line text-lg"></i><span>Review</span>
+</a>
+<div class="pt-3 mt-3 border-t border-gray-100">
+    <p class="px-3 text-xs font-semibold text-heading/40 uppercase tracking-wider mb-2">Support</p>
+    <a href="/org/supports" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/supports') && !request()->is('org/supports/create') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+        <i class="ri-question-answer-line text-lg"></i><span>Tickets</span>
+    </a>
+    <a href="/org/supports/create" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/supports/create') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+        <i class="ri-add-circle-line text-lg"></i><span>New Ticket</span>
+    </a>
+</div>
+<a href="/org/noticeboard" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/noticeboard') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-megaphone-line text-lg"></i><span>Notice Board</span>
+</a>
+<a href="/org/notification" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/notification') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-notification-3-line text-lg"></i><span>Notification</span>
+</a>
+<a href="/org/wishlists" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/wishlists') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-heart-line text-lg"></i><span>Wishlist</span>
+</a>
+<a href="/org/setting" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/setting') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-settings-3-line text-lg"></i><span>Settings</span>
+</a>
