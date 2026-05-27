@@ -43,7 +43,7 @@ class AuthController extends Controller
         if (Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $request->filled('remember'))) {
             $request->session()->regenerate();
 
-            return $this->redirectToDashboard($user);
+            return $this->redirectToDashboard($user, true);
         }
 
         return back()->withErrors([
@@ -182,13 +182,15 @@ class AuthController extends Controller
             ->with('success', 'Welcome! Your instructor account has been created.');
     }
 
-    private function redirectToDashboard(User $user): RedirectResponse
+    private function redirectToDashboard(User $user, bool $useIntended = false): RedirectResponse
     {
-        return match ($user->role) {
-            User::ROLE_ADMIN => redirect()->intended(route('admin.dashboard.dashboard')),
-            User::ROLE_INSTRUCTOR => redirect()->intended(route('instructor.dashboard.dashboard')),
-            User::ROLE_ORGANIZATION => redirect()->intended(route('org.dashboard.dashboard')),
-            default => redirect()->intended(route('dashboard')),
+        $url = match ($user->role) {
+            User::ROLE_ADMIN => route('admin.dashboard.dashboard'),
+            User::ROLE_INSTRUCTOR => route('instructor.dashboard.dashboard'),
+            User::ROLE_ORGANIZATION => route('org.dashboard.dashboard'),
+            default => route('dashboard'),
         };
+
+        return $useIntended ? redirect()->intended($url) : redirect($url);
     }
 }

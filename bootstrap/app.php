@@ -14,6 +14,19 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
+
+        $middleware->redirectUsersTo(function () {
+            $user = auth()->user();
+            if (!$user) {
+                return route('dashboard');
+            }
+            return match ($user->role) {
+                \App\Models\User::ROLE_ADMIN => route('admin.dashboard.dashboard'),
+                \App\Models\User::ROLE_INSTRUCTOR => route('instructor.dashboard.dashboard'),
+                \App\Models\User::ROLE_ORGANIZATION => route('org.dashboard.dashboard'),
+                default => route('dashboard'),
+            };
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
