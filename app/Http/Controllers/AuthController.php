@@ -178,16 +178,16 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('instructor.dashboard')
+        return redirect()->route('instructor.dashboard.dashboard')
             ->with('success', 'Welcome! Your instructor account has been created.');
     }
 
     private function redirectToDashboard(User $user): RedirectResponse
     {
         return match ($user->role) {
-            User::ROLE_ADMIN => redirect()->intended(route('admin.dashboard')),
-            User::ROLE_INSTRUCTOR => redirect()->intended(route('instructor.dashboard')),
-            User::ROLE_ORGANIZATION => redirect()->intended(route('org.dashboard')),
+            User::ROLE_ADMIN => redirect()->intended(route('admin.dashboard.dashboard')),
+            User::ROLE_INSTRUCTOR => redirect()->intended(route('instructor.dashboard.dashboard')),
+            User::ROLE_ORGANIZATION => redirect()->intended(route('org.dashboard.dashboard')),
             default => redirect()->intended(route('dashboard')),
         };
     }

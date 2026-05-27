@@ -58,7 +58,7 @@
                     <span class="absolute -top-2 -right-2 w-4 h-4 bg-secondary text-[10px] font-bold text-heading rounded-full flex items-center justify-center">0</span>
                 </a>
                 @auth
-                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : (auth()->user()->isInstructor() ? route('instructor.dashboard') : (auth()->user()->isOrganization() ? route('org.dashboard') : route('dashboard'))) }}" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all duration-300">
+                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard.dashboard') : (auth()->user()->isInstructor() ? route('instructor.dashboard.dashboard') : (auth()->user()->isOrganization() ? route('org.dashboard.dashboard') : route('dashboard'))) }}" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all duration-300">
                         <i class="ri-dashboard-line"></i> Dashboard
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="hidden lg:inline">
@@ -104,7 +104,7 @@
             <a href="/contact" class="block text-sm font-semibold text-heading/80 py-2">Contact</a>
             <div class="flex gap-3 pt-2">
                 @auth
-                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : (auth()->user()->isInstructor() ? route('instructor.dashboard') : (auth()->user()->isOrganization() ? route('org.dashboard') : route('dashboard'))) }}" class="flex-1 text-center px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-full">Dashboard</a>
+                    <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard.dashboard') : (auth()->user()->isInstructor() ? route('instructor.dashboard.dashboard') : (auth()->user()->isOrganization() ? route('org.dashboard.dashboard') : route('dashboard'))) }}" class="flex-1 text-center px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-full">Dashboard</a>
                     <form method="POST" action="{{ route('logout') }}" class="flex-1">
                         @csrf
                         <button type="submit" class="w-full text-center px-5 py-2.5 bg-secondary text-heading text-sm font-semibold rounded-full">Logout</button>

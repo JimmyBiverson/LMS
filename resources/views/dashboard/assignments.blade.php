@@ -24,7 +24,7 @@
                     <td class="py-4 px-6 text-heading/70">{{ $s->assignment?->course?->title ?? 'Course' }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $s->score !== null ? $s->score . '/' . $s->assignment?->total_marks : '--' }}</td>
                     <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $s->status=='graded' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ ucfirst($s->status) }}</span></td>
-                    <td class="py-4 px-6 text-heading/70">{{ $s->submitted_at->format('Y-m-d') }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $s->submitted_at?->format('Y-m-d') ?? 'N/A' }}</td>
                 </tr>
                 @empty
                 <tr><td colspan="6" class="py-8 text-center text-heading/50 text-sm">No submissions yet.</td></tr>

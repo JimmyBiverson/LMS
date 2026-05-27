@@ -26,7 +26,7 @@
                     <td class="py-4 px-6 text-heading/70">{{ $i + 1 }}</td>
                     <td class="py-4 px-6 font-semibold text-heading">{{ $course->title }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $course->category }}</td>
-                    <td class="py-4 px-6 text-heading/70">${{ number_format($course->price, 2) }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $course->displayPrice() }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $course->lessons->count() }}</td>
                     <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $course->status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ $course->status }}</span></td>
                     <td class="py-4 px-6 text-right">

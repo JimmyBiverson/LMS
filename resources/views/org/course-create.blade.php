@@ -52,6 +52,7 @@
                 <div><label class="block text-sm font-semibold text-heading mb-1">Instructor</label><select name="instructor_id" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"><option value="">Select Instructor</option>@isset($instructors)@foreach($instructors as $instructor)<option value="{{ $instructor->id }}" @selected(old('instructor_id') == $instructor->id)>{{ $instructor->name }}</option>@endforeach@endisset</select></div>
                 <div><label class="block text-sm font-semibold text-heading mb-1">Status</label><select name="status" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"><option value="Draft" @selected(old('status', 'Draft') === 'Draft')>Draft</option><option value="Active" @selected(old('status') === 'Active')>Active</option></select></div>
             </div>
+            <div><label class="block text-sm font-semibold text-heading mb-1">Thumbnail</label><input name="thumbnail" type="file" accept="image/jpg,image/jpeg,image/png,image/webp" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
             <button type="submit" class="px-8 py-3 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300">Create Course</button>
         </form>
     </div>

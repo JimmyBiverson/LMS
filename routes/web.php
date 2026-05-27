@@ -50,7 +50,7 @@ Route::post('/newsletter', function (\Illuminate\Http\Request $r) {
     logger('Newsletter subscription: ' . $r->email);
     return back()->with('success', 'Subscribed to newsletter successfully!');
 });
-Route::post('/become-instructor', [AuthController::class, 'becomeInstructor']);
+Route::post('/become-instructor', [AuthController::class, 'becomeInstructor'])->middleware('guest');
 Route::get('/cart', fn() => view('cart'));
 Route::get('/privacy-policy', fn() => view('privacy-policy'));
 Route::get('/terms-conditions', fn() => view('terms-conditions'));
@@ -77,7 +77,10 @@ Route::middleware('auth')->group(function () {
         \App\Models\Enrollment::firstOrCreate([
             'user_id' => auth()->id(),
             'course_id' => $course->id,
-        ], ['amount_paid' => $amountPaid]);
+        ], [
+            'amount_paid' => $amountPaid,
+            'status' => 'in_progress',
+        ]);
         return redirect('/courses/' . $course->id)->with('success', 'Enrolled successfully!');
     });
 
@@ -104,7 +107,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/purchase-course', fn() => view('dashboard.purchase-course'));
         Route::get('/bundle-course', fn() => view('dashboard.bundle-course'));
         Route::get('/certificate', function () {
-            $certificates = \App\Models\Certificate::with('course')->latest()->get();
+            $certificates = \App\Models\Certificate::with('course')
+                ->where('user_id', auth()->id())->latest()->get();
             return view('dashboard.certificate', compact('certificates'));
         });
         Route::get('/quizzes/my-result', [QuizController::class, 'myResults']);
@@ -112,7 +116,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/quizzes/{quiz}/submit', [QuizController::class, 'submit']);
         Route::get('/assignments/{assignment}/submit', [AssignmentController::class, 'submitForm']);
         Route::post('/assignments/{assignment}/submit', [AssignmentController::class, 'submit']);
-        Route::get('/assignments', fn() => view('dashboard.assignments'));
+        Route::get('/assignments', function () {
+            $submissions = \App\Models\AssignmentSubmission::with('assignment.course')
+                ->where('user_id', auth()->id())->latest()->get();
+            return view('dashboard.assignments', compact('submissions'));
+        });
         Route::get('/course-review', fn() => view('dashboard.course-review'));
         Route::get('/offline-payment', fn() => view('dashboard.offline-payment'));
         Route::get('/supports/create', fn() => view('dashboard.supports.create'));
@@ -129,9 +137,9 @@ Route::middleware('auth')->group(function () {
             $courses = \App\Models\Course::withCount('enrollments')->where('user_id', auth()->id())->latest()->get();
             $totalStudents = \App\Models\Enrollment::whereIn('course_id', $courses->pluck('id'))->count();
             return view('instructor.index', compact('courses', 'totalStudents'));
-        });
+        })->name('dashboard');
         Route::get('/courses', [InstructorCourseController::class, 'index']);
-        Route::match(['GET', 'POST'], '/courses/create', [InstructorCourseController::class, 'create']);
+        Route::get('/courses/create', [InstructorCourseController::class, 'create']);
         Route::post('/courses', [InstructorCourseController::class, 'store']);
         Route::get('/courses/edit/{id}', [InstructorCourseController::class, 'edit'])->name('courses.edit');
         Route::post('/courses/edit/{id}', [InstructorCourseController::class, 'update']);
@@ -139,7 +147,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/courses/{id}/lessons', [InstructorCourseController::class, 'storeLesson']);
         Route::post('/courses/{courseId}/lessons/{lessonId}/delete', [InstructorCourseController::class, 'destroyLesson'])->name('courses.lessons.delete');
         Route::get('/courses/{course}/quizzes', [QuizController::class, 'index'])->name('courses.quizzes');
-        Route::match(['GET', 'POST'], '/courses/{course}/quizzes/create', [QuizController::class, 'create']);
+        Route::get('/courses/{course}/quizzes/create', [QuizController::class, 'create']);
         Route::post('/courses/{course}/quizzes', [QuizController::class, 'store']);
         Route::get('/quizzes/{quiz}/edit', [QuizController::class, 'edit'])->name('quizzes.edit');
         Route::post('/quizzes/{quiz}', [QuizController::class, 'update']);
@@ -147,7 +155,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/quizzes/{quiz}/questions', [QuizController::class, 'storeQuestion']);
         Route::post('/quizzes/questions/{question}/delete', [QuizController::class, 'destroyQuestion']);
         Route::get('/courses/{course}/assignments', [AssignmentController::class, 'index'])->name('courses.assignments');
-        Route::match(['GET', 'POST'], '/courses/{course}/assignments/create', [AssignmentController::class, 'create']);
+        Route::get('/courses/{course}/assignments/create', [AssignmentController::class, 'create']);
         Route::post('/courses/{course}/assignments', [AssignmentController::class, 'store']);
         Route::get('/assignments/{assignment}/edit', [AssignmentController::class, 'edit'])->name('assignments.edit');
         Route::post('/assignments/{assignment}', [AssignmentController::class, 'update']);
@@ -171,9 +179,9 @@ Route::middleware('auth')->group(function () {
             $courses = \App\Models\Course::withCount('enrollments')->where('user_id', auth()->id())->latest()->get();
             $totalStudents = \App\Models\Enrollment::whereIn('course_id', $courses->pluck('id'))->count();
             return view('org.index', compact('courses', 'totalStudents'));
-        });
+        })->name('dashboard');
         Route::get('/courses', [OrgCourseController::class, 'index']);
-        Route::match(['GET', 'POST'], '/courses/create', [OrgCourseController::class, 'create']);
+        Route::get('/courses/create', [OrgCourseController::class, 'create']);
         Route::post('/courses', [OrgCourseController::class, 'store']);
         Route::get('/courses/edit/{id}', [OrgCourseController::class, 'edit'])->name('courses.edit');
         Route::post('/courses/edit/{id}', [OrgCourseController::class, 'update']);
@@ -203,7 +211,7 @@ Route::middleware('auth')->group(function () {
             $totalInstructors = \App\Models\User::where('role', 'instructor')->count();
             $totalEnrollments = \App\Models\Enrollment::count();
             return view('admin.index', compact('totalStudents', 'totalCourses', 'totalInstructors', 'totalEnrollments'));
-        });
+        })->name('dashboard');
         Route::get('/course', function () {
             $courses = \App\Models\Course::with('instructor')->withCount('enrollments')->latest()->get();
             return view('admin.course.index', compact('courses'));

@@ -25,7 +25,7 @@
                     <td class="py-4 px-6 text-heading/70">{{ $e->course?->instructor?->name ?? 'N/A' }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $e->amount_paid > 0 ? '$'.number_format($e->amount_paid,2) : 'Free' }}</td>
                     <td class="py-4 px-6"><div class="flex items-center gap-2"><div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="h-full bg-primary rounded-full" style="width:{{ $e->completed_at ? '100' : '30' }}%"></div></div><span class="text-xs text-heading/60">{{ $e->completed_at ? '100' : '30' }}%</span></div></td>
-                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $e->status=='completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ ucfirst(str_replace('_',' ',$e->status ?? 'in_progress')) }}</span></td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $e->status==='completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ ucfirst(str_replace('_',' ',$e->status ?? 'in_progress')) }}</span></td>
                     <td class="py-4 px-6 text-right"><a href="/courses/{{ $e->course_id }}" class="text-primary text-sm font-semibold hover:underline">View</a></td>
                 </tr>
                 @empty
@@ -34,7 +34,7 @@
             </tbody>
         </table>
     </div>
-    @if($enrollments->hasPages())
+    @if(method_exists($enrollments, 'hasPages') && $enrollments->hasPages())
     <div class="p-6 flex items-center justify-center gap-2">{{ $enrollments->links() }}</div>
     @endif
 </div>

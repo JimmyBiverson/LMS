@@ -33,14 +33,14 @@
                 </p>
 
                 <div class="flex items-center gap-4 mb-8">
-                    <div class="flex items-center gap-2">
-                        <div class="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center">
-                            <i class="ri-user-smile-line text-primary"></i>
+                        <div class="flex items-center gap-2">
+                            <div class="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center">
+                                <i class="ri-user-smile-line text-primary"></i>
+                            </div>
+                            <div>
+                                <span class="text-sm font-bold text-heading">{{ $course->instructor?->name ?? 'Instructor' }}</span>
+                            </div>
                         </div>
-                        <div>
-                            <a href="/users/3/profile" class="text-sm font-bold text-heading hover:text-primary">{{ $course->instructor?->name ?? 'Instructor' }}</a>
-                        </div>
-                    </div>
                     <span class="px-3 py-1 rounded-full bg-primary-50 text-primary text-xs font-bold">{{ $course->category }}</span>
                 </div>
 
@@ -175,11 +175,15 @@
             </div>
 
             {{-- Sidebar --}}
-            <aside class="lg:w-96 shrink-0">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-28">
-                    <div class="aspect-video bg-gradient-to-br from-primary-100 to-primary-50 rounded-lg flex items-center justify-center mb-6">
-                        <i class="ri-play-circle-line text-6xl text-primary/30"></i>
-                    </div>
+                <aside class="lg:w-96 shrink-0">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-28">
+                        @if($course->thumbnail)
+                            <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" class="w-full aspect-video object-cover rounded-lg mb-6">
+                        @else
+                            <div class="aspect-video bg-gradient-to-br from-primary-100 to-primary-50 rounded-lg flex items-center justify-center mb-6">
+                                <i class="ri-play-circle-line text-6xl text-primary/30"></i>
+                            </div>
+                        @endif
                     <h3 class="font-bold text-heading text-lg mb-4">This Course Includes:</h3>
                     <div class="space-y-3 mb-6">
                         <div class="flex items-center justify-between text-sm">

@@ -13,6 +13,7 @@ class Course extends Model
 
     protected $fillable = [
         'user_id',
+        'instructor_id',
         'title',
         'description',
         'category',
@@ -58,8 +59,18 @@ class Course extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function assignedInstructor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'instructor_id');
+    }
+
     public function lessons(): HasMany
     {
         return $this->hasMany(Lesson::class);
+    }
+
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
     }
 }

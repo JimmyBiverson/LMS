@@ -11,6 +11,7 @@
     'lessons' => '0',
     'students' => '0',
     'image' => null,
+    'course' => null,
 ])
 
 @php
@@ -20,9 +21,13 @@
 
 <div class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">
     <div class="relative overflow-hidden">
-        <div class="h-48 bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center">
-            <i class="ri-play-circle-line text-5xl text-primary/30"></i>
-        </div>
+        @if($image)
+            <img src="{{ asset('storage/' . $image) }}" alt="{{ $title }}" class="w-full h-48 object-cover">
+        @else
+            <div class="h-48 bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center">
+                <i class="ri-play-circle-line text-5xl text-primary/30"></i>
+            </div>
+        @endif
         <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold bg-secondary text-heading">
             {{ $level }}
         </span>

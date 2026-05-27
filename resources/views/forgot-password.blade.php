@@ -30,7 +30,7 @@
                 <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
                 <div class="relative flex justify-center"><span class="bg-white px-4 text-sm text-heading/60">OR</span></div>
             </div>
-            <p class="text-center"><a href="/login" class="text-primary font-semibold text-sm hover:underline flex items-center justify-center gap-2"><i class="ri-arrow-left-line"></i> Back to Login</a></p>
+            <p class="text-center"><a href="{{ route('login') }}" class="text-primary font-semibold text-sm hover:underline flex items-center justify-center gap-2"><i class="ri-arrow-left-line"></i> Back to Login</a></p>
         </div>
     </div>
 </section>

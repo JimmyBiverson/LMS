@@ -63,6 +63,7 @@ class CourseController extends Controller
             'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'instructor_id' => ['nullable', 'exists:users,id'],
             'status' => ['required', 'string', 'in:Active,Draft'],
+            'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         $validated['user_id'] = auth()->id();
@@ -70,6 +71,10 @@ class CourseController extends Controller
         if ($validated['payment_type'] === 'free') {
             $validated['price'] = 0;
             $validated['sale_price'] = null;
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            $validated['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
         }
 
         $course = Course::create($validated);
@@ -100,11 +105,16 @@ class CourseController extends Controller
             'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'instructor_id' => ['nullable', 'exists:users,id'],
             'status' => ['required', 'string', 'in:Active,Draft'],
+            'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         if ($validated['payment_type'] === 'free') {
             $validated['price'] = 0;
             $validated['sale_price'] = null;
+        }
+
+        if ($request->hasFile('thumbnail')) {
+            $validated['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
         }
 
         $course->update($validated);

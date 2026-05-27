@@ -38,6 +38,7 @@
                     title="{{ $course->title }}"
                     duration="{{ $course->duration ?? 'N/A' }}"
                     lessons="{{ $course->lessons->count() }}"
+                    image="{{ $course->thumbnail }}"
                 />
             @empty
                 <div class="col-span-full text-center py-12 text-heading/40">No courses available yet.</div>
