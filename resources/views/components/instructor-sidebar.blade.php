@@ -34,6 +34,9 @@
 <a href="/instructor/notification" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('instructor/notification') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-notification-3-line text-lg"></i><span>Notification</span>
 </a>
-<a href="/instructor/setting" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('instructor/setting') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+<a href="/instructor/settings" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('instructor/settings') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-user-line text-lg"></i><span>Profile</span>
+</a>
+<a href="/instructor/settings" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('instructor/settings') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-settings-3-line text-lg"></i><span>Settings</span>
 </a>

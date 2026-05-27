@@ -129,6 +129,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/course-support', fn() => view('dashboard.course-support'));
         Route::get('/notifications', fn() => view('dashboard.notifications'));
         Route::get('/wishlists', fn() => view('dashboard.wishlists'));
+        Route::get('/profile', fn() => view('dashboard.profile'));
+        Route::get('/settings', fn() => view('dashboard.settings'));
+        Route::post('/settings', function (\Illuminate\Http\Request $request) {
+            $request->validate([
+                'current_password' => ['required', 'current_password'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+            ]);
+            auth()->user()->update(['password' => bcrypt($request->password)]);
+            return back()->with('status', 'Password changed successfully!');
+        });
     });
 
     // Instructor Dashboard

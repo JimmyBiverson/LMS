@@ -49,6 +49,9 @@
 <a href="/org/wishlists" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/wishlists') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-heart-line text-lg"></i><span>Wishlist</span>
 </a>
-<a href="/org/setting" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/setting') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+<a href="/org/profile" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/profile') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-user-line text-lg"></i><span>Profile</span>
+</a>
+<a href="/org/settings" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('org/settings') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-settings-3-line text-lg"></i><span>Settings</span>
 </a>

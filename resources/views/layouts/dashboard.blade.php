@@ -50,8 +50,23 @@
                     <span class="text-sm font-semibold text-heading hidden sm:block">@yield('user-name', 'User')</span>
                     <i class="ri-arrow-down-s-line text-heading/60 text-sm"></i>
                     <div class="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                        <a href="@yield('profile-route', '#')" class="block px-4 py-2 text-sm text-heading/70 hover:bg-primary-50 hover:text-primary transition-colors"><i class="ri-user-line mr-2"></i>Profile</a>
-                        <a href="@yield('setting-route', '#')" class="block px-4 py-2 text-sm text-heading/70 hover:bg-primary-50 hover:text-primary transition-colors"><i class="ri-settings-3-line mr-2"></i>Settings</a>
+                        @php
+                            $currentUser = auth()->user();
+                            $profileUrl = match(true) {
+                                $currentUser->isAdmin() => url('admin/profile'),
+                                $currentUser->isInstructor() => url('instructor/settings'),
+                                $currentUser->isOrganization() => url('org/profile'),
+                                default => url('dashboard/profile'),
+                            };
+                            $settingsUrl = match(true) {
+                                $currentUser->isAdmin() => url('admin/backend-setting'),
+                                $currentUser->isInstructor() => url('instructor/settings'),
+                                $currentUser->isOrganization() => url('org/settings'),
+                                default => url('dashboard/settings'),
+                            };
+                        @endphp
+                        <a href="{{ $profileUrl }}" class="block px-4 py-2 text-sm text-heading/70 hover:bg-primary-50 hover:text-primary transition-colors"><i class="ri-user-line mr-2"></i>Profile</a>
+                        <a href="{{ $settingsUrl }}" class="block px-4 py-2 text-sm text-heading/70 hover:bg-primary-50 hover:text-primary transition-colors"><i class="ri-settings-3-line mr-2"></i>Settings</a>
                         <hr class="my-1 border-gray-100">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

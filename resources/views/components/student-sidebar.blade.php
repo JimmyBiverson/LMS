@@ -43,3 +43,12 @@
 <a href="/dashboard/wishlists" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/wishlists') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-heart-line text-lg"></i><span>Wishlist</span>
 </a>
+<div class="pt-3 mt-3 border-t border-gray-100">
+    <p class="px-3 text-xs font-semibold text-heading/40 uppercase tracking-wider mb-2">Account</p>
+    <a href="/dashboard/profile" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/profile') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+        <i class="ri-user-line text-lg"></i><span>Profile</span>
+    </a>
+    <a href="/dashboard/settings" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/settings') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+        <i class="ri-settings-3-line text-lg"></i><span>Settings</span>
+    </a>
+</div>
