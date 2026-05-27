@@ -59,5 +59,7 @@ class DatabaseSeeder extends Seeder
             'role' => User::ROLE_STUDENT,
             'status' => User::STATUS_ACTIVE,
         ]);
+
+        $this->call(CourseSeeder::class);
     }
 }

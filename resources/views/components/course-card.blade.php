@@ -32,7 +32,7 @@
             {{ $level }}
         </span>
         @if($isFree)
-            <span class="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold bg-green-500 text-white">FREE</span>
+            <span class="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold bg-free text-white">FREE</span>
         @elseif($hasSale)
             <span class="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold bg-red-500 text-white">SALE</span>
         @endif
@@ -40,7 +40,7 @@
     <div class="p-5">
         <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-semibold text-primary">{{ $category }}</span>
-            <span class="text-sm font-bold {{ $isFree ? 'text-green-600' : 'text-heading' }}">
+            <span class="text-sm font-bold {{ $isFree ? 'text-free' : 'text-heading' }}">
                 @if($isFree)
                     Free
                 @elseif($hasSale)

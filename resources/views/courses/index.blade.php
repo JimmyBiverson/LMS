@@ -19,7 +19,7 @@
                 All
             </a>
             <a href="/courses?type=free"
-               class="px-5 py-2 rounded-full text-sm font-bold transition-all duration-300 {{ request('type') === 'free' ? 'bg-green-500 text-white shadow-md shadow-green-500/25' : 'bg-gray-100 text-heading hover:bg-gray-200' }}">
+               class="px-5 py-2 rounded-full text-sm font-bold transition-all duration-300 {{ request('type') === 'free' ? 'bg-free text-white shadow-md shadow-free/25' : 'bg-gray-100 text-heading hover:bg-gray-200' }}">
                 Free
             </a>
             <a href="/courses?type=paid"

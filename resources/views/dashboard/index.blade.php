@@ -13,7 +13,7 @@
         <p class="text-heading/60 text-sm">In Progress</p>
         <p class="text-2xl font-extrabold text-heading mt-1">{{ $inProgress }}</p>
     </div>
-    <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-green-500">
+    <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-free">
         <p class="text-heading/60 text-sm">Completed</p>
         <p class="text-2xl font-extrabold text-heading mt-1">{{ $completed }}</p>
     </div>

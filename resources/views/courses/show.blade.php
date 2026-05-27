@@ -204,7 +204,7 @@
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-heading/60">Price</span>
-                            <span class="font-bold text-lg {{ $course->payment_type === 'free' ? 'text-green-600' : 'text-heading' }}">
+                            <span class="font-bold text-lg {{ $course->payment_type === 'free' ? 'text-free' : 'text-heading' }}">
                                 @if($course->payment_type === 'free')
                                     Free
                                 @elseif($course->sale_price)
