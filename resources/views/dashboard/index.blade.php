@@ -19,7 +19,7 @@
     </div>
     <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-purple-500">
         <p class="text-heading/60 text-sm">Certificate</p>
-        <p class="text-2xl font-extrabold text-heading mt-1">0</p>
+        <p class="text-2xl font-extrabold text-heading mt-1">{{ $certificateCount }}</p>
     </div>
     <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-red-400">
         <p class="text-heading/60 text-sm">Wishlist</p>

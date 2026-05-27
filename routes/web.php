@@ -107,8 +107,9 @@ Route::middleware('auth')->group(function () {
             $totalEnrolled = $enrollments->count();
             $inProgress = $enrollments->where('status', 'in_progress')->count();
             $completed = $enrollments->where('status', 'completed')->count();
+            $certificateCount = \App\Models\Certificate::where('user_id', auth()->id())->count();
             $latest = $enrollments->take(4);
-            return view('dashboard.index', compact('enrollments', 'totalEnrolled', 'inProgress', 'completed', 'latest'));
+            return view('dashboard.index', compact('enrollments', 'totalEnrolled', 'inProgress', 'completed', 'certificateCount', 'latest'));
         });
         Route::get('/my-enrolled-course', function () {
             $enrollments = \App\Models\Enrollment::with('course.instructor')->where('user_id', auth()->id())->latest()->get();
