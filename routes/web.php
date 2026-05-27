@@ -26,8 +26,8 @@ Route::get('/courses', function () {
     $courses = $query->latest()->get();
     return view('courses.index', compact('courses'));
 });
-Route::get('/courses/{slug}', function ($slug) {
-    $course = \App\Models\Course::with('lessons', 'instructor')->where('status', 'Active')->findOrFail($slug);
+Route::get('/courses/{course}', function ($course) {
+    $course = \App\Models\Course::with('lessons', 'instructor')->where('status', 'Active')->findOrFail($course);
     return view('courses.show', compact('course'));
 });
 Route::get('/instructors', fn() => view('instructors.index'));
@@ -72,7 +72,7 @@ Route::middleware('auth')->group(function () {
 
     // Enrollment
     Route::post('/enroll/{courseId}', function ($courseId) {
-        $course = \App\Models\Course::findOrFail($courseId);
+        $course = \App\Models\Course::where('status', 'Active')->findOrFail($courseId);
         $amountPaid = $course->payment_type === 'free' ? 0 : ($course->sale_price ?? $course->price);
         \App\Models\Enrollment::firstOrCreate([
             'user_id' => auth()->id(),

@@ -33,7 +33,13 @@ class AdminController extends Controller
             return back()->withErrors(['course_id' => 'Student is already enrolled in this course.']);
         }
 
-        Enrollment::create($validated);
+        $course = Course::findOrFail($validated['course_id']);
+        $amountPaid = $course->payment_type === 'free' ? 0 : ($course->sale_price ?? $course->price);
+
+        Enrollment::create(array_merge($validated, [
+            'amount_paid' => $amountPaid,
+            'status' => 'in_progress',
+        ]));
 
         return redirect()->route('admin.dashboard.enrollment.new-create')
             ->with('success', 'Student enrolled successfully!');
