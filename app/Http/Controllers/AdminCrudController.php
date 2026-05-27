@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Blog, BlogCategory, Category, ContactMessage, Faq, HeroSection, Page, Slider, Subject, Testimonial, User, Enrollment, Certificate};
+use App\Models\{Blog, BlogCategory, Category, ContactMessage, Coupon, Faq, HeroSection, NotificationTemplate, Page, PaymentMethod, Slider, Subject, SupportTicket, Testimonial, User, Enrollment, Certificate, Wishlist};
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -403,5 +403,154 @@ class AdminCrudController extends Controller
     {
         $contactMessage->update(['is_read' => true]);
         return back()->with('success', 'Message marked as read.');
+    }
+
+    // ─── Coupon CRUD ──────────────────────────────────────────────────
+    public function coupons(): View
+    {
+        $coupons = Coupon::latest()->get();
+        return view('admin.marketing.coupon', compact('coupons'));
+    }
+
+    public function storeCoupon(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:50|unique:coupons,code',
+            'discount' => 'required|numeric|min:0',
+            'discount_type' => 'required|in:percentage,fixed',
+            'max_uses' => 'nullable|integer|min:1',
+            'min_amount' => 'nullable|numeric|min:0',
+            'expires_at' => 'nullable|date',
+            'status' => 'required|in:active,inactive',
+        ]);
+        $validated['code'] = strtoupper($validated['code']);
+        Coupon::create($validated);
+        return back()->with('success', 'Coupon created successfully!');
+    }
+
+    public function updateCoupon(Request $request, Coupon $coupon): RedirectResponse
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:50|unique:coupons,code,' . $coupon->id,
+            'discount' => 'required|numeric|min:0',
+            'discount_type' => 'required|in:percentage,fixed',
+            'max_uses' => 'nullable|integer|min:1',
+            'min_amount' => 'nullable|numeric|min:0',
+            'expires_at' => 'nullable|date',
+            'status' => 'required|in:active,inactive',
+        ]);
+        $validated['code'] = strtoupper($validated['code']);
+        $coupon->update($validated);
+        return back()->with('success', 'Coupon updated successfully!');
+    }
+
+    public function destroyCoupon(Coupon $coupon): RedirectResponse
+    {
+        $coupon->delete();
+        return back()->with('success', 'Coupon deleted successfully!');
+    }
+
+    // ─── Payment Method CRUD ──────────────────────────────────────────
+    public function paymentMethods(): View
+    {
+        $methods = PaymentMethod::latest()->get();
+        return view('admin.payment-method', compact('methods'));
+    }
+
+    public function storePaymentMethod(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:Online,Offline',
+            'status' => 'required|in:active,inactive',
+        ]);
+        PaymentMethod::create($validated);
+        return back()->with('success', 'Payment method created successfully!');
+    }
+
+    public function updatePaymentMethod(Request $request, PaymentMethod $paymentMethod): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:Online,Offline',
+            'status' => 'required|in:active,inactive',
+        ]);
+        $paymentMethod->update($validated);
+        return back()->with('success', 'Payment method updated successfully!');
+    }
+
+    public function destroyPaymentMethod(PaymentMethod $paymentMethod): RedirectResponse
+    {
+        $paymentMethod->delete();
+        return back()->with('success', 'Payment method deleted successfully!');
+    }
+
+    // ─── Notification Templates CRUD ─────────────────────────────────
+    public function notificationTemplates(): View
+    {
+        $templates = NotificationTemplate::latest()->get();
+        return view('admin.notification.index', compact('templates'));
+    }
+
+    public function storeNotificationTemplate(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'type' => 'required|in:email,in_app',
+            'template_name' => 'required|string|max:255',
+            'subject' => 'nullable|string|max:255',
+            'body' => 'nullable|string',
+            'status' => 'required|in:active,inactive',
+        ]);
+        NotificationTemplate::create($validated);
+        return back()->with('success', 'Notification template created successfully!');
+    }
+
+    public function updateNotificationTemplate(Request $request, NotificationTemplate $notificationTemplate): RedirectResponse
+    {
+        $validated = $request->validate([
+            'type' => 'required|in:email,in_app',
+            'template_name' => 'required|string|max:255',
+            'subject' => 'nullable|string|max:255',
+            'body' => 'nullable|string',
+            'status' => 'required|in:active,inactive',
+        ]);
+        $notificationTemplate->update($validated);
+        return back()->with('success', 'Notification template updated successfully!');
+    }
+
+    public function destroyNotificationTemplate(NotificationTemplate $notificationTemplate): RedirectResponse
+    {
+        $notificationTemplate->delete();
+        return back()->with('success', 'Notification template deleted successfully!');
+    }
+
+    // ─── Support Ticket CRUD (Admin) ─────────────────────────────────
+    public function supportTickets(): View
+    {
+        $tickets = SupportTicket::with('user')->latest()->get();
+        return view('admin.support-ticket.ticket', compact('tickets'));
+    }
+
+    public function updateSupportTicket(Request $request, SupportTicket $supportTicket): RedirectResponse
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:Open,Closed,Pending',
+            'priority' => 'nullable|in:Low,Medium,High',
+        ]);
+        $supportTicket->update($validated);
+        return back()->with('success', 'Ticket updated successfully!');
+    }
+
+    public function destroySupportTicket(SupportTicket $supportTicket): RedirectResponse
+    {
+        $supportTicket->delete();
+        return back()->with('success', 'Ticket deleted successfully!');
+    }
+
+    // ─── Wishlist CRUD (Admin view) ──────────────────────────────────
+    public function wishlists(): View
+    {
+        $wishlists = Wishlist::with('user', 'course')->latest()->get();
+        return view('admin.wishlists', compact('wishlists'));
     }
 }

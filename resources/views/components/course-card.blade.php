@@ -16,7 +16,9 @@
 
 @php
     $isFree = $paymentType === 'free';
-    $hasSale = !$isFree && !is_null($salePrice) && $salePrice < $price;
+    $price = (float) $price;
+    $salePrice = ($salePrice === null || $salePrice === '') ? null : (float) $salePrice;
+    $hasSale = !$isFree && $salePrice !== null && $salePrice < $price;
 @endphp
 
 <div class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300">

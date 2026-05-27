@@ -9,6 +9,7 @@ use App\Http\Controllers\Instructor\CourseController as InstructorCourseControll
 use App\Http\Controllers\Organization\CourseController as OrgCourseController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\SupportTicketController;
+use App\Http\Controllers\WishlistController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -26,8 +27,8 @@ Route::get('/courses', function () {
     $courses = $query->latest()->get();
     return view('courses.index', compact('courses'));
 });
-Route::get('/courses/{course}', function ($course) {
-    $course = \App\Models\Course::with('lessons', 'instructor')->where('status', 'Active')->findOrFail($course);
+Route::get('/courses/{slug}', function ($slug) {
+    $course = \App\Models\Course::with('lessons', 'instructor')->withCount('enrollments')->where('status', 'Active')->where('slug', $slug)->firstOrFail();
     return view('courses.show', compact('course'));
 });
 Route::get('/instructors', fn() => view('instructors.index'));
@@ -60,6 +61,7 @@ Route::get('/categories', fn() => view('categories'));
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/admin/admin-login', [AuthController::class, 'adminLogin'])->name('admin.login');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/forgot-password', fn() => view('forgot-password'))->name('password.request');
@@ -71,8 +73,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Checkout & Enrollment
-    Route::get('/courses/{course}/checkout', function ($courseId) {
-        $course = \App\Models\Course::where('status', 'Active')->findOrFail($courseId);
+    Route::get('/courses/{slug}/checkout', function ($slug) {
+        $course = \App\Models\Course::where('status', 'Active')->where('slug', $slug)->firstOrFail();
         $isEnrolled = \App\Models\Enrollment::where('user_id', auth()->id())
             ->where('course_id', $course->id)->exists();
         return view('courses.checkout', compact('course', 'isEnrolled'));
@@ -94,6 +96,9 @@ Route::middleware('auth')->group(function () {
         return redirect('/courses/' . $course->id)->with('success', 'Enrolled successfully!');
     });
 
+    // Lesson Completion
+    Route::post('/lessons/{lesson}/toggle-completion', [\App\Http\Controllers\LessonCompletionController::class, 'toggle']);
+
     // User Profile
     Route::get('/profile', fn() => view('users.profile'))->name('profile');
     Route::post('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
@@ -112,8 +117,20 @@ Route::middleware('auth')->group(function () {
             return view('dashboard.index', compact('enrollments', 'totalEnrolled', 'inProgress', 'completed', 'certificateCount', 'latest'));
         });
         Route::get('/my-enrolled-course', function () {
-            $enrollments = \App\Models\Enrollment::with('course.instructor')->where('user_id', auth()->id())->latest()->get();
-            return view('dashboard.my-enrolled-course', compact('enrollments'));
+            $enrollments = \App\Models\Enrollment::with('course.instructor', 'course.lessons')
+                ->where('user_id', auth()->id())->latest()->get();
+
+            $progress = $enrollments->mapWithKeys(function ($e) {
+                $total = $e->course?->lessons->count() ?? 0;
+                $completed = 0;
+                if ($total > 0) {
+                    $completed = \App\Models\LessonCompletion::where('user_id', auth()->id())
+                        ->where('course_id', $e->course_id)->count();
+                }
+                return [$e->id => ['total' => $total, 'completed' => $completed]];
+            });
+
+            return view('dashboard.my-enrolled-course', compact('enrollments', 'progress'));
         });
         Route::get('/purchase-course', fn() => view('dashboard.purchase-course'));
         Route::get('/bundle-course', fn() => view('dashboard.bundle-course'));
@@ -139,7 +156,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/supports', fn() => view('dashboard.supports.index'));
         Route::get('/course-support', fn() => view('dashboard.course-support'));
         Route::get('/notifications', fn() => view('dashboard.notifications'));
-        Route::get('/wishlists', fn() => view('dashboard.wishlists'));
+        Route::get('/wishlists', [WishlistController::class, 'index']);
+        Route::post('/wishlists/toggle/{course}', function ($courseId) {
+            $course = \App\Models\Course::findOrFail($courseId);
+            return app(WishlistController::class)->toggle(request(), $course->id);
+        });
         Route::get('/profile', fn() => view('dashboard.profile'));
         Route::get('/settings', fn() => view('dashboard.settings'));
         Route::post('/settings', function (\Illuminate\Http\Request $request) {
@@ -282,7 +303,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/testimonial/{testimonial}/delete', [AdminCrudController::class, 'destroyTestimonial']);
         Route::get('/contact', [AdminCrudController::class, 'contactMessages']);
         Route::post('/contact/{contactMessage}/read', [AdminCrudController::class, 'markAsRead']);
-        Route::get('/payment-method', fn() => view('admin.payment-method'));
+        Route::get('/payment-method', [AdminCrudController::class, 'paymentMethods']);
+        Route::post('/payment-method', [AdminCrudController::class, 'storePaymentMethod']);
+        Route::post('/payment-method/{paymentMethod}', [AdminCrudController::class, 'updatePaymentMethod']);
+        Route::post('/payment-method/{paymentMethod}/delete', [AdminCrudController::class, 'destroyPaymentMethod']);
         Route::get('/financial/sale', fn() => view('admin.financial.sale'));
         Route::get('/financial/offline', fn() => view('admin.financial.offline'));
         Route::get('/financial/payout-request', fn() => view('admin.financial.payout-request'));
@@ -292,12 +316,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/enrollment/all', [AdminCrudController::class, 'allEnrollments']);
         Route::get('/enrollment/new-create', [AdminController::class, 'newEnrollment'])->name('enrollment.new-create');
         Route::post('/enrollment', [AdminController::class, 'storeEnrollment']);
-        Route::get('/marketing/coupon', fn() => view('admin.marketing.coupon'));
+        Route::get('/marketing/coupon', [AdminCrudController::class, 'coupons']);
+        Route::post('/marketing/coupon', [AdminCrudController::class, 'storeCoupon']);
+        Route::post('/marketing/coupon/{coupon}', [AdminCrudController::class, 'updateCoupon']);
+        Route::post('/marketing/coupon/{coupon}/delete', [AdminCrudController::class, 'destroyCoupon']);
         Route::get('/review/course-review', fn() => view('admin.review.course-review'));
-        Route::get('/notification', fn() => view('admin.notification.index'));
+        Route::get('/notification', [AdminCrudController::class, 'notificationTemplates']);
+        Route::post('/notification', [AdminCrudController::class, 'storeNotificationTemplate']);
+        Route::post('/notification/{notificationTemplate}', [AdminCrudController::class, 'updateNotificationTemplate']);
+        Route::post('/notification/{notificationTemplate}/delete', [AdminCrudController::class, 'destroyNotificationTemplate']);
         Route::get('/notification/history', fn() => view('admin.notification.history'));
         Route::get('/support-ticket/category', fn() => view('admin.support-ticket.category'));
-        Route::get('/support-ticket/ticket', fn() => view('admin.support-ticket.ticket'));
+        Route::get('/support-ticket/ticket', [AdminCrudController::class, 'supportTickets']);
+        Route::post('/support-ticket/ticket/{supportTicket}', [AdminCrudController::class, 'updateSupportTicket']);
+        Route::post('/support-ticket/ticket/{supportTicket}/delete', [AdminCrudController::class, 'destroySupportTicket']);
         Route::get('/meet-provider', fn() => view('admin.meet-provider'));
         Route::get('/lms-module/subscription', fn() => view('admin.lms-module.subscription'));
         Route::get('/theme-setting', fn() => view('admin.theme-setting'));
@@ -316,6 +348,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/localization/city', fn() => view('admin.localization.city'));
         Route::get('/localization/time-zone', fn() => view('admin.localization.time-zone'));
         Route::get('/icon-providers/icon', fn() => view('admin.icon-providers.icon'));
+        Route::get('/wishlists', [AdminCrudController::class, 'wishlists']);
         Route::get('/noticeboard', fn() => view('admin.noticeboard'));
     });
 });

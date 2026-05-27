@@ -11,7 +11,7 @@
             <i class="ri-arrow-right-s-line"></i>
             <a href="/courses" class="hover:text-primary transition-colors">Courses</a>
             <i class="ri-arrow-right-s-line"></i>
-            <a href="/courses/{{ $course->id }}" class="hover:text-primary transition-colors">{{ $course->title }}</a>
+            <a href="/courses/{{ $course->slug }}" class="hover:text-primary transition-colors">{{ $course->title }}</a>
             <i class="ri-arrow-right-s-line"></i>
             <span class="text-primary font-semibold">Checkout</span>
         </div>
@@ -86,7 +86,7 @@
                                 Confirm & Enroll - ${{ number_format($course->sale_price ?? $course->price, 2) }}
                             @endif
                         </button>
-                        <a href="/courses/{{ $course->id }}" class="text-sm text-heading/60 hover:text-primary transition-colors">
+                        <a href="/courses/{{ $course->slug }}" class="text-sm text-heading/60 hover:text-primary transition-colors">
                             Cancel
                         </a>
                     </div>

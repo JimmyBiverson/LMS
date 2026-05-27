@@ -28,6 +28,8 @@
                 </div>
             </div>
             <div><label class="block text-sm font-semibold text-heading mb-1">Description</label><textarea name="description" rows="5" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">{{ old('description', $course->description) }}</textarea></div>
+            <div><label class="block text-sm font-semibold text-heading mb-1">Learning Outcomes <span class="text-heading/40 font-normal">(one per line)</span></label><textarea name="outcomes" rows="4" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary" placeholder="What students will learn...">{{ old('outcomes', $course->outcomes) }}</textarea></div>
+            <div><label class="block text-sm font-semibold text-heading mb-1">Requirements <span class="text-heading/40 font-normal">(one per line)</span></label><textarea name="requirements" rows="3" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary" placeholder="Prerequisites or required skills...">{{ old('requirements', $course->requirements) }}</textarea></div>
             <div x-data="{ type: '{{ old('payment_type', $course->payment_type ?? 'free') }}' }">
                 <label class="block text-sm font-semibold text-heading mb-2">Payment Type</label>
                 <div class="flex gap-6 mb-4">

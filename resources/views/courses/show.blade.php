@@ -3,6 +3,10 @@
 @section('title', 'Course Details')
 
 @section('content')
+@php
+    $isEnrolled = auth()->check() && \App\Models\Enrollment::where('user_id', auth()->id())->where('course_id', $course->id)->exists();
+    $inWishlist = auth()->check() && \App\Models\Wishlist::where('user_id', auth()->id())->where('course_id', $course->id)->exists();
+@endphp
 {{-- Breadcrumb --}}
 <section class="bg-[#F7F4FF] py-12">
     <div class="max-w-7xl mx-auto px-4">
@@ -60,21 +64,31 @@
                         <strong>Web Development</strong> refers to the process of creating, building, and maintaining websites or web applications. It involves coding, designing, and structuring websites to ensure functionality, responsiveness, and an engaging user experience. Web development typically includes frontend development (user interface and visuals), backend development (server-side logic and databases), and web hosting to make the site accessible on the internet. It plays a crucial role in creating dynamic, interactive, and scalable digital platforms for businesses and individuals.
                     </p>
 
+                    @if($course->outcomes)
                     <h3 class="text-lg font-bold text-heading mb-3">Learning Outcomes</h3>
                     <ul class="space-y-2 mb-6">
+                        @foreach(explode("\n", $course->outcomes) as $outcome)
+                        @continue(trim($outcome) === '')
                         <li class="flex items-start gap-2 text-heading/70">
                             <i class="ri-checkbox-circle-fill text-primary mt-1"></i>
-                            Understand the core concepts of web development, including the structure of web pages, client-server architecture, and the roles of frontend and backend development.
+                            {{ trim($outcome) }}
                         </li>
+                        @endforeach
                     </ul>
+                    @endif
 
+                    @if($course->requirements)
                     <h3 class="text-lg font-bold text-heading mb-3">Course Requirements</h3>
                     <ul class="space-y-2 mb-6">
+                        @foreach(explode("\n", $course->requirements) as $req)
+                        @continue(trim($req) === '')
                         <li class="flex items-start gap-2 text-heading/70">
                             <i class="ri-checkbox-circle-fill text-primary mt-1"></i>
-                            Define Target Audience Beginners: No prior experience, looking to learn foundational skills. Intermediate: Some knowledge of HTML, CSS, and JavaScript, aiming to enhance their skills.
+                            {{ trim($req) }}
                         </li>
+                        @endforeach
                     </ul>
+                    @endif
 
                     <h3 class="text-lg font-bold text-heading mb-3">Course FAQS</h3>
                     <div class="space-y-3 mb-8">
@@ -103,9 +117,25 @@
 
                     <h3 class="text-lg font-bold text-heading mb-4">Course Curriculum</h3>
                     @forelse($course->lessons->sortBy('order') as $lesson)
+                    @php
+                        $lessonCompleted = auth()->check() && \App\Models\LessonCompletion::where('user_id', auth()->id())
+                            ->where('lesson_id', $lesson->id)->exists();
+                    @endphp
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-3 overflow-hidden">
                         <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                            <span class="font-bold text-heading text-sm">{{ $lesson->title }}</span>
+                            <div class="flex items-center gap-3">
+                                @auth
+                                @if($isEnrolled)
+                                <form method="POST" action="/lessons/{{ $lesson->id }}/toggle-completion" class="inline">
+                                    @csrf
+                                    <button type="submit" class="flex items-center justify-center w-5 h-5 rounded border-2 {{ $lessonCompleted ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-primary' }} transition-colors">
+                                        @if($lessonCompleted)<i class="ri-check-line text-xs font-bold"></i>@endif
+                                    </button>
+                                </form>
+                                @endif
+                                @endauth
+                                <span class="font-bold text-heading text-sm {{ $lessonCompleted ? 'text-green-600' : '' }}">{{ $lesson->title }}</span>
+                            </div>
                             <span class="text-xs text-heading/60">{{ $lesson->duration ?? '--' }}</span>
                         </div>
                         @if($lesson->content)
@@ -199,8 +229,8 @@
                             <span class="font-semibold text-heading">{{ $course->category }}</span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-heading/60">Status</span>
-                            <span class="font-semibold text-heading">{{ $course->status }}</span>
+                            <span class="text-heading/60">Students</span>
+                            <span class="font-semibold text-heading">{{ $course->enrollments_count }}</span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-heading/60">Price</span>
@@ -217,17 +247,21 @@
                         </div>
                     </div>
                     @auth
-                    @php
-                        $isEnrolled = \App\Models\Enrollment::where('user_id', auth()->id())->where('course_id', $course->id)->exists();
-                    @endphp
                     @if($isEnrolled)
                         <a href="/dashboard/my-enrolled-course" class="w-full px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block">
                             Go to Course
                         </a>
                     @else
-                        <a href="/courses/{{ $course->id }}/checkout" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block">
+                        <a href="/courses/{{ $course->slug }}/checkout" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block mb-3">
                             Enroll Now
                         </a>
+                        <form method="POST" action="/dashboard/wishlists/toggle/{{ $course->id }}" class="block">
+                            @csrf
+                            <button type="submit" class="w-full px-8 py-3 border-2 {{ $inWishlist ? 'border-red-300 text-red-500 bg-red-50' : 'border-gray-200 text-heading/60 hover:border-red-300 hover:text-red-500' }} font-bold rounded-full transition-all duration-300 text-center block text-sm">
+                                <i class="{{ $inWishlist ? 'ri-heart-fill' : 'ri-heart-line' }} mr-1"></i>
+                                {{ $inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}
+                            </button>
+                        </form>
                     @endif
                     @else
                     <a href="/login" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block">

@@ -51,6 +51,31 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
+    public function adminLogin(Request $request): RedirectResponse
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        $user = User::where('email', $credentials['email'])->where('role', User::ROLE_ADMIN)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email' => 'No admin account found with this email.']);
+        }
+
+        if ($user->status === User::STATUS_INACTIVE) {
+            return back()->withErrors(['email' => 'Your account has been deactivated. Please contact support.']);
+        }
+
+        if (Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']])) {
+            $request->session()->regenerate();
+            return redirect()->route('admin.dashboard.dashboard');
+        }
+
+        return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
+    }
+
     public function showRegisterForm()
     {
         return view('auth.register');

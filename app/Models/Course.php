@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Course extends Model
 {
@@ -15,6 +16,7 @@ class Course extends Model
         'user_id',
         'instructor_id',
         'title',
+        'slug',
         'description',
         'category',
         'price',
@@ -23,7 +25,18 @@ class Course extends Model
         'duration',
         'status',
         'thumbnail',
+        'outcomes',
+        'requirements',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Course $course) {
+            if (empty($course->slug)) {
+                $course->slug = Str::slug($course->title) . '-' . Str::random(5);
+            }
+        });
+    }
 
     protected function casts(): array
     {

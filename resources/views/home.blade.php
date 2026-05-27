@@ -85,7 +85,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($courses as $course)
             <x-course-card
-                slug="{{ $course->id }}"
+                slug="{{ $course->slug ?? $course->id }}"
                 category="{{ $course->category ?? 'General' }}"
                 paymentType="{{ $course->payment_type ?? 'free' }}"
                 price="{{ $course->price }}"
@@ -176,7 +176,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             @forelse($courses->take(3) as $course)
             <x-course-card
-                slug="{{ $course->id }}"
+                slug="{{ $course->slug ?? $course->id }}"
                 category="{{ $course->category ?? 'General' }}"
                 paymentType="{{ $course->payment_type ?? 'free' }}"
                 price="{{ $course->price }}"
