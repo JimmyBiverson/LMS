@@ -31,6 +31,7 @@
             @forelse($courses as $course)
                 <x-course-card
                     slug="{{ $course->slug }}"
+                    level="{{ $course->level?->name ?? 'Intermediate' }}"
                     category="{{ $course->category }}"
                     paymentType="{{ $course->payment_type ?? 'free' }}"
                     price="{{ $course->price }}"

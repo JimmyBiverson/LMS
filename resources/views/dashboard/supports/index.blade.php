@@ -4,6 +4,9 @@
 @section('user-name', 'Student')
 @section('sidebar')@include('components.student-sidebar')@stop
 @section('content')
+@if(session('success'))
+    <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm font-semibold">{{ session('success') }}</div>
+@endif
 <div class="bg-white rounded-xl shadow-sm">
     <div class="p-6 border-b border-gray-100 flex items-center justify-between">
         <h3 class="font-bold text-heading">Support Tickets</h3>
@@ -21,17 +24,19 @@
                 <th class="text-right py-4 px-6 font-semibold">Action</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=3;$i++)
+                @forelse($tickets as $i=>$t)
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">Login Issue</td>
-                    <td class="py-4 px-6 text-heading/70">Technical Issue</td>
-                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $i == 1 ? 'bg-red-100 text-red-700' : ($i == 2 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700') }}">{{ $i == 1 ? 'High' : ($i == 2 ? 'Medium' : 'Low') }}</span></td>
-                    <td class="py-4 px-6 text-heading/70">2024-12-0{{ $i }}</td>
-                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $i <= 2 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ $i <= 2 ? 'Closed' : 'Open' }}</span></td>
-                    <td class="py-4 px-6 text-right"><a href="#" class="text-primary text-sm font-semibold hover:underline">View</a></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $t->subject }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $t->category }}</td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $t->priority === 'High' ? 'bg-red-100 text-red-700' : ($t->priority === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700') }}">{{ $t->priority }}</span></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $t->created_at->format('Y-m-d') }}</td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $t->status === 'Open' ? 'bg-green-100 text-green-700' : ($t->status === 'Pending' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700') }}">{{ $t->status }}</span></td>
+                    <td class="py-4 px-6 text-right"><a href="/dashboard/supports/{{ $t->id }}" class="text-primary text-sm font-semibold hover:underline">View</a></td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="7" class="py-8 text-center text-heading/50 text-sm">No tickets yet. Create one to get support.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

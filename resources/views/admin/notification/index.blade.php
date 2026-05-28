@@ -29,6 +29,26 @@
         </form>
     </div>
 </div>
+<div class="bg-white rounded-xl shadow-sm mb-6">
+    <div class="p-6 border-b border-gray-100"><h3 class="font-bold text-heading">Send Notification</h3></div>
+    <div class="p-6">
+        <form method="POST" action="/admin/notification/send-test" class="flex flex-wrap gap-4 items-end">
+            @csrf
+            <select name="template_id" required class="px-4 py-2.5 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">
+                <option value="">Select template</option>
+                @foreach($templates as $t)
+                <option value="{{ $t->id }}">{{ $t->template_name }}</option>
+                @endforeach
+            </select>
+            <select name="channel" required class="px-4 py-2.5 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">
+                <option value="in_app">In-App</option>
+                <option value="email">Email</option>
+                <option value="both">Both</option>
+            </select>
+            <button type="submit" class="px-6 py-2.5 bg-primary text-white font-semibold rounded-lg hover:opacity-90 text-sm">Send to Self</button>
+        </form>
+    </div>
+</div>
 <div class="bg-white rounded-xl shadow-sm">
     <div class="p-6 border-b border-gray-100"><h3 class="font-bold text-heading">Notification Templates</h3></div>
     <div class="overflow-x-auto">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Certificate;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,7 +49,8 @@ class AdminController extends Controller
     public function certificateCreate(): \Illuminate\View\View
     {
         $courses = Course::where('status', 'Active')->get();
-        return view('admin.certificate.create', compact('courses'));
+        $students = User::where('role', User::ROLE_STUDENT)->get();
+        return view('admin.certificate.create', compact('courses', 'students'));
     }
 
     public function storeCertificate(Request $request): RedirectResponse
@@ -56,6 +58,7 @@ class AdminController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'course_id' => ['required', 'exists:courses,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
             'description' => ['nullable', 'string'],
         ]);
 
@@ -74,21 +77,10 @@ class AdminController extends Controller
             'maintenance_mode' => ['nullable', 'boolean'],
         ]);
 
-        $envPath = base_path('.env');
-        if (file_exists($envPath)) {
-            $content = file_get_contents($envPath);
-
-            if (!empty($validated['app_name'])) {
-                $content = preg_replace('/^APP_NAME=.*/m', 'APP_NAME=' . $validated['app_name'], $content);
+        foreach ($validated as $key => $value) {
+            if ($value !== null) {
+                Setting::setValue('backend_' . $key, $value);
             }
-            if (!empty($validated['email'])) {
-                $content = preg_replace('/^MAIL_FROM_ADDRESS=.*/m', 'MAIL_FROM_ADDRESS=' . $validated['email'], $content);
-            }
-            if (!empty($validated['timezone'])) {
-                $content = preg_replace('/^APP_TIMEZONE=.*/m', 'APP_TIMEZONE=' . $validated['timezone'], $content);
-            }
-
-            file_put_contents($envPath, $content);
         }
 
         return back()->with('success', 'Backend settings updated successfully!');
@@ -103,6 +95,12 @@ class AdminController extends Controller
             'site_description' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        return back()->with('success', 'Theme settings saved successfully! (Manual CSS update required for colors)');
+        foreach ($validated as $key => $value) {
+            if ($value !== null) {
+                Setting::setValue('theme_' . $key, $value);
+            }
+        }
+
+        return back()->with('success', 'Theme settings saved successfully!');
     }
 }

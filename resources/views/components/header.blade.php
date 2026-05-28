@@ -53,9 +53,13 @@
             </nav>
 
             <div class="flex items-center gap-4">
+                <a href="/search" class="text-heading/80 hover:text-primary transition-colors duration-300">
+                    <i class="ri-search-line text-xl"></i>
+                </a>
                 <a href="/cart" class="relative text-heading/80 hover:text-primary transition-colors duration-300">
                     <i class="ri-shopping-cart-line text-xl"></i>
-                    <span class="absolute -top-2 -right-2 w-4 h-4 bg-secondary text-[10px] font-bold text-heading rounded-full flex items-center justify-center">0</span>
+                    @php $cartCount = count(session('cart.courses', [])) + count(session('cart.bundles', [])); @endphp
+                    <span class="absolute -top-2 -right-2 w-4 h-4 bg-secondary text-[10px] font-bold text-heading rounded-full flex items-center justify-center">{{ $cartCount }}</span>
                 </a>
                 @auth
                     <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard.dashboard') : (auth()->user()->isInstructor() ? route('instructor.dashboard.dashboard') : (auth()->user()->isOrganization() ? route('org.dashboard.dashboard') : route('dashboard'))) }}" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all duration-300">

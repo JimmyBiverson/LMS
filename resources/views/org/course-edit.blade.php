@@ -20,12 +20,24 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div><label class="block text-sm font-semibold text-heading mb-1">Course Title *</label><input name="title" type="text" value="{{ old('title', $course->title) }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
                 <div><label class="block text-sm font-semibold text-heading mb-1">Category *</label>
-                    <select name="category" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">
-                        @foreach(['Development','Design','Business','Marketing','Photography','Music','Health & Fitness'] as $cat)
-                            <option value="{{ $cat }}" @selected(old('category', $course->category) === $cat)>{{ $cat }}</option>
+                    <select name="category_id" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">
+                        <option value="">Select category</option>
+                        @foreach($categories ?? [] as $cat)
+                            <option value="{{ $cat->id }}" @selected(old('category_id', $course->category_id) == $cat->id)>{{ $cat->name }}</option>
                         @endforeach
                     </select>
                 </div>
+                <div><label class="block text-sm font-semibold text-heading mb-1">Level</label>
+                    <select name="level_id" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">
+                        <option value="">Select level</option>
+                        @foreach($levels ?? [] as $level)
+                            <option value="{{ $level->id }}" @selected(old('level_id', $course->level_id) == $level->id)>{{ $level->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div><label class="block text-sm font-semibold text-heading mb-1">Tags</label>
+                <div class="flex flex-wrap gap-3 mt-1">@php $courseTagIds = $course->tags->pluck('id')->toArray(); @endphp@foreach($tags ?? [] as $tag)<label class="flex items-center gap-2 cursor-pointer select-none"><input type="checkbox" name="tags[]" value="{{ $tag->id }}" {{ in_array($tag->id, old('tags', $courseTagIds)) ? 'checked' : '' }} class="w-4 h-4 text-primary focus:ring-primary rounded"><span class="text-sm text-heading/80">{{ $tag->name }}</span></label>@endforeach</div>
             </div>
             <div><label class="block text-sm font-semibold text-heading mb-1">Description</label><textarea name="description" rows="5" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">{{ old('description', $course->description) }}</textarea></div>
             <div><label class="block text-sm font-semibold text-heading mb-1">Learning Outcomes <span class="text-heading/40 font-normal">(one per line)</span></label><textarea name="outcomes" rows="4" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary" placeholder="What students will learn...">{{ old('outcomes', $course->outcomes) }}</textarea></div>

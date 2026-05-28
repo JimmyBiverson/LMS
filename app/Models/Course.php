@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
@@ -15,6 +16,7 @@ class Course extends Model
     protected $fillable = [
         'user_id',
         'instructor_id',
+        'category_id',
         'title',
         'slug',
         'description',
@@ -27,6 +29,7 @@ class Course extends Model
         'thumbnail',
         'outcomes',
         'requirements',
+        'level_id',
     ];
 
     protected static function booted(): void
@@ -77,6 +80,11 @@ class Course extends Model
         return $this->belongsTo(User::class, 'instructor_id');
     }
 
+    public function categoryRelation(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
     public function lessons(): HasMany
     {
         return $this->hasMany(Lesson::class);
@@ -85,5 +93,25 @@ class Course extends Model
     public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function averageRating(): float
+    {
+        return $this->reviews()->where('is_approved', true)->average('rating') ?? 0;
+    }
+
+    public function level(): BelongsTo
+    {
+        return $this->belongsTo(Level::class);
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
     }
 }

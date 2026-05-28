@@ -255,6 +255,14 @@
                         <a href="/courses/{{ $course->slug }}/checkout" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block mb-3">
                             Enroll Now
                         </a>
+                        @if($course->payment_type !== 'free')
+                        <form method="POST" action="/cart/add/{{ $course->id }}" class="block mb-3">
+                            @csrf
+                            <button type="submit" class="w-full px-8 py-3 border-2 border-gray-200 text-heading/70 hover:border-primary hover:text-primary font-bold rounded-full transition-all duration-300 text-center block text-sm">
+                                <i class="ri-shopping-cart-line mr-1"></i> Add to Cart
+                            </button>
+                        </form>
+                        @endif
                         <form method="POST" action="/dashboard/wishlists/toggle/{{ $course->id }}" class="block">
                             @csrf
                             <button type="submit" class="w-full px-8 py-3 border-2 {{ $inWishlist ? 'border-red-300 text-red-500 bg-red-50' : 'border-gray-200 text-heading/60 hover:border-red-300 hover:text-red-500' }} font-bold rounded-full transition-all duration-300 text-center block text-sm">

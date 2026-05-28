@@ -18,6 +18,14 @@
         <form method="POST" action="/admin/certificate" class="space-y-4">
             @csrf
             <div><label class="block text-sm font-semibold text-heading mb-1">Certificate Title *</label><input name="title" type="text" value="{{ old('title') }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
+            <div><label class="block text-sm font-semibold text-heading mb-1">Student *</label>
+                <select name="user_id" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">
+                    <option value="">Select Student</option>
+                    @foreach($students as $student)
+                        <option value="{{ $student->id }}" @selected(old('user_id') == $student->id)>{{ $student->name }} ({{ $student->email }})</option>
+                    @endforeach
+                </select>
+            </div>
             <div><label class="block text-sm font-semibold text-heading mb-1">Course *</label>
                 <select name="course_id" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">
                     <option value="">Select Course</option>

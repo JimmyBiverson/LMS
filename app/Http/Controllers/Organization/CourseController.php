@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Organization;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\Level;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +27,10 @@ class CourseController extends Controller
         $instructors = User::where('organization_id', auth()->id())
             ->where('role', User::ROLE_INSTRUCTOR)
             ->get();
-        return view('org.course-create', compact('instructors'));
+        $categories = Category::where('status', 'active')->get();
+        $levels = Level::orderBy('order')->get();
+        $tags = Tag::orderBy('name')->get();
+        return view('org.course-create', compact('instructors', 'categories', 'levels', 'tags'));
     }
 
     public function storeInstructor(Request $request): RedirectResponse
@@ -56,7 +62,10 @@ class CourseController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:255'],
+            'category_id' => ['nullable', 'exists:categories,id'],
+            'level_id' => ['nullable', 'exists:levels,id'],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['exists:tags,id'],
             'description' => ['nullable', 'string'],
             'outcomes' => ['nullable', 'string'],
             'requirements' => ['nullable', 'string'],
@@ -75,11 +84,20 @@ class CourseController extends Controller
             $validated['sale_price'] = null;
         }
 
+        if (!empty($validated['category_id'])) {
+            $category = Category::find($validated['category_id']);
+            $validated['category'] = $category ? $category->name : null;
+        }
+
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
         }
 
         $course = Course::create($validated);
+
+        if (!empty($validated['tags'])) {
+            $course->tags()->sync($validated['tags']);
+        }
 
         return redirect()->route('org.dashboard.courses.edit', $course->id)
             ->with('success', 'Course created successfully!');
@@ -91,7 +109,10 @@ class CourseController extends Controller
         $instructors = User::where('organization_id', auth()->id())
             ->where('role', User::ROLE_INSTRUCTOR)
             ->get();
-        return view('org.course-edit', compact('course', 'instructors'));
+        $categories = Category::where('status', 'active')->get();
+        $levels = Level::orderBy('order')->get();
+        $tags = Tag::orderBy('name')->get();
+        return view('org.course-edit', compact('course', 'instructors', 'categories', 'levels', 'tags'));
     }
 
     public function update(Request $request, int $id): RedirectResponse
@@ -100,7 +121,10 @@ class CourseController extends Controller
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:255'],
+            'category_id' => ['nullable', 'exists:categories,id'],
+            'level_id' => ['nullable', 'exists:levels,id'],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['exists:tags,id'],
             'description' => ['nullable', 'string'],
             'outcomes' => ['nullable', 'string'],
             'requirements' => ['nullable', 'string'],
@@ -117,11 +141,20 @@ class CourseController extends Controller
             $validated['sale_price'] = null;
         }
 
+        if (!empty($validated['category_id'])) {
+            $category = Category::find($validated['category_id']);
+            $validated['category'] = $category ? $category->name : null;
+        }
+
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
         }
 
         $course->update($validated);
+
+        if ($request->has('tags')) {
+            $course->tags()->sync($validated['tags'] ?? []);
+        }
 
         return redirect()->route('org.dashboard.courses.edit', $course->id)
             ->with('success', 'Course updated successfully!');
@@ -144,11 +177,13 @@ class CourseController extends Controller
             'duration' => ['nullable', 'string', 'max:50'],
             'order' => ['nullable', 'integer', 'min:0'],
             'is_free_preview' => ['nullable', 'boolean'],
+            'status' => ['nullable', 'string', 'in:draft,published'],
         ]);
 
         $validated['course_id'] = $course->id;
         $validated['order'] = $validated['order'] ?? ($course->lessons()->max('order') + 1);
         $validated['is_free_preview'] = $request->boolean('is_free_preview');
+        $validated['status'] = $validated['status'] ?? 'published';
 
         Lesson::create($validated);
 

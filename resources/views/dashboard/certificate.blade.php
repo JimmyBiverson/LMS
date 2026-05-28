@@ -20,7 +20,7 @@
                     <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
                     <td class="py-4 px-6 font-semibold text-heading">{{ $c->course?->title ?? $c->title }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $c->created_at->format('Y-m-d') }}</td>
-                    <td class="py-4 px-6 text-right"><a href="#" class="inline-flex items-center gap-1 px-4 py-2 bg-primary text-white text-xs font-bold rounded-full hover:opacity-90 transition-all duration-300"><i class="ri-download-line"></i> Download</a></td>
+                    <td class="py-4 px-6 text-right"><a href="/dashboard/certificate/{{ $c->id }}/download" class="inline-flex items-center gap-1 px-4 py-2 bg-primary text-white text-xs font-bold rounded-full hover:opacity-90 transition-all duration-300"><i class="ri-download-line"></i> Download</a></td>
                 </tr>
                 @empty
                 <tr><td colspan="4" class="py-8 text-center text-heading/50 text-sm">You haven't earned any certificates yet. Complete a course to get one.</td></tr>

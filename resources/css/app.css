@@ -211,4 +211,12 @@
         color: color-mix(in srgb, var(--color-heading) 70%, transparent);
         font-weight: 500;
     }
+
+    .text-danger {
+        color: #dc2626;
+    }
+
+    .bg-border {
+        background-color: color-mix(in srgb, var(--color-heading) 10%, transparent);
+    }
 }

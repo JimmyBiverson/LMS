@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use App\Models\QuizResult;
@@ -104,12 +105,26 @@ class QuizController extends Controller
         if ($quiz->status !== 'published') {
             abort(404);
         }
+        $isEnrolled = Enrollment::where('user_id', auth()->id())
+            ->where('course_id', $quiz->course_id)
+            ->whereIn('status', ['in_progress', 'completed'])
+            ->exists();
+        if (!$isEnrolled) {
+            abort(403, 'You must be enrolled in the course to take this quiz.');
+        }
         $quiz->load('questions');
         return view('quizzes.take', compact('quiz'));
     }
 
     public function submit(Request $request, Quiz $quiz): RedirectResponse
     {
+        $isEnrolled = Enrollment::where('user_id', auth()->id())
+            ->where('course_id', $quiz->course_id)
+            ->whereIn('status', ['in_progress', 'completed'])
+            ->exists();
+        if (!$isEnrolled) {
+            abort(403, 'You must be enrolled in the course to submit this quiz.');
+        }
         $quiz->load('questions');
         $answers = $request->input('answers', []);
         $score = 0;
