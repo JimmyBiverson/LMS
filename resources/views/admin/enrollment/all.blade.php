@@ -21,7 +21,7 @@
                     <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
                     <td class="py-4 px-6 font-semibold text-heading">{{ $e->user?->name ?? 'Deleted User' }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $e->course?->title ?? 'Deleted Course' }}</td>
-                    <td class="py-4 px-6 text-heading/70">${{ number_format($e->amount_paid ?? 0, 2) }}</td>
+                    <td class="py-4 px-6 text-heading/70">${{ number_format((float)($e->amount_paid ?? 0), 2) }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $e->created_at->format('Y-m-d H:i') }}</td>
                 </tr>
                 @empty

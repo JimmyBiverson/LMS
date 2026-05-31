@@ -20,16 +20,18 @@
                 <th class="text-right py-4 px-6 font-semibold">Actions</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=4;$i++)
+                @forelse($assignments as $assignment)
                 <tr class="hover:bg-gray-50">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">Project {{ $i }}</td>
-                    <td class="py-4 px-6 text-heading/70">Web Development</td>
-                    <td class="py-4 px-6 text-heading/70">2024-12-{{ str_pad(10+$i,2,'0',STR_PAD_LEFT) }}</td>
-                    <td class="py-4 px-6 text-heading/70">{{ 15+$i*5 }}</td>
-                    <td class="py-4 px-6 text-right"><a href="#" class="px-3 py-1 text-xs font-semibold rounded-full border border-heading/10 hover:bg-primary hover:text-white transition-all">Manage</a></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $loop->iteration }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $assignment->title }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $assignment->course->title ?? "N/A" }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $assignment->due_date ? $assignment->due_date->format("Y-m-d") : "N/A" }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $assignment->submissions_count }}</td>
+                    <td class="py-4 px-6 text-right"><a href="{{ route("instructor.dashboard.assignments.edit", $assignment) }}" class="px-3 py-1 text-xs font-semibold rounded-full border border-heading/10 hover:bg-primary hover:text-white transition-all">Manage</a></td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="6" class="py-12 text-center text-heading/40 text-sm">No assignments created yet.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

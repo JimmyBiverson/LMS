@@ -53,15 +53,15 @@
                             @if($course->payment_type === 'free')
                                 <span class="text-free font-semibold">Free</span>
                             @elseif($course->sale_price)
-                                <span class="text-heading/40 line-through">${{ number_format($course->price, 2) }}</span>
+                                <span class="text-heading/40 line-through">${{ number_format((float)$course->price, 2) }}</span>
                             @else
-                                <span class="font-semibold">${{ number_format($course->price, 2) }}</span>
+                                <span class="font-semibold">${{ number_format((float)$course->price, 2) }}</span>
                             @endif
                         </div>
                         @if($course->sale_price)
                         <div class="flex justify-between">
                             <span class="text-heading/60">Sale Price</span>
-                            <span class="text-red-500 font-semibold">-${{ number_format($course->price - $course->sale_price, 2) }}</span>
+                            <span class="text-red-500 font-semibold">-${{ number_format((float)$course->price - (float)$course->sale_price, 2) }}</span>
                         </div>
                         @endif
                         <div class="border-t border-gray-100 pt-2 flex justify-between font-bold text-heading">
@@ -69,7 +69,7 @@
                             @if($course->payment_type === 'free')
                                 <span class="text-free">Free</span>
                             @else
-                                <span>${{ number_format($course->sale_price ?? $course->price, 2) }}</span>
+                                <span>${{ number_format((float)($course->sale_price ?? $course->price), 2) }}</span>
                             @endif
                         </div>
                     </div>
@@ -83,7 +83,7 @@
                             @if($course->payment_type === 'free')
                                 Confirm Free Enrollment
                             @else
-                                Confirm & Enroll - ${{ number_format($course->sale_price ?? $course->price, 2) }}
+                                Confirm & Enroll - ${{ number_format((float)($course->sale_price ?? $course->price), 2) }}
                             @endif
                         </button>
                         <a href="/courses/{{ $course->slug }}" class="text-sm text-heading/60 hover:text-primary transition-colors">

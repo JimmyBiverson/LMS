@@ -51,7 +51,7 @@
                 <tr class="hover:bg-gray-50">
                     <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
                     <td class="py-4 px-6 font-semibold text-heading uppercase">{{ $c->code }}</td>
-                    <td class="py-4 px-6 text-heading/70">{{ $c->discount_type === 'percentage' ? $c->discount.'%' : '$'.number_format($c->discount,2) }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $c->discount_type === 'percentage' ? $c->discount.'%' : '$'.number_format((float)$c->discount,2) }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ ucfirst($c->discount_type) }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $c->used_count }}{{ $c->max_uses ? '/'.$c->max_uses : '' }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $c->expires_at ? $c->expires_at->format('d M Y') : '--' }}</td>

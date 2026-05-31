@@ -17,16 +17,18 @@
                 <th class="text-right py-4 px-6 font-semibold">Status</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=3;$i++)
+                @forelse($reviews as $review)
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">Full-Stack Web Development</td>
-                    <td class="py-4 px-6"><div class="flex items-center gap-1 text-amber-400 text-xs"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-{{ $i == 3 ? 'line' : 'fill' }}"></i></div></td>
-                    <td class="py-4 px-6 text-heading/70 max-w-xs truncate">Great course, learned a lot!</td>
-                    <td class="py-4 px-6 text-heading/70">2024-12-0{{ $i }}</td>
-                    <td class="py-4 px-6 text-right"><span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Approved</span></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $loop->iteration }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $review->course->title ?? "N/A" }}</td>
+                    <td class="py-4 px-6"><div class="flex items-center gap-1 text-amber-400 text-xs">@for($j=1;$j<=5;$j++)<i class="ri-star{{ $j <= $review->rating ? "-fill" : "-line" }}"></i>@endfor</div></td>
+                    <td class="py-4 px-6 text-heading/70 max-w-xs truncate">{{ $review->review ?? "N/A" }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $review->created_at->format("Y-m-d") }}</td>
+                    <td class="py-4 px-6 text-right"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $review->is_approved ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700" }}">{{ $review->is_approved ? "Approved" : "Pending" }}</span></td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="6" class="py-12 text-center text-heading/40 text-sm">No reviews yet.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

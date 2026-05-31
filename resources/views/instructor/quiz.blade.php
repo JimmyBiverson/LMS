@@ -20,16 +20,18 @@
                 <th class="text-right py-4 px-6 font-semibold">Actions</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=4;$i++)
+                @forelse($quizzes as $quiz)
                 <tr class="hover:bg-gray-50">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">HTML Basics Quiz {{ $i }}</td>
-                    <td class="py-4 px-6 text-heading/70">Web Development</td>
-                    <td class="py-4 px-6 text-heading/70">{{ 5+$i*3 }}</td>
-                    <td class="py-4 px-6 text-heading/70">{{ 10+$i*5 }} min</td>
-                    <td class="py-4 px-6 text-right"><a href="#" class="px-3 py-1 text-xs font-semibold rounded-full border border-heading/10 hover:bg-primary hover:text-white transition-all">Edit</a></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $loop->iteration }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $quiz->title }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $quiz->course->title ?? "N/A" }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $quiz->questions()->count() }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $quiz->time_limit }} min</td>
+                    <td class="py-4 px-6 text-right"><a href="{{ route("instructor.dashboard.quizzes.edit", $quiz) }}" class="px-3 py-1 text-xs font-semibold rounded-full border border-heading/10 hover:bg-primary hover:text-white transition-all">Edit</a></td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="6" class="py-12 text-center text-heading/40 text-sm">No quizzes created yet.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

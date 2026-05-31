@@ -15,14 +15,16 @@
                 <th class="text-left py-4 px-6 font-semibold">Price</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=4;$i++)
+                @forelse($wishlists as $wl)
                 <tr class="hover:bg-gray-50">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">Course {{ $i }}</td>
-                    <td class="py-4 px-6 text-heading/70">{{ 5+$i*3 }}</td>
-                    <td class="py-4 px-6 text-heading/70">${{ 29+$i*10 }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $loop->iteration }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $wl->course->title ?? "N/A" }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $wl->course->wishlists_count ?? $wl->course->wishlists()->count() }}</td>
+                    <td class="py-4 px-6 text-heading/70">${{ number_format((float)($wl->course->price ?? 0), 2) }}</td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="4" class="py-12 text-center text-heading/40 text-sm">No wishlists yet.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

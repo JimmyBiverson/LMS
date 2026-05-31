@@ -12,21 +12,21 @@
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">From</th>
                 <th class="text-left py-4 px-6 font-semibold">Subject</th>
-                <th class="text-left py-4 px-6 font-semibold">Priority</th>
                 <th class="text-left py-4 px-6 font-semibold">Date</th>
                 <th class="text-left py-4 px-6 font-semibold">Status</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=3;$i++)
+                @forelse($tickets as $ticket)
                 <tr class="hover:bg-gray-50">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">User {{ $i }}</td>
-                    <td class="py-4 px-6 text-heading/70">Support request {{ $i }}</td>
-                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $i == 1 ? 'bg-red-100 text-red-700' : ($i == 2 ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700') }}">{{ $i == 1 ? 'High' : ($i == 2 ? 'Medium' : 'Low') }}</span></td>
-                    <td class="py-4 px-6 text-heading/70">2024-12-0{{ $i }}</td>
-                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">Open</span></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $loop->iteration }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $ticket->user->full_name ?? "N/A" }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $ticket->subject }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $ticket->created_at->format("Y-m-d") }}</td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $ticket->status === "resolved" ? "bg-green-100 text-green-700" : ($ticket->status === "pending" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700") }}">{{ ucfirst($ticket->status) }}</span></td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="5" class="py-12 text-center text-heading/40 text-sm">No support tickets.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

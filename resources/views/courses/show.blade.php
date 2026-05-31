@@ -238,10 +238,10 @@
                                 @if($course->payment_type === 'free')
                                     Free
                                 @elseif($course->sale_price)
-                                    <span class="text-heading/40 line-through text-xs mr-1">${{ number_format($course->price, 2) }}</span>
-                                    ${{ number_format($course->sale_price, 2) }}
+                                    <span class="text-heading/40 line-through text-xs mr-1">${{ number_format((float)$course->price, 2) }}</span>
+                                    ${{ number_format((float)$course->sale_price, 2) }}
                                 @else
-                                    ${{ number_format($course->price, 2) }}
+                                    ${{ number_format((float)$course->price, 2) }}
                                 @endif
                             </span>
                         </div>

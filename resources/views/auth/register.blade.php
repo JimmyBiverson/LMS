@@ -285,7 +285,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    showForm('asStudent');
+    const oldRole = "{{ old('role', 'student') }}";
+    const tabMap = {
+        'student': 'asStudent',
+        'instructor': 'asInstructor',
+        'organization': 'asOrganization'
+    };
+    const initialTabId = tabMap[oldRole] || 'asStudent';
+    
+    const initialTab = document.getElementById(initialTabId);
+    if (initialTab) {
+        tabs.forEach(t => t.classList.remove('active'));
+        initialTab.classList.add('active');
+        showForm(initialTabId);
+    } else {
+        showForm('asStudent');
+    }
 });
 </script>
 @endpush

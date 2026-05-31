@@ -15,21 +15,24 @@
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Name</th>
                 <th class="text-left py-4 px-6 font-semibold">Email</th>
-                <th class="text-left py-4 px-6 font-semibold">Courses</th>
-                <th class="text-left py-4 px-6 font-semibold">Students</th>
+                <th class="text-left py-4 px-6 font-semibold">Designation</th>
                 <th class="text-left py-4 px-6 font-semibold">Status</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=4;$i++)
+                @forelse($instructors as $instructor)
                 <tr class="hover:bg-gray-50">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 flex items-center gap-3"><img src="https://placehold.co/32x32/5F3EED/FFFFFF?text=I{{ $i }}" class="w-8 h-8 rounded-full"><span class="font-semibold text-heading">Instructor {{ $i }}</span></td>
-                    <td class="py-4 px-6 text-heading/70">instructor{{ $i }}@mail.com</td>
-                    <td class="py-4 px-6 text-heading/70">{{ 2+$i }}</td>
-                    <td class="py-4 px-6 text-heading/70">{{ 50+$i*30 }}</td>
-                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Active</span></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $loop->iteration }}</td>
+                    <td class="py-4 px-6 flex items-center gap-3">
+                        <img src="https://placehold.co/32x32/5F3EED/FFFFFF?text={{ substr($instructor->first_name, 0, 1) }}" class="w-8 h-8 rounded-full">
+                        <span class="font-semibold text-heading">{{ $instructor->full_name }}</span>
+                    </td>
+                    <td class="py-4 px-6 text-heading/70">{{ $instructor->email }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $instructor->designation ?? "N/A" }}</td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $instructor->status === "active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700" }}">{{ ucfirst($instructor->status) }}</span></td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="5" class="py-12 text-center text-heading/40 text-sm">No instructors yet.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

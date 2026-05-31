@@ -14,13 +14,13 @@
         <div class="dashkit-tab flex-center gap-2 flex-wrap mt-10" id="userRegisterTab">
             <button type="button" aria-label="Login tab for Student"
                 class="dashkit-tab-btn btn b-light btn-primary-light btn-lg h-11 !rounded-full text-[14px] sm:text-[16px] md:text-[18px] [&.active]:bg-primary [&.active]:text-white login-credentials"
-                id="asStudetn" data-email="" data-password="">Student</button>
+                id="asStudent" data-email="" data-password="">Student</button>
             <button type="button" aria-label="Login tab for Instructor"
                 class="dashkit-tab-btn btn b-light btn-primary-light btn-lg h-11 !rounded-full text-[14px] sm:text-[16px] md:text-[18px] [&.active]:bg-primary [&.active]:text-white login-credentials"
-                id="asStudetn" data-email="" data-password="">Instructor</button>
+                id="asInstructor" data-email="" data-password="">Instructor</button>
             <button type="button" aria-label="Login tab for Organization"
                 class="dashkit-tab-btn btn b-light btn-primary-light btn-lg h-11 !rounded-full text-[14px] sm:text-[16px] md:text-[18px] [&.active]:bg-primary [&.active]:text-white login-credentials"
-                id="asStudetn" data-email="" data-password="">Organization</button>
+                id="asOrganization" data-email="" data-password="">Organization</button>
             <button type="button" aria-label="Login tab for Admin"
                 class="dashkit-tab-btn btn b-light btn-primary-light btn-lg h-11 !rounded-full text-[14px] sm:text-[16px] md:text-[18px] [&.active]:bg-primary [&.active]:text-white active login-credentials"
                 id="admin">Admin</button>
@@ -28,7 +28,7 @@
 
         <div class="dashkit-tab-content w-full max-w-screen-sm mt-10 *:hidden" id="userRegisterTabContent">
             {{-- Non-admin form (student / instructor / organization) --}}
-            <div class="dashkit-tab-pane" data-tab="asStudetn">
+            <div class="dashkit-tab-pane" data-tab="non-admin">
                 <form method="POST" action="{{ route('login') }}" class="w-full form">
                     @csrf
                     <input type="hidden" name="role" id="login-role" value="student">
@@ -145,9 +145,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (tabId === 'admin') {
                 showPane('admin');
             } else {
-                showPane('asStudetn');
+                showPane('non-admin');
                 if (roleInput) {
-                    roleInput.value = tabId === 'asStudetn' ? 'student' : tabId;
+                    var roleMap = { asStudent: 'student', asInstructor: 'instructor', asOrganization: 'organization' };
+                    roleInput.value = roleMap[tabId] || 'student';
                 }
                 if (emailInput) emailInput.value = email || '';
                 if (passwordInput) passwordInput.value = password || '';

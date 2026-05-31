@@ -10,21 +10,23 @@
         <table class="w-full text-sm">
             <thead><tr class="bg-gray-50 text-heading/60 text-xs uppercase tracking-wider">
                 <th class="text-left py-4 px-6 font-semibold">#</th>
-                <th class="text-left py-4 px-6 font-semibold">From</th>
-                <th class="text-left py-4 px-6 font-semibold">Course</th>
                 <th class="text-left py-4 px-6 font-semibold">Subject</th>
+                <th class="text-left py-4 px-6 font-semibold">Category</th>
                 <th class="text-left py-4 px-6 font-semibold">Date</th>
+                <th class="text-left py-4 px-6 font-semibold">Status</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=3;$i++)
+                @forelse($tickets as $ticket)
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">Instructor Name</td>
-                    <td class="py-4 px-6 text-heading/70">Full-Stack Web Development</td>
-                    <td class="py-4 px-6 text-heading/70">Regarding your assignment submission</td>
-                    <td class="py-4 px-6 text-heading/70">2024-12-0{{ $i }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $loop->iteration }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $ticket->subject }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $ticket->category ?? "General" }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $ticket->created_at->format("Y-m-d") }}</td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $ticket->status === "resolved" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700" }}">{{ ucfirst($ticket->status) }}</span></td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="5" class="py-12 text-center text-heading/40 text-sm">No support messages.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

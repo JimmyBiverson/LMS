@@ -52,7 +52,7 @@
                         <div class="text-right shrink-0">
                             <div class="font-bold text-heading">
                                 @if($item['price'] > 0)
-                                    ${{ number_format($item['price'], 2) }}
+                                    ${{ number_format((float)$item['price'], 2) }}
                                 @else
                                     <span class="text-green-600">Free</span>
                                 @endif
@@ -68,7 +68,7 @@
                 <div class="bg-gray-50 p-6 flex items-center justify-between">
                     <div>
                         <span class="text-heading/60 text-sm">Total:</span>
-                        <span class="text-2xl font-extrabold text-heading ml-2">${{ number_format($total, 2) }}</span>
+                        <span class="text-2xl font-extrabold text-heading ml-2">${{ number_format((float)$total, 2) }}</span>
                     </div>
                     <div class="flex gap-3">
                         <form method="POST" action="/cart/clear">

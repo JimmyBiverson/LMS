@@ -46,10 +46,10 @@
                 @if($isFree)
                     Free
                 @elseif($hasSale)
-                    <span class="text-heading/40 line-through text-xs mr-1">${{ number_format($price, 2) }}</span>
-                    ${{ number_format($salePrice, 2) }}
+                    <span class="text-heading/40 line-through text-xs mr-1">${{ number_format((float)$price, 2) }}</span>
+                    ${{ number_format((float)$salePrice, 2) }}
                 @else
-                    ${{ number_format($price, 2) }}
+                    ${{ number_format((float)$price, 2) }}
                 @endif
             </span>
         </div>

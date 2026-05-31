@@ -12,19 +12,22 @@
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Student</th>
                 <th class="text-left py-4 px-6 font-semibold">Email</th>
-                <th class="text-left py-4 px-6 font-semibold">Course</th>
                 <th class="text-left py-4 px-6 font-semibold">Enrolled</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=5;$i++)
+                @forelse($students as $student)
                 <tr class="hover:bg-gray-50">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 flex items-center gap-3"><img src="https://placehold.co/32x32/5F3EED/FFFFFF?text=S{{ $i }}" class="w-8 h-8 rounded-full"><span class="font-semibold text-heading">Student {{ $i }}</span></td>
-                    <td class="py-4 px-6 text-heading/70">student{{ $i }}@mail.com</td>
-                    <td class="py-4 px-6 text-heading/70">Web Development Bootcamp</td>
-                    <td class="py-4 px-6 text-heading/70">2024-12-0{{ $i }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $loop->iteration }}</td>
+                    <td class="py-4 px-6 flex items-center gap-3">
+                        <img src="https://placehold.co/32x32/5F3EED/FFFFFF?text={{ substr($student->first_name, 0, 1) }}" class="w-8 h-8 rounded-full">
+                        <span class="font-semibold text-heading">{{ $student->full_name }}</span>
+                    </td>
+                    <td class="py-4 px-6 text-heading/70">{{ $student->email }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $student->created_at->format("Y-m-d") }}</td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="4" class="py-12 text-center text-heading/40 text-sm">No students enrolled yet.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

@@ -15,21 +15,21 @@
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Course</th>
                 <th class="text-left py-4 px-6 font-semibold">Amount</th>
-                <th class="text-left py-4 px-6 font-semibold">Payment Method</th>
                 <th class="text-left py-4 px-6 font-semibold">Date</th>
                 <th class="text-left py-4 px-6 font-semibold">Status</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
-                @for($i=1;$i<=5;$i++)
+                @forelse($purchases as $purchase)
                 <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="py-4 px-6 text-heading/70">{{ $i }}</td>
-                    <td class="py-4 px-6 font-semibold text-heading">Full-Stack Web Development</td>
-                    <td class="py-4 px-6 text-heading/70">$25.50</td>
-                    <td class="py-4 px-6 text-heading/70">PayPal</td>
-                    <td class="py-4 px-6 text-heading/70">2024-12-0{{ $i }}</td>
-                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Paid</span></td>
+                    <td class="py-4 px-6 text-heading/70">{{ $loop->iteration }}</td>
+                    <td class="py-4 px-6 font-semibold text-heading">{{ $purchase->course->title ?? 'N/A' }}</td>
+                    <td class="py-4 px-6 text-heading/70">${{ number_format((float)$purchase->amount_paid, 2) }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $purchase->created_at->format("Y-m-d") }}</td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $purchase->status === "completed" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700" }}">{{ ucfirst($purchase->status) }}</span></td>
                 </tr>
-                @endfor
+                @empty
+                <tr><td colspan="5" class="py-12 text-center text-heading/40 text-sm">No purchases yet.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

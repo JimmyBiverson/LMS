@@ -23,7 +23,7 @@
                     <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
                     <td class="py-4 px-6 font-semibold text-heading">{{ $e->course?->title ?? 'Deleted Course' }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $e->course?->instructor?->name ?? 'N/A' }}</td>
-                    <td class="py-4 px-6 text-heading/70">{{ $e->amount_paid > 0 ? '$'.number_format($e->amount_paid,2) : 'Free' }}</td>
+                    <td class="py-4 px-6 text-heading/70">{{ $e->amount_paid > 0 ? '$'.number_format((float)$e->amount_paid,2) : 'Free' }}</td>
                     @php $p = $progress[$e->id] ?? ['total'=>0,'completed'=>0]; $pct = $p['total'] > 0 ? round(($p['completed']/$p['total'])*100) : 0; @endphp
                     <td class="py-4 px-6"><div class="flex items-center gap-2"><div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="h-full bg-primary rounded-full" style="width:{{ $pct }}%"></div></div><span class="text-xs text-heading/60">{{ $pct }}%</span></div></td>
                     <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $e->status==='completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ ucfirst(str_replace('_',' ',$e->status ?? 'in_progress')) }}</span></td>

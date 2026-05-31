@@ -28,6 +28,20 @@ use Illuminate\Notifications\Notifiable;
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
+    protected $fillable = [
+        'name',
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'password',
+        'role',
+        'designation',
+        'address',
+        'status',
+        'organization_id',
+        'bio',
+    ];
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 

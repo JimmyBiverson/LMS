@@ -40,10 +40,10 @@
                     @if($w->course?->payment_type === 'free')
                         <span class="text-free">Free</span>
                     @elseif($w->course?->sale_price)
-                        <span class="text-heading/40 line-through text-xs mr-1">${{ number_format($w->course->price, 2) }}</span>
-                        ${{ number_format($w->course->sale_price, 2) }}
+                        <span class="text-heading/40 line-through text-xs mr-1">${{ number_format((float)($w->course?->price ?? 0), 2) }}</span>
+                        ${{ number_format((float)($w->course?->sale_price ?? 0), 2) }}
                     @else
-                        ${{ number_format($w->course?->price ?? 0, 2) }}
+                        ${{ number_format((float)($w->course?->price ?? 0), 2) }}
                     @endif
                 </span>
                 <a href="/courses/{{ $w->course?->slug ?? $w->course_id }}/checkout" class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-full hover:opacity-90 transition-all duration-300">Enroll Now</a>
