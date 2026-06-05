@@ -81,14 +81,20 @@ class AssignmentController extends Controller
     {
         $validated = $request->validate([
             'submission_text' => 'nullable|string',
-            'file_url' => 'nullable|string|max:500',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,txt,zip|max:10240',
         ]);
-        AssignmentSubmission::create([
+
+        $data = [
             'assignment_id' => $assignment->id,
             'user_id' => auth()->id(),
-            'submission_text' => $validated['submission_text'],
-            'file_url' => $validated['file_url'],
-        ]);
+            'submission_text' => $validated['submission_text'] ?? null,
+        ];
+
+        if ($request->hasFile('file')) {
+            $data['file_url'] = $request->file('file')->store('submissions', 'public');
+        }
+
+        AssignmentSubmission::create($data);
         return back()->with('success', 'Assignment submitted successfully!');
     }
 

@@ -11,9 +11,8 @@ class TagSeeder extends Seeder
     {
         $tags = ['PHP', 'Laravel', 'JavaScript', 'Python', 'CSS', 'HTML', 'React', 'Vue.js', 'Node.js', 'MySQL'];
         foreach ($tags as $name) {
-            Tag::create([
+            Tag::updateOrCreate(['slug' => \Illuminate\Support\Str::slug($name)], [
                 'name' => $name,
-                'slug' => \Illuminate\Support\Str::slug($name),
             ]);
         }
     }

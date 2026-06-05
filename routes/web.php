@@ -89,6 +89,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::get('/forgot-password', fn() => view('forgot-password'))->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}', fn($token) => view('reset-password', ['token' => $token]))->name('password.reset');
 });
 
 // Authenticated Routes
@@ -386,14 +387,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/students', [AdminCrudController::class, 'students']);
         Route::get('/organizations', [AdminCrudController::class, 'organizations']);
         Route::get('/staff', fn() => view('admin.staff'));
-        Route::get('/blog', [AdminCrudController::class, 'blogs']);
-        Route::post('/blog', [AdminCrudController::class, 'storeBlog']);
-        Route::post('/blog/{blog}', [AdminCrudController::class, 'updateBlog']);
-        Route::post('/blog/{blog}/delete', [AdminCrudController::class, 'destroyBlog']);
         Route::get('/blog/category', [AdminCrudController::class, 'blogCategories']);
         Route::post('/blog/category', [AdminCrudController::class, 'storeBlogCategory']);
         Route::post('/blog/category/{blogCategory}', [AdminCrudController::class, 'updateBlogCategory']);
         Route::post('/blog/category/{blogCategory}/delete', [AdminCrudController::class, 'destroyBlogCategory']);
+        Route::get('/blog', [AdminCrudController::class, 'blogs']);
+        Route::post('/blog', [AdminCrudController::class, 'storeBlog']);
+        Route::post('/blog/{blog}', [AdminCrudController::class, 'updateBlog']);
+        Route::post('/blog/{blog}/delete', [AdminCrudController::class, 'destroyBlog']);
         Route::get('/faq', [AdminCrudController::class, 'faqs']);
         Route::post('/faq', [AdminCrudController::class, 'storeFaq']);
         Route::post('/faq/{faq}', [AdminCrudController::class, 'updateFaq']);

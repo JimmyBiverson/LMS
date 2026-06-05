@@ -11,9 +11,8 @@ class LevelSeeder extends Seeder
     {
         $levels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
         foreach ($levels as $i => $name) {
-            Level::create([
+            Level::updateOrCreate(['slug' => \Illuminate\Support\Str::slug($name)], [
                 'name' => $name,
-                'slug' => \Illuminate\Support\Str::slug($name),
                 'order' => $i + 1,
             ]);
         }

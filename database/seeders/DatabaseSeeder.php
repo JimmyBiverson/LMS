@@ -13,11 +13,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Admin
-        User::factory()->create([
+        User::updateOrCreate(['email' => 'admin@edulab.test'], [
             'first_name' => 'Admin',
             'last_name' => 'User',
             'name' => 'Admin User',
-            'email' => 'admin@edulab.test',
             'phone' => '+1234567890',
             'password' => bcrypt('password'),
             'role' => User::ROLE_ADMIN,
@@ -25,11 +24,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Instructor
-        User::factory()->create([
+        User::updateOrCreate(['email' => 'instructor@edulab.test'], [
             'first_name' => 'Robert',
             'last_name' => 'Smith',
             'name' => 'Robert Smith',
-            'email' => 'instructor@edulab.test',
             'phone' => '+1234567891',
             'password' => bcrypt('password'),
             'role' => User::ROLE_INSTRUCTOR,
@@ -38,9 +36,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Organization
-        User::factory()->create([
+        User::updateOrCreate(['email' => 'org@edulab.test'], [
             'name' => 'Codexshapper',
-            'email' => 'org@edulab.test',
             'phone' => '+1234567892',
             'password' => bcrypt('password'),
             'role' => User::ROLE_ORGANIZATION,
@@ -49,17 +46,28 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Student
-        User::factory()->create([
+        User::updateOrCreate(['email' => 'student@edulab.test'], [
             'first_name' => 'John',
             'last_name' => 'Doe',
             'name' => 'John Doe',
-            'email' => 'student@edulab.test',
             'phone' => '+1234567893',
             'password' => bcrypt('password'),
             'role' => User::ROLE_STUDENT,
             'status' => User::STATUS_ACTIVE,
         ]);
 
-        $this->call(CourseSeeder::class);
+        $this->call([
+            LevelSeeder::class,
+            TagSeeder::class,
+            CategorySeeder::class,
+            CourseSeeder::class,
+            LessonSeeder::class,
+            QuizSeeder::class,
+            AssignmentSeeder::class,
+            EnrollmentSeeder::class,
+            ReviewSeeder::class,
+            BlogSeeder::class,
+            MiscSeeder::class,
+        ]);
     }
 }
