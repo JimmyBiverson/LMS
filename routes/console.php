@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+Schedule::command('lms:daily-report')->daily();
+Schedule::command('lms:cleanup-notifications --days=90')->weekly();
+Schedule::command('lms:cleanup-certificates --days=365')->monthly();

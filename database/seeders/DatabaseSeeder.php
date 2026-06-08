@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,7 +19,7 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'User',
             'name' => 'Admin User',
             'phone' => '+1234567890',
-            'password' => bcrypt('password'),
+            'password' => Hash::make('password'),
             'role' => User::ROLE_ADMIN,
             'status' => User::STATUS_ACTIVE,
         ]);
@@ -29,7 +30,7 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'Smith',
             'name' => 'Robert Smith',
             'phone' => '+1234567891',
-            'password' => bcrypt('password'),
+            'password' => Hash::make('password'),
             'role' => User::ROLE_INSTRUCTOR,
             'designation' => 'Senior Web Developer',
             'status' => User::STATUS_ACTIVE,
@@ -39,7 +40,7 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(['email' => 'org@edulab.test'], [
             'name' => 'Codexshapper',
             'phone' => '+1234567892',
-            'password' => bcrypt('password'),
+            'password' => Hash::make('password'),
             'role' => User::ROLE_ORGANIZATION,
             'address' => 'Toronto, Canada',
             'status' => User::STATUS_ACTIVE,
@@ -51,7 +52,7 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'Doe',
             'name' => 'John Doe',
             'phone' => '+1234567893',
-            'password' => bcrypt('password'),
+            'password' => Hash::make('password'),
             'role' => User::ROLE_STUDENT,
             'status' => User::STATUS_ACTIVE,
         ]);

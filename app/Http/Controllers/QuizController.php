@@ -33,9 +33,11 @@ class QuizController extends Controller
             'instructions' => 'nullable|string',
             'time_limit' => 'nullable|integer|min:1',
             'passing_score' => 'required|integer|min:0|max:100',
+            'attempts_limit' => 'nullable|integer|min:1',
             'status' => 'required|in:draft,published',
         ]);
         $validated['course_id'] = $course->id;
+        $validated['user_id'] = auth()->id();
         Quiz::create($validated);
         return redirect("/instructor/courses/{$course->id}/quizzes")->with('success', 'Quiz created!');
     }
@@ -59,6 +61,7 @@ class QuizController extends Controller
             'instructions' => 'nullable|string',
             'time_limit' => 'nullable|integer|min:1',
             'passing_score' => 'required|integer|min:0|max:100',
+            'attempts_limit' => 'nullable|integer|min:1',
             'status' => 'required|in:draft,published',
         ]);
         $quiz->update($validated);
@@ -77,13 +80,22 @@ class QuizController extends Controller
     {
         $validated = $request->validate([
             'question' => 'required|string',
-            'type' => 'required|in:multiple_choice,true_false',
-            'options' => 'required|array|min:2',
-            'options.*' => 'required|string',
+            'type' => 'required|in:multiple_choice,true_false,matching,short_answer',
+            'options' => 'nullable|array',
+            'options.*' => 'nullable|string',
             'correct_answer' => 'required|string',
             'marks' => 'required|integer|min:1',
         ]);
-        $validated['options'] = array_values($validated['options']);
+        if (in_array($validated['type'], ['multiple_choice', 'true_false'])) {
+            $validated['options'] = array_values($validated['options'] ?? []);
+        }
+        if ($validated['type'] === 'short_answer') {
+            $validated['options'] = null;
+        }
+        if ($validated['type'] === 'matching') {
+            $request->validate(['pairs' => 'required|array|min:2', 'pairs.*.key' => 'required|string', 'pairs.*.value' => 'required|string']);
+            $validated['options'] = $request->pairs;
+        }
         $validated['quiz_id'] = $quiz->id;
         $validated['order'] = $quiz->questions()->count() + 1;
         QuizQuestion::create($validated);
@@ -112,6 +124,12 @@ class QuizController extends Controller
         if (!$isEnrolled) {
             abort(403, 'You must be enrolled in the course to take this quiz.');
         }
+        if ($quiz->attempts_limit) {
+            $attempts = QuizResult::where('quiz_id', $quiz->id)->where('user_id', auth()->id())->count();
+            if ($attempts >= $quiz->attempts_limit) {
+                abort(403, 'You have reached the maximum number of attempts for this quiz.');
+            }
+        }
         $quiz->load('questions');
         return view('quizzes.take', compact('quiz'));
     }
@@ -135,6 +153,7 @@ class QuizController extends Controller
         }
         $totalMarks = $quiz->questions->sum('marks');
         $percentage = $totalMarks > 0 ? ($score / $totalMarks) * 100 : 0;
+        $passed = $percentage >= $quiz->passing_score;
         QuizResult::create([
             'quiz_id' => $quiz->id,
             'user_id' => auth()->id(),
@@ -142,8 +161,9 @@ class QuizController extends Controller
             'total_marks' => $totalMarks,
             'answers' => $answers,
             'completed_at' => now(),
-            'passed' => $percentage >= $quiz->passing_score,
+            'passed' => $passed,
         ]);
+        \App\Notifications\QuizResultNotification::send(auth()->user(), $quiz, $score, $totalMarks, $passed);
         return redirect("/dashboard/quizzes/my-result")->with('success', 'Quiz submitted! Score: ' . $score . '/' . $totalMarks);
     }
 

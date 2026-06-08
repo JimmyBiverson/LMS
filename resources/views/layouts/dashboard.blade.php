@@ -53,7 +53,8 @@
                 @endphp
                 <a href="{{ $notifUrl }}" class="relative text-heading/60 hover:text-{{ $roleAccent }} transition-colors">
                     <i class="ri-notification-3-line text-lg"></i>
-                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">3</span>
+                    @php $unreadCount = auth()->user()->notifications()->where('is_read', false)->count(); @endphp
+                    @if ($unreadCount > 0)<span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ min($unreadCount, 99) }}</span>@endif
                 </a>
                 <div class="flex items-center gap-2 cursor-pointer group relative">
                     <div class="w-8 h-8 rounded-full {{ $roleAvatarBg ?? 'bg-primary-50' }} flex items-center justify-center"><i class="ri-user-smile-line text-sm {{ $roleAvatarText ?? 'text-primary' }}"></i></div>

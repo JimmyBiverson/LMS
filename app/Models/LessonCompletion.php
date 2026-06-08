@@ -12,12 +12,14 @@ class LessonCompletion extends Model
         'lesson_id',
         'course_id',
         'completed_at',
+        'last_watched_position',
     ];
 
     protected function casts(): array
     {
         return [
             'completed_at' => 'datetime',
+            'last_watched_position' => 'integer',
         ];
     }
 

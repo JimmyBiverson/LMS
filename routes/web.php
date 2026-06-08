@@ -75,6 +75,11 @@ Route::post('/cart/add-bundle/{bundleId}', [CartController::class, 'addBundle'])
 Route::post('/cart/remove/{type}/{id}', [CartController::class, 'remove'])->middleware('auth');
 Route::post('/cart/clear', [CartController::class, 'clear'])->middleware('auth');
 Route::get('/checkout', [CartController::class, 'checkout'])->middleware('auth');
+Route::post('/checkout/place-order', [CartController::class, 'placeOrder'])->middleware('auth');
+Route::post('/coupon/apply', [CartController::class, 'applyCoupon'])->middleware('auth');
+Route::post('/coupon/remove', [CartController::class, 'removeCoupon'])->middleware('auth');
+Route::get('/language/{locale}', [\App\Http\Controllers\LanguageController::class, 'switch']);
+
 Route::get('/privacy-policy', fn() => view('privacy-policy'));
 Route::get('/terms-conditions', fn() => view('terms-conditions'));
 Route::get('/categories', fn() => view('categories'));
@@ -91,6 +96,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
     Route::get('/reset-password/{token}', fn($token) => view('reset-password', ['token' => $token]))->name('password.reset');
 });
+
+// Webhook
+Route::post('/webhook', [\App\Http\Controllers\WebhookController::class, 'handle'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
 
 // Authenticated Routes
 Route::middleware('auth')->group(function () {
@@ -114,11 +122,62 @@ Route::middleware('auth')->group(function () {
             'amount_paid' => $amountPaid,
             'status' => 'in_progress',
         ]);
+        \App\Notifications\CourseEnrolled::send(auth()->user(), $course);
         return redirect('/courses/' . $course->slug)->with('success', 'Enrolled successfully!');
     });
 
     // Lesson Completion
     Route::post('/lessons/{lesson}/toggle-completion', [\App\Http\Controllers\LessonCompletionController::class, 'toggle']);
+
+    // Course Prerequisites
+    Route::post('/courses/{course}/prerequisites', function (\App\Models\Course $course, \Illuminate\Http\Request $request) {
+        if ($course->user_id !== auth()->id()) {
+            abort(403);
+        }
+        $validated = $request->validate(['prerequisite_ids' => 'nullable|array', 'prerequisite_ids.*' => 'exists:courses,id']);
+        $course->prerequisites()->sync($validated['prerequisite_ids'] ?? []);
+        return back()->with('success', 'Prerequisites updated!');
+    });
+
+    // Course Discussions
+    Route::get('/courses/{course}/discussions', [\App\Http\Controllers\DiscussionController::class, 'index'])->name('courses.discussions');
+    Route::post('/courses/{course}/discussions', [\App\Http\Controllers\DiscussionController::class, 'store']);
+    Route::post('/courses/{course}/discussions/{discussion}/reply', [\App\Http\Controllers\DiscussionController::class, 'reply']);
+    Route::post('/courses/{course}/discussions/{discussion}/delete', [\App\Http\Controllers\DiscussionController::class, 'destroy']);
+
+    // Notification Preferences
+    Route::get('/notifications/preferences', function () {
+        $preferences = \App\Models\NotificationPreference::where('user_id', auth()->id())->get()->keyBy('type');
+        return view('dashboard.notification-preferences', compact('preferences'));
+    });
+    Route::post('/notifications/preferences', function (\Illuminate\Http\Request $request) {
+        $types = ['course_enrolled', 'lesson_completed', 'course_completed', 'quiz_result', 'assignment_graded', 'discussion_reply'];
+        foreach ($types as $type) {
+            $channel = $request->input($type, 'none');
+            if ($channel === 'none') {
+                \App\Models\NotificationPreference::where('user_id', auth()->id())->where('type', $type)->delete();
+            } else {
+                \App\Models\NotificationPreference::updateOrCreate(
+                    ['user_id' => auth()->id(), 'type' => $type],
+                    ['channel' => $channel, 'enabled' => $channel !== 'none']
+                );
+            }
+        }
+        return back()->with('success', 'Notification preferences saved!');
+    });
+
+    // Video Progress
+    Route::post('/lessons/{lesson}/progress', function (\App\Models\Lesson $lesson, \Illuminate\Http\Request $request) {
+        $request->validate(['position' => 'required|integer|min:0']);
+        $completion = \App\Models\LessonCompletion::firstOrNew([
+            'user_id' => auth()->id(),
+            'lesson_id' => $lesson->id,
+            'course_id' => $lesson->course_id,
+        ]);
+        $completion->last_watched_position = $request->position;
+        $completion->save();
+        return response()->json(['success' => true]);
+    });
 
     // User Profile
     Route::get('/profile', fn() => view('users.profile'))->name('profile');
@@ -227,6 +286,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/courses/{id}/lessons', [InstructorCourseController::class, 'lessons'])->name('courses.lessons');
         Route::post('/courses/{id}/lessons', [InstructorCourseController::class, 'storeLesson']);
         Route::post('/courses/{courseId}/lessons/{lessonId}/delete', [InstructorCourseController::class, 'destroyLesson'])->name('courses.lessons.delete');
+        Route::post('/courses/delete/{id}', [InstructorCourseController::class, 'destroy'])->name('courses.delete');
+        Route::post('/courses/{id}/lessons/reorder', [InstructorCourseController::class, 'updateLessonOrder'])->name('courses.lessons.reorder');
         Route::get('/courses/{course}/quizzes', [QuizController::class, 'index'])->name('courses.quizzes');
         Route::get('/courses/{course}/quizzes/create', [QuizController::class, 'create']);
         Route::post('/courses/{course}/quizzes', [QuizController::class, 'store']);
@@ -257,6 +318,8 @@ Route::middleware('auth')->group(function () {
                 ->where("status", "Active")->sum("amount_paid");
             return view('instructor.earnings', compact('totalEarnings', 'currentMonth', 'pendingEarnings'));
         });
+        Route::get('/payouts', [\App\Http\Controllers\PayoutController::class, 'index']);
+        Route::post('/payouts/request', [\App\Http\Controllers\PayoutController::class, 'request']);
         Route::get('/students', function () {
             $courseIds = \App\Models\Course::where("user_id", auth()->id())->pluck("id");
             $studentIds = \App\Models\Enrollment::whereIn("course_id", $courseIds)->pluck("user_id");
@@ -291,6 +354,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/courses', [OrgCourseController::class, 'store']);
         Route::get('/courses/edit/{id}', [OrgCourseController::class, 'edit'])->name('courses.edit');
         Route::post('/courses/edit/{id}', [OrgCourseController::class, 'update']);
+        Route::post('/courses/delete/{id}', [OrgCourseController::class, 'destroy'])->name('courses.delete');
+        Route::post('/courses/{id}/lessons/reorder', [OrgCourseController::class, 'updateLessonOrder'])->name('courses.lessons.reorder');
         Route::get('/courses/{id}/lessons', [OrgCourseController::class, 'lessons'])->name('courses.lessons');
         Route::post('/courses/{id}/lessons', [OrgCourseController::class, 'storeLesson']);
         Route::post('/courses/{courseId}/lessons/{lessonId}/delete', [OrgCourseController::class, 'destroyLesson'])->name('courses.lessons.delete');
@@ -421,9 +486,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/payment-method', [AdminCrudController::class, 'storePaymentMethod']);
         Route::post('/payment-method/{paymentMethod}', [AdminCrudController::class, 'updatePaymentMethod']);
         Route::post('/payment-method/{paymentMethod}/delete', [AdminCrudController::class, 'destroyPaymentMethod']);
+        Route::get('/financial/payouts', [\App\Http\Controllers\PayoutController::class, 'adminIndex']);
+        Route::post('/financial/payouts/{payout}/approve', [\App\Http\Controllers\PayoutController::class, 'approve']);
+        Route::post('/financial/payouts/{payout}/reject', [\App\Http\Controllers\PayoutController::class, 'reject']);
+        Route::get('/financial/payout-request', [\App\Http\Controllers\PayoutController::class, 'adminIndex']);
         Route::get('/financial/sale', fn() => view('admin.financial.sale'));
         Route::get('/financial/offline', fn() => view('admin.financial.offline'));
-        Route::get('/financial/payout-request', fn() => view('admin.financial.payout-request'));
         Route::get('/certificate', [AdminCrudController::class, 'certificates']);
         Route::get('/certificate/create', [AdminController::class, 'certificateCreate'])->name('certificate.create');
         Route::post('/certificate', [AdminController::class, 'storeCertificate'])->name('certificate.store');
@@ -442,7 +510,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/notification/{notificationTemplate}', [AdminCrudController::class, 'updateNotificationTemplate']);
         Route::post('/notification/{notificationTemplate}/delete', [AdminCrudController::class, 'destroyNotificationTemplate']);
         Route::post('/notification/send-test', [NotificationController::class, 'sendTest']);
-        Route::get('/notification/history', fn() => view('admin.notification.history'));
+        Route::get('/notification/history', function () {
+            $logs = \App\Models\NotificationLog::with('user', 'template')->latest()->paginate(20);
+            return view('admin.notification.history', compact('logs'));
+        });
         Route::get('/support-ticket/category', fn() => view('admin.support-ticket.category'));
         Route::get('/support-ticket/ticket', [AdminCrudController::class, 'supportTickets']);
         Route::get('/support-ticket/ticket/{supportTicket}', [SupportTicketController::class, 'show']);

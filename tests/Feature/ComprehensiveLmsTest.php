@@ -933,6 +933,7 @@ class ComprehensiveLmsTest extends TestCase
             'last_name' => 'Instructor',
             'email' => 'sub-instructor@test.com',
             'password' => 'password123',
+            'password_confirmation' => 'password123',
             'designation' => 'Junior Dev',
         ]);
 
@@ -1304,7 +1305,7 @@ class ComprehensiveLmsTest extends TestCase
             'status' => 'active',
         ])->assertRedirect();
 
-        $this->assertDatabaseHas('notifications', ['template_name' => 'welcome_email']);
+        $this->assertDatabaseHas('notification_templates', ['template_name' => 'welcome_email']);
     }
 
     public function test_admin_can_manage_subjects()

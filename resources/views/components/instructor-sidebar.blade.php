@@ -13,6 +13,9 @@
 <a href="/instructor/earnings" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('instructor/earnings') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-money-dollar-circle-line text-lg"></i><span>Earnings</span>
 </a>
+<a href="/instructor/payouts" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('instructor/payouts') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-hand-coin-line text-lg"></i><span>Payouts</span>
+</a>
 <a href="/instructor/students" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('instructor/students') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-group-line text-lg"></i><span>Students</span>
 </a>

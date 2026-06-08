@@ -251,6 +251,9 @@
                         <a href="/dashboard/my-enrolled-course" class="w-full px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block">
                             Go to Course
                         </a>
+                        <a href="/courses/{{ $course->id }}/discussions" class="w-full px-8 py-3 mt-3 border-2 border-gray-200 text-heading/70 hover:border-primary hover:text-primary font-bold rounded-full transition-all duration-300 text-center block text-sm">
+                            <i class="ri-question-answer-line mr-1"></i> Discussions
+                        </a>
                     @else
                         <a href="/courses/{{ $course->slug }}/checkout" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block mb-3">
                             Enroll Now

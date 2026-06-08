@@ -90,13 +90,55 @@ $notifUrl = url('admin/notification');
     </div>
 </div>
 
+<div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <h3 class="font-bold text-heading mb-4 flex items-center gap-2"><span class="w-1.5 h-5 bg-slate-700 rounded-full"></span>Platform Overview</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center p-4 rounded-lg bg-slate-50"><p class="text-2xl font-extrabold text-slate-700">{{ number_format(\App\Models\User::count()) }}</p><p class="text-xs text-heading/50 mt-1">Total Users</p></div>
+            <div class="text-center p-4 rounded-lg bg-blue-50"><p class="text-2xl font-extrabold text-blue-700">{{ \App\Models\Category::where('status','active')->count() }}</p><p class="text-xs text-heading/50 mt-1">Categories</p></div>
+            <div class="text-center p-4 rounded-lg bg-emerald-50"><p class="text-2xl font-extrabold text-emerald-700">{{ \App\Models\Blog::where('status','published')->count() }}</p><p class="text-xs text-heading/50 mt-1">Published Blogs</p></div>
+            <div class="text-center p-4 rounded-lg bg-amber-50"><p class="text-2xl font-extrabold text-amber-700">${{ number_format(\App\Models\Enrollment::sum('amount_paid'), 0) }}</p><p class="text-xs text-heading/50 mt-1">Total Revenue</p></div>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <h3 class="font-bold text-heading mb-4 flex items-center gap-2"><span class="w-1.5 h-5 bg-slate-700 rounded-full"></span>Popular Courses</h3>
+        <div class="space-y-3">
+            @php($popular = \App\Models\Course::withCount('enrollments')->orderByDesc('enrollments_count')->take(5)->get())
+            @forelse($popular as $c)
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-heading/80 truncate max-w-[200px]">{{ $c->title }}</span>
+                <div class="flex items-center gap-2">
+                    <div class="w-24 h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-slate-700 rounded-full" style="width: {{ $c->enrollments_count > 0 ? min(100, ($c->enrollments_count / $popular->max('enrollments_count')) * 100) : 0 }}%"></div></div>
+                    <span class="text-xs font-bold text-heading/60">{{ $c->enrollments_count }}</span>
+                </div>
+            </div>
+            @empty <p class="text-sm text-heading/50">No courses yet.</p> @endforelse
+        </div>
+    </div>
+</div>
+
+<?php
+$monthlyData = \App\Models\Enrollment::selectRaw("strftime('%Y-%m', created_at) as month, count(*) as count, sum(amount_paid) as revenue")
+    ->where('created_at', '>=', now()->subMonths(6))
+    ->groupBy('month')->orderBy('month')->get();
+$maxCount = $monthlyData->max('count') ?: 1;
+$maxRevenue = $monthlyData->max('revenue') ?: 1;
+?>
 <div class="mt-6 bg-white rounded-xl shadow-sm p-6">
-    <h3 class="font-bold text-heading mb-4 flex items-center gap-2"><span class="w-1.5 h-5 bg-slate-700 rounded-full"></span>Platform Overview</h3>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="text-center p-4 rounded-lg bg-slate-50"><p class="text-2xl font-extrabold text-slate-700">{{ number_format(\App\Models\User::count()) }}</p><p class="text-xs text-heading/50 mt-1">Total Users</p></div>
-        <div class="text-center p-4 rounded-lg bg-blue-50"><p class="text-2xl font-extrabold text-blue-700">{{ \App\Models\Category::where('status','active')->count() }}</p><p class="text-xs text-heading/50 mt-1">Categories</p></div>
-        <div class="text-center p-4 rounded-lg bg-emerald-50"><p class="text-2xl font-extrabold text-emerald-700">{{ \App\Models\Blog::where('status','published')->count() }}</p><p class="text-xs text-heading/50 mt-1">Published Blogs</p></div>
-        <div class="text-center p-4 rounded-lg bg-amber-50"><p class="text-2xl font-extrabold text-amber-700">${{ number_format(\App\Models\Enrollment::sum('amount_paid'), 0) }}</p><p class="text-xs text-heading/50 mt-1">Total Revenue</p></div>
+    <h3 class="font-bold text-heading mb-6 flex items-center gap-2"><span class="w-1.5 h-5 bg-slate-700 rounded-full"></span>Monthly Trends ({{ now()->subMonths(6)->format('M Y') }} — {{ now()->format('M Y') }})</h3>
+    <div class="flex items-end gap-3 h-40">
+        @foreach($monthlyData as $m)
+        <div class="flex-1 flex flex-col items-center gap-1">
+            <span class="text-xs font-bold text-emerald-600">${{ number_format($m->revenue, 0) }}</span>
+            <div class="w-full bg-emerald-100 rounded-t-md relative" style="height: {{ max(4, ($m->revenue / $maxRevenue) * 100) }}px"><div class="absolute inset-x-0 -top-1 h-1 bg-emerald-500 rounded-full"></div></div>
+            <div class="w-full bg-slate-100 rounded-t-md" style="height: {{ max(4, ($m->count / $maxCount) * 80) }}px"><div class="w-full h-full bg-slate-700 rounded-t-md opacity-80"></div></div>
+            <span class="text-xs text-heading/50 mt-1">{{ \Carbon\Carbon::createFromFormat('Y-m', $m->month)->format('M') }}</span>
+        </div>
+        @endforeach
+    </div>
+    <div class="flex items-center gap-6 mt-4 text-xs text-heading/50">
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-slate-700"></span> Enrollments</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-emerald-400"></span> Revenue</span>
     </div>
 </div>
 @endsection

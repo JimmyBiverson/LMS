@@ -114,4 +114,14 @@ class Course extends Model
     {
         return $this->belongsToMany(Tag::class);
     }
+
+    public function prerequisites(): BelongsToMany
+    {
+        return $this->belongsToMany(Course::class, 'course_prerequisite', 'course_id', 'prerequisite_id');
+    }
+
+    public function dependentCourses(): BelongsToMany
+    {
+        return $this->belongsToMany(Course::class, 'course_prerequisite', 'prerequisite_id', 'course_id');
+    }
 }

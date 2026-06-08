@@ -33,6 +33,7 @@ class LessonCompletionController extends Controller
                 'course_id' => $course->id,
                 'completed_at' => now(),
             ]);
+            \App\Notifications\LessonCompleted::send(auth()->user(), $lesson, $course);
         }
 
         $totalLessons = $course->lessons()->count();
@@ -53,6 +54,8 @@ class LessonCompletionController extends Controller
                 'title' => 'Certificate of Completion: ' . $course->title,
                 'description' => 'This certifies that the student has successfully completed the course.',
             ]);
+
+            \App\Notifications\CourseCompleted::send(auth()->user(), $course);
         }
 
         if ($enrollment->status === 'completed' && $completedLessons < $totalLessons) {

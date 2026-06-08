@@ -40,6 +40,9 @@
 <a href="/dashboard/notifications" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/notifications') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-notification-3-line text-lg"></i><span>Notification</span>
 </a>
+<a href="/notifications/preferences" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('notifications/preferences') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-settings-3-line text-lg"></i><span>Notif. Preferences</span>
+</a>
 <a href="/dashboard/wishlists" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/wishlists') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-heart-line text-lg"></i><span>Wishlist</span>
 </a>

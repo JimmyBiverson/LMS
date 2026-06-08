@@ -25,3 +25,4 @@ class DynamicMail extends Mailable
             ->html($this->bodyContent);
     }
 }
+}

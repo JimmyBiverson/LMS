@@ -72,8 +72,8 @@
     <a href="/admin/financial/offline" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm {{ request()->is('admin/financial/offline') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300 text-sm font-semibold">
         <i class="ri-bank-line text-lg"></i><span>Offline Payment</span>
     </a>
-    <a href="/admin/financial/payout-request" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm {{ request()->is('admin/financial/payout-request') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300 text-sm font-semibold">
-        <i class="ri-hand-coin-line text-lg"></i><span>Payout Request</span>
+    <a href="/admin/financial/payouts" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm {{ request()->is('admin/financial/payouts') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300 text-sm font-semibold">
+        <i class="ri-hand-coin-line text-lg"></i><span>Payouts</span>
     </a>
 </div>
 <a href="/admin/certificate/create" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('admin/certificate/*') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">

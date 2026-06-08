@@ -45,7 +45,7 @@ class NotificationController extends Controller
     public function sendTest(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'template_id' => ['required', 'exists:notifications,id'],
+            'template_id' => ['required', 'exists:notification_templates,id'],
             'user_id' => ['nullable', 'exists:users,id'],
             'channel' => ['required', 'in:in_app,email,both'],
         ]);
@@ -84,9 +84,9 @@ class NotificationController extends Controller
 
         if (in_array($channel, ['email', 'both'])) {
             try {
-                Mail::to($user->email)->send(new DynamicMail($subject, nl2br(e($body))));
+                Mail::to($user->email)->queue(new DynamicMail($subject, nl2br(e($body))));
             } catch (\Exception $e) {
-                logger()->error('Failed to send notification email: ' . $e->getMessage());
+                logger()->error('Failed to queue notification email: ' . $e->getMessage());
             }
         }
     }

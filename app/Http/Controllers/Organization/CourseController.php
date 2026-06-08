@@ -39,7 +39,7 @@ class CourseController extends Controller
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'designation' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -191,6 +191,14 @@ class CourseController extends Controller
             ->with('success', 'Lesson added successfully!');
     }
 
+    public function destroy(int $id): RedirectResponse
+    {
+        $course = Course::where('user_id', auth()->id())->findOrFail($id);
+        $course->delete();
+
+        return redirect('/org/courses')->with('success', 'Course deleted successfully!');
+    }
+
     public function destroyLesson(int $courseId, int $lessonId): RedirectResponse
     {
         $course = Course::where('user_id', auth()->id())->findOrFail($courseId);
@@ -199,5 +207,23 @@ class CourseController extends Controller
 
         return redirect()->route('org.dashboard.courses.lessons', $course->id)
             ->with('success', 'Lesson deleted successfully!');
+    }
+
+    public function updateLessonOrder(Request $request, int $courseId): RedirectResponse
+    {
+        $course = Course::where('user_id', auth()->id())->findOrFail($courseId);
+
+        $request->validate([
+            'lessons' => 'required|array',
+            'lessons.*.id' => 'required|integer|exists:lessons,id',
+            'lessons.*.order' => 'required|integer|min:0',
+        ]);
+
+        foreach ($request->lessons as $item) {
+            Lesson::where('id', $item['id'])->where('course_id', $course->id)
+                ->update(['order' => $item['order']]);
+        }
+
+        return back()->with('success', 'Lesson order updated!');
     }
 }

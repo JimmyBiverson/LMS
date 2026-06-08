@@ -11,7 +11,7 @@ class Assignment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['course_id', 'title', 'description', 'instructions', 'due_date', 'total_marks', 'status'];
+    protected $fillable = ['course_id', 'user_id', 'title', 'description', 'instructions', 'due_date', 'total_marks', 'status'];
 
     protected function casts(): array
     {

@@ -34,6 +34,7 @@ class AssignmentController extends Controller
             'status' => 'required|in:draft,published',
         ]);
         $validated['course_id'] = $course->id;
+        $validated['user_id'] = auth()->id();
         Assignment::create($validated);
         return redirect("/instructor/courses/{$course->id}/assignments")->with('success', 'Assignment created!');
     }
@@ -108,6 +109,7 @@ class AssignmentController extends Controller
         $validated['status'] = 'graded';
         $validated['graded_at'] = now();
         $submission->update($validated);
+        \App\Notifications\AssignmentGraded::send($submission->user, $submission);
         return back()->with('success', 'Submission graded!');
     }
 
