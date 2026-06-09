@@ -13,10 +13,15 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\NoticeboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Instructor\CourseController as InstructorCourseController;
+use App\Http\Controllers\MeetProviderController;
 use App\Http\Controllers\Organization\CourseController as OrgCourseController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\StaffController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SupportTicketCategoryController;
 use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\WishlistController;
 use App\Models\User;
@@ -29,7 +34,9 @@ Route::get('/', function () {
     $categories = \App\Models\Category::withCount('courses')->where('status', 'active')->latest()->take(4)->get();
     $testimonials = \App\Models\Testimonial::where('status', 'active')->latest()->take(3)->get();
     $bundles = \App\Models\Bundle::withCount('courses')->where('status', 'active')->latest()->take(4)->get();
-    return view('home', compact('courses', 'categories', 'testimonials', 'bundles'));
+    $instructors = \App\Models\User::where('role', 'instructor')->where('status', 'active')->latest()->take(4)->get();
+    $blogs = \App\Models\Blog::with('category', 'author')->where('status', 'published')->latest()->take(3)->get();
+    return view('home', compact('courses', 'categories', 'testimonials', 'bundles', 'instructors', 'blogs'));
 });
 Route::get('/courses', function () {
     $query = \App\Models\Course::with('lessons')->where('status', 'Active');
@@ -47,6 +54,12 @@ Route::get('/courses/{slug}/checkout', function ($slug) {
 Route::get('/courses/{slug}', function ($slug) {
     $course = \App\Models\Course::with('lessons', 'instructor')->withCount('enrollments')->where('status', 'Active')->where('slug', $slug)->firstOrFail();
     return view('courses.show', compact('course'));
+});
+// Lesson viewing route
+Route::get('/courses/{slug}/lessons/{lessonId}', function ($slug, $lessonId) {
+    $course = \App\Models\Course::with('lessons')->where('status', 'Active')->where('slug', $slug)->firstOrFail();
+    $lesson = $course->lessons()->findOrFail($lessonId);
+    return view('courses.lesson', compact('course', 'lesson'));
 });
 Route::get('/instructors', fn() => view('instructors.index'));
 Route::get('/organizations', fn() => view('organizations.index'));
@@ -74,12 +87,18 @@ Route::post('/cart/add/{courseId}', [CartController::class, 'addCourse'])->middl
 Route::post('/cart/add-bundle/{bundleId}', [CartController::class, 'addBundle'])->middleware('auth');
 Route::post('/cart/remove/{type}/{id}', [CartController::class, 'remove'])->middleware('auth');
 Route::post('/cart/clear', [CartController::class, 'clear'])->middleware('auth');
-Route::get('/checkout', [CartController::class, 'checkout'])->middleware('auth');
+Route::get('/checkout', [PaymentController::class, 'showCheckout'])->middleware('auth');
 Route::post('/checkout/place-order', [CartController::class, 'placeOrder'])->middleware('auth');
+Route::post('/checkout/paystack', [PaymentController::class, 'initiatePaystack'])->middleware('auth');
+Route::get('/checkout/paystack/callback', [PaymentController::class, 'handlePaystackCallback'])->name('paystack.callback')->middleware('auth');
 Route::post('/coupon/apply', [CartController::class, 'applyCoupon'])->middleware('auth');
 Route::post('/coupon/remove', [CartController::class, 'removeCoupon'])->middleware('auth');
 Route::get('/language/{locale}', [\App\Http\Controllers\LanguageController::class, 'switch']);
 
+Route::get('/faq', function () {
+    $faqs = \App\Models\Faq::where('status', 'active')->orderBy('order')->latest()->get();
+    return view('faq', compact('faqs'));
+});
 Route::get('/privacy-policy', fn() => view('privacy-policy'));
 Route::get('/terms-conditions', fn() => view('terms-conditions'));
 Route::get('/categories', fn() => view('categories'));
@@ -95,10 +114,12 @@ Route::middleware('guest')->group(function () {
     Route::get('/forgot-password', fn() => view('forgot-password'))->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
     Route::get('/reset-password/{token}', fn($token) => view('reset-password', ['token' => $token]))->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
-// Webhook
+// Webhooks
 Route::post('/webhook', [\App\Http\Controllers\WebhookController::class, 'handle'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
+Route::post('/webhook/paystack', [PaymentController::class, 'paystackWebhook'])->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class);
 
 // Authenticated Routes
 Route::middleware('auth')->group(function () {
@@ -451,7 +472,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/instructors', [AdminCrudController::class, 'instructors']);
         Route::get('/students', [AdminCrudController::class, 'students']);
         Route::get('/organizations', [AdminCrudController::class, 'organizations']);
-        Route::get('/staff', fn() => view('admin.staff'));
+        Route::get('/staff', [StaffController::class, 'index']);
+        Route::post('/staff', [StaffController::class, 'store']);
+        Route::post('/staff/{staff}', [StaffController::class, 'update']);
+        Route::post('/staff/{staff}/delete', [StaffController::class, 'destroy']);
         Route::get('/blog/category', [AdminCrudController::class, 'blogCategories']);
         Route::post('/blog/category', [AdminCrudController::class, 'storeBlogCategory']);
         Route::post('/blog/category/{blogCategory}', [AdminCrudController::class, 'updateBlogCategory']);
@@ -514,13 +538,22 @@ Route::middleware('auth')->group(function () {
             $logs = \App\Models\NotificationLog::with('user', 'template')->latest()->paginate(20);
             return view('admin.notification.history', compact('logs'));
         });
-        Route::get('/support-ticket/category', fn() => view('admin.support-ticket.category'));
+        Route::get('/support-ticket/category', [SupportTicketCategoryController::class, 'index']);
+        Route::post('/support-ticket/category', [SupportTicketCategoryController::class, 'store']);
+        Route::post('/support-ticket/category/{supportTicketCategory}', [SupportTicketCategoryController::class, 'update']);
+        Route::post('/support-ticket/category/{supportTicketCategory}/delete', [SupportTicketCategoryController::class, 'destroy']);
         Route::get('/support-ticket/ticket', [AdminCrudController::class, 'supportTickets']);
         Route::get('/support-ticket/ticket/{supportTicket}', [SupportTicketController::class, 'show']);
         Route::post('/support-ticket/ticket/{supportTicket}', [AdminCrudController::class, 'updateSupportTicket']);
         Route::post('/support-ticket/ticket/{supportTicket}/delete', [AdminCrudController::class, 'destroySupportTicket']);
-        Route::get('/meet-provider', fn() => view('admin.meet-provider'));
-        Route::get('/lms-module/subscription', fn() => view('admin.lms-module.subscription'));
+        Route::get('/meet-provider', [MeetProviderController::class, 'index']);
+        Route::post('/meet-provider', [MeetProviderController::class, 'store']);
+        Route::post('/meet-provider/{meetProvider}', [MeetProviderController::class, 'update']);
+        Route::post('/meet-provider/{meetProvider}/delete', [MeetProviderController::class, 'destroy']);
+        Route::get('/lms-module/subscription', [SubscriptionController::class, 'index']);
+        Route::post('/lms-module/subscription', [SubscriptionController::class, 'store']);
+        Route::post('/lms-module/subscription/{subscriptionPlan}', [SubscriptionController::class, 'update']);
+        Route::post('/lms-module/subscription/{subscriptionPlan}/delete', [SubscriptionController::class, 'destroy']);
         Route::get('/theme-setting', fn() => view('admin.theme-setting'));
         Route::post('/theme-setting', [AdminController::class, 'updateThemeSetting']);
         Route::get('/site-language', fn() => view('admin.site-language'));

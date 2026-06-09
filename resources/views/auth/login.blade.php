@@ -29,9 +29,8 @@
         <div class="dashkit-tab-content w-full max-w-screen-sm mt-10 *:hidden" id="userRegisterTabContent">
             {{-- Non-admin form (student / instructor / organization) --}}
             <div class="dashkit-tab-pane" data-tab="non-admin">
-                <form method="POST" action="{{ route('login') }}" class="w-full form">
-                    @csrf
-                    <input type="hidden" name="role" id="login-role" value="student">
+                    <form method="POST" action="{{ route('login') }}" class="w-full form">
+                        @csrf
                     <div class="grid grid-cols-2 gap-x-3 gap-y-5">
                         <div class="col-span-full">
                             <div class="relative">
@@ -123,9 +122,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.login-credentials');
     const panes = document.querySelectorAll('.dashkit-tab-pane');
-    const roleInput = document.getElementById('login-role');
-    const emailInput = document.getElementById('role_email');
-    const passwordInput = document.getElementById('role_password');
 
     function showPane(tab) {
         panes.forEach(p => p.classList.remove('!block'));
@@ -136,8 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
             const tabId = this.id;
-            const email = this.dataset.email;
-            const password = this.dataset.password;
 
             tabs.forEach(t => t.classList.remove('active'));
             this.classList.add('active');
@@ -146,12 +140,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 showPane('admin');
             } else {
                 showPane('non-admin');
-                if (roleInput) {
-                    var roleMap = { asStudent: 'student', asInstructor: 'instructor', asOrganization: 'organization' };
-                    roleInput.value = roleMap[tabId] || 'student';
-                }
-                if (emailInput) emailInput.value = email || '';
-                if (passwordInput) passwordInput.value = password || '';
             }
         });
     });

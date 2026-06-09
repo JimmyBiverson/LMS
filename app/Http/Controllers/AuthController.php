@@ -23,14 +23,13 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
-            'role' => ['required', Rule::in([User::ROLE_STUDENT, User::ROLE_INSTRUCTOR, User::ROLE_ORGANIZATION, User::ROLE_ADMIN])],
         ]);
 
         $user = User::where('email', $credentials['email'])->first();
 
-        if (!$user || $user->role !== $credentials['role']) {
+        if (!$user) {
             return back()->withErrors([
-                'email' => 'No account found with this email for the selected role.',
+                'email' => 'No account found with this email.',
             ])->onlyInput('email');
         }
 
@@ -175,6 +174,27 @@ class AuthController extends Controller
         $user->save();
 
         return back()->with('success', 'Profile updated successfully!');
+    }
+
+    public function resetPassword(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill(['password' => Hash::make($password)])->save();
+                event(new PasswordReset($user));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('login')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]]);
     }
 
     public function becomeInstructor(Request $request): RedirectResponse

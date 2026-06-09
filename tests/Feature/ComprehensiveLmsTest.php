@@ -255,7 +255,6 @@ class ComprehensiveLmsTest extends TestCase
         $response = $this->post('/login', [
             'email' => 'student-login@test.com',
             'password' => 'password123',
-            'role' => 'student',
         ]);
 
         $response->assertRedirect('/dashboard');
@@ -269,7 +268,6 @@ class ComprehensiveLmsTest extends TestCase
         $response = $this->post('/login', [
             'email' => 'inst-login@test.com',
             'password' => 'password123',
-            'role' => 'instructor',
         ]);
 
         $response->assertRedirect('/instructor');
@@ -283,7 +281,6 @@ class ComprehensiveLmsTest extends TestCase
         $response = $this->post('/login', [
             'email' => 'org-login@test.com',
             'password' => 'password123',
-            'role' => 'organization',
         ]);
 
         $response->assertRedirect('/org');
@@ -303,20 +300,6 @@ class ComprehensiveLmsTest extends TestCase
         $this->assertAuthenticated();
     }
 
-    public function test_login_fails_for_wrong_role()
-    {
-        $this->createUser('student', ['email' => 'wrong@test.com']);
-
-        $response = $this->post('/login', [
-            'email' => 'wrong@test.com',
-            'password' => 'password123',
-            'role' => 'instructor',
-        ]);
-
-        $response->assertSessionHasErrors('email');
-        $this->assertGuest();
-    }
-
     public function test_login_fails_for_inactive_user()
     {
         $this->createUser('student', [
@@ -327,7 +310,6 @@ class ComprehensiveLmsTest extends TestCase
         $response = $this->post('/login', [
             'email' => 'inactive@test.com',
             'password' => 'password123',
-            'role' => 'student',
         ]);
 
         $response->assertSessionHasErrors('email');
@@ -341,7 +323,6 @@ class ComprehensiveLmsTest extends TestCase
         $response = $this->post('/login', [
             'email' => 'badpw@test.com',
             'password' => 'wrongpassword',
-            'role' => 'student',
         ]);
 
         $response->assertSessionHasErrors('email');

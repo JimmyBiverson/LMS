@@ -65,6 +65,21 @@
                 <div class="bg-white rounded-xl shadow-sm p-6 mt-6">
                     <h3 class="font-bold text-heading text-lg mb-4">Payment Method</h3>
                     <div class="space-y-3">
+                        @if ($subtotal > 0 && $hasPaystack)
+                        <form method="POST" action="/checkout/paystack">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center gap-3 p-4 border border-heading/10 rounded-lg cursor-pointer hover:border-primary transition-colors bg-primary-50">
+                                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                                    <span class="font-extrabold text-primary text-xs">P</span>
+                                </div>
+                                <div class="text-left flex-1">
+                                    <p class="font-semibold text-heading text-sm">Pay with Paystack</p>
+                                    <p class="text-xs text-heading/50">Pay via Card, Bank Transfer, USSD, or Mobile Money</p>
+                                </div>
+                                <i class="ri-arrow-right-s-line text-xl text-heading/40"></i>
+                            </button>
+                        </form>
+                        @endif
                         <label class="flex items-center gap-3 p-4 border border-heading/10 rounded-lg cursor-pointer hover:border-primary transition-colors">
                             <input type="radio" name="payment_method" value="offline" form="placeOrder" checked class="accent-primary">
                             <div><p class="font-semibold text-heading text-sm">Offline Payment</p><p class="text-xs text-heading/50">Pay via bank transfer or manual payment</p></div>

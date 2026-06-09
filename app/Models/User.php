@@ -50,6 +50,7 @@ class User extends Authenticatable
     const ROLE_INSTRUCTOR = 'instructor';
     const ROLE_ORGANIZATION = 'organization';
     const ROLE_ADMIN = 'admin';
+    const ROLE_STAFF = 'staff';
 
     const STATUS_ACTIVE = 'active';
     const STATUS_INACTIVE = 'inactive';

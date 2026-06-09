@@ -15,11 +15,29 @@ class Lesson extends Model
         'title',
         'content',
         'video_url',
+        'video_file',
+        'document_file',
         'duration',
         'order',
         'is_free_preview',
         'status',
     ];
+
+    /**
+     * Returns true if the lesson has at least one media source.
+     */
+    public function hasMedia(): bool
+    {
+        return $this->video_url || $this->video_file || $this->document_file;
+    }
+
+    public function videoSource(): ?string
+    {
+        if ($this->video_file) {
+            return asset('storage/' . $this->video_file);
+        }
+        return $this->video_url;
+    }
 
     protected function casts(): array
     {

@@ -171,19 +171,40 @@ class CourseController extends Controller
         $course = Course::where('user_id', auth()->id())->findOrFail($courseId);
 
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'content' => ['nullable', 'string'],
-            'video_url' => ['nullable', 'url', 'max:500'],
-            'duration' => ['nullable', 'string', 'max:50'],
-            'order' => ['nullable', 'integer', 'min:0'],
+            'title'           => ['required', 'string', 'max:255'],
+            'content'         => ['nullable', 'string'],
+            'video_url'       => ['nullable', 'url', 'max:500'],
+            'video_file'      => ['nullable', 'file', 'mimes:mp4,mov,avi,webm,ogg', 'max:512000'],
+            'document_file'   => ['nullable', 'file', 'mimes:pdf,doc,docx,ppt,pptx,xls,xlsx', 'max:51200'],
+            'duration'        => ['nullable', 'string', 'max:50'],
+            'order'           => ['nullable', 'integer', 'min:0'],
             'is_free_preview' => ['nullable', 'boolean'],
-            'status' => ['nullable', 'string', 'in:draft,published'],
+            'status'          => ['nullable', 'string', 'in:draft,published'],
         ]);
 
-        $validated['course_id'] = $course->id;
-        $validated['order'] = $validated['order'] ?? ($course->lessons()->max('order') + 1);
+        // Require at least one media source
+        $hasMedia = !empty($validated['video_url'])
+            || $request->hasFile('video_file')
+            || $request->hasFile('document_file');
+
+        if (!$hasMedia) {
+            return back()
+                ->withErrors(['video_url' => 'Please provide at least one media source: a Video URL, a Video File, or a Document.'])
+                ->withInput();
+        }
+
+        $validated['course_id']       = $course->id;
+        $validated['order']           = $validated['order'] ?? ($course->lessons()->max('order') + 1);
         $validated['is_free_preview'] = $request->boolean('is_free_preview');
-        $validated['status'] = $validated['status'] ?? 'published';
+        $validated['status']          = $validated['status'] ?? 'published';
+
+        if ($request->hasFile('video_file')) {
+            $validated['video_file'] = $request->file('video_file')->store('lessons/videos', 'public');
+        }
+
+        if ($request->hasFile('document_file')) {
+            $validated['document_file'] = $request->file('document_file')->store('lessons/documents', 'public');
+        }
 
         Lesson::create($validated);
 

@@ -28,7 +28,7 @@
                 <h3 class="text-lg font-bold mb-5">Support</h3>
                 <ul class="space-y-3">
                     <li><a href="/contact" class="text-white/70 text-sm hover:text-secondary transition-colors duration-300">Forum Support</a></li>
-                    <li><a href="/contact" class="text-white/70 text-sm hover:text-secondary transition-colors duration-300">Help & FAQ</a></li>
+                    <li><a href="/faq" class="text-white/70 text-sm hover:text-secondary transition-colors duration-300">Help & FAQ</a></li>
                     <li><a href="/bundles" class="text-white/70 text-sm hover:text-secondary transition-colors duration-300">Course Bundles</a></li>
                     <li><a href="/contact" class="text-white/70 text-sm hover:text-secondary transition-colors duration-300">Contact Us</a></li>
                 </ul>

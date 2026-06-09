@@ -235,7 +235,11 @@
             </a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            @forelse($instructors as $instructor)
+            <x-instructor-card name="{{ $instructor->full_name }}" designation="{{ $instructor->designation ?? 'Instructor' }}" url="/users/{{ $instructor->id }}/profile" />
+            @empty
             <x-instructor-card name="Robert Smith" designation="Senior Web Developer" url="/users/3/profile" />
+            @endforelse
         </div>
     </div>
 </section>
@@ -292,9 +296,13 @@
             </a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @forelse($blogs as $blog)
+            <x-blog-card slug="{{ $blog->slug }}" category="{{ $blog->category?->name ?? 'General' }}" author="{{ $blog->author?->name ?? 'Admin' }}" date="{{ $blog->created_at->format('d M Y') }}" title="{{ $blog->title }}" />
+            @empty
             <x-blog-card slug="the-importance-of-programming-in-our-everyday-lives" category="Programming Languages" author="Admin" date="05 Dec 2024" title="How Kindergarten Shapes Future Achievements" />
             <x-blog-card slug="how-kindergarten-shapes-future-achievements" category="Design of Art" author="Admin" date="04 Dec 2024" title="How Kindergarten Shapes Future Achievements" />
             <x-blog-card slug="the-power-of-lifelong-learning-never-stop-growing" category="Design of Art" author="Admin" date="27 Nov 2024" title="The Power of Lifelong Learning, Never Stop Growing" />
+            @endforelse
         </div>
     </div>
 </section>
