@@ -42,12 +42,6 @@ class QuizController extends Controller
         return redirect("/instructor/courses/{$course->id}/quizzes")->with('success', 'Quiz created!');
     }
 
-    public function show(Quiz $quiz): View
-    {
-        $quiz->load('questions', 'course');
-        return view('quizzes.show', compact('quiz'));
-    }
-
     public function edit(Quiz $quiz): View
     {
         $quiz->load('questions');
