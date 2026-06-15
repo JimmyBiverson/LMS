@@ -11,7 +11,7 @@ class Quiz extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['course_id', 'user_id', 'title', 'instructions', 'time_limit', 'passing_score', 'total_marks', 'attempts_limit', 'status'];
+    protected $fillable = ['course_id', 'user_id', 'title', 'instructions', 'instructions_file', 'time_limit', 'passing_score', 'total_marks', 'attempts_limit', 'status'];
 
     public function course(): BelongsTo
     {

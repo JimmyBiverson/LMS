@@ -61,8 +61,14 @@ Route::get('/courses/{slug}/lessons/{lessonId}', function ($slug, $lessonId) {
     $lesson = $course->lessons()->findOrFail($lessonId);
     return view('courses.lesson', compact('course', 'lesson'));
 });
-Route::get('/instructors', fn() => view('instructors.index'));
-Route::get('/organizations', fn() => view('organizations.index'));
+Route::get('/instructors', function () {
+    $instructors = \App\Models\User::where('role', 'instructor')->where('status', 'active')->latest()->get();
+    return view('instructors.index', compact('instructors'));
+});
+Route::get('/organizations', function () {
+    $organizations = \App\Models\User::where('role', 'organization')->where('status', 'active')->latest()->get();
+    return view('organizations.index', compact('organizations'));
+});
 Route::get('/blogs', function () {
     $blogs = \App\Models\Blog::with('category', 'author')->where('status', 'published')->latest()->get();
     return view('blogs.index', compact('blogs'));
@@ -99,6 +105,7 @@ Route::get('/faq', function () {
     $faqs = \App\Models\Faq::where('status', 'active')->orderBy('order')->latest()->get();
     return view('faq', compact('faqs'));
 });
+Route::get('/about', fn() => view('about'));
 Route::get('/privacy-policy', fn() => view('privacy-policy'));
 Route::get('/terms-conditions', fn() => view('terms-conditions'));
 Route::get('/categories', fn() => view('categories'));
@@ -265,11 +272,16 @@ Route::middleware('auth')->group(function () {
                 ->where('amount_paid', '>', 0)->latest()->get();
             return view('dashboard.offline-payment', compact('payments'));
         });
-        Route::get('/supports/create', fn() => view('dashboard.supports.create'));
+        Route::get('/supports/create', function () {
+            $enrollments = \App\Models\Enrollment::with('course')
+                ->where('user_id', auth()->id())
+                ->where('status', 'in_progress')
+                ->get();
+            $courses = $enrollments->map->course->filter();
+            return view('dashboard.supports.create', compact('courses'));
+        });
         Route::post('/supports', [SupportTicketController::class, 'store']);
         Route::get('/supports', [SupportTicketController::class, 'index'])->name('dashboard.supports');
-        Route::get('/supports/{supportTicket}', [SupportTicketController::class, 'show']);
-        Route::post('/supports/{supportTicket}/reply', [SupportTicketController::class, 'reply']);
         Route::get('/course-support', function () {
             $tickets = \App\Models\SupportTicket::where('user_id', auth()->id())
                 ->latest()->get();
@@ -292,6 +304,11 @@ Route::middleware('auth')->group(function () {
         });
     });
 
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/supports/{supportTicket}', [SupportTicketController::class, 'show']);
+        Route::post('/supports/{supportTicket}/reply', [SupportTicketController::class, 'reply']);
+    });
+
     // Instructor Dashboard
     Route::middleware('role:' . User::ROLE_INSTRUCTOR)->prefix('instructor')->name('instructor.dashboard.')->group(function () {
         Route::get('/', function () {
@@ -299,13 +316,13 @@ Route::middleware('auth')->group(function () {
             $totalStudents = \App\Models\Enrollment::whereIn('course_id', $courses->pluck('id'))->count();
             return view('instructor.index', compact('courses', 'totalStudents'));
         })->name('dashboard');
-        Route::get('/courses', [InstructorCourseController::class, 'index']);
-        Route::get('/courses/create', [InstructorCourseController::class, 'create']);
-        Route::post('/courses', [InstructorCourseController::class, 'store']);
+        Route::get('/courses', [InstructorCourseController::class, 'index'])->name('courses.index');
+        Route::get('/courses/create', [InstructorCourseController::class, 'create'])->name('courses.create');
+        Route::post('/courses', [InstructorCourseController::class, 'store'])->name('courses.store');
         Route::get('/courses/edit/{id}', [InstructorCourseController::class, 'edit'])->name('courses.edit');
-        Route::post('/courses/edit/{id}', [InstructorCourseController::class, 'update']);
+        Route::post('/courses/edit/{id}', [InstructorCourseController::class, 'update'])->name('courses.update');
         Route::get('/courses/{id}/lessons', [InstructorCourseController::class, 'lessons'])->name('courses.lessons');
-        Route::post('/courses/{id}/lessons', [InstructorCourseController::class, 'storeLesson']);
+        Route::post('/courses/{id}/lessons', [InstructorCourseController::class, 'storeLesson'])->name('courses.lessons.store');
         Route::post('/courses/{courseId}/lessons/{lessonId}/delete', [InstructorCourseController::class, 'destroyLesson'])->name('courses.lessons.delete');
         Route::post('/courses/delete/{id}', [InstructorCourseController::class, 'destroy'])->name('courses.delete');
         Route::post('/courses/{id}/lessons/reorder', [InstructorCourseController::class, 'updateLessonOrder'])->name('courses.lessons.reorder');
@@ -323,7 +340,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/assignments', function () {
             $courseIds = \App\Models\Course::where("user_id", auth()->id())->pluck("id");
             $assignments = \App\Models\Assignment::with("course")->withCount("submissions")->whereIn("course_id", $courseIds)->latest()->get();
-            return view('instructor.assignments', compact('assignments'));
+            $courses = \App\Models\Course::where("user_id", auth()->id())->latest()->get();
+            return view('instructor.assignments', compact('assignments', 'courses'));
         });
         Route::get('/assignments/{assignment}/edit', [AssignmentController::class, 'edit'])->name('assignments.edit');
         Route::post('/assignments/{assignment}', [AssignmentController::class, 'update']);
@@ -351,7 +369,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/quiz', function () {
             $courseIds = \App\Models\Course::where("user_id", auth()->id())->pluck("id");
             $quizzes = \App\Models\Quiz::with("course")->whereIn("course_id", $courseIds)->latest()->get();
-            return view('instructor.quiz', compact('quizzes'));
+            $courses = \App\Models\Course::where("user_id", auth()->id())->latest()->get();
+            return view('instructor.quiz', compact('quizzes', 'courses'));
         });
         Route::get('/supports', function () {
             $courseIds = \App\Models\Course::where("user_id", auth()->id())->pluck("id");
@@ -361,6 +380,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::get('/settings', fn() => view('instructor.settings'));
         Route::post('/settings', [AuthController::class, 'updateProfile']);
+        Route::post('/change-password', [AuthController::class, 'changePassword']);
     });
 
     // Organization Dashboard
@@ -378,7 +398,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/courses/delete/{id}', [OrgCourseController::class, 'destroy'])->name('courses.delete');
         Route::post('/courses/{id}/lessons/reorder', [OrgCourseController::class, 'updateLessonOrder'])->name('courses.lessons.reorder');
         Route::get('/courses/{id}/lessons', [OrgCourseController::class, 'lessons'])->name('courses.lessons');
-        Route::post('/courses/{id}/lessons', [OrgCourseController::class, 'storeLesson']);
+        Route::post('/courses/{id}/lessons', [OrgCourseController::class, 'storeLesson'])->name('courses.lessons.store');
         Route::post('/courses/{courseId}/lessons/{lessonId}/delete', [OrgCourseController::class, 'destroyLesson'])->name('courses.lessons.delete');
         Route::get('/courses/bundle', function () {
             $bundles = \App\Models\Bundle::withCount('courses')->latest()->get();
@@ -426,6 +446,7 @@ Route::middleware('auth')->group(function () {
         });
         Route::get('/settings', fn() => view('org.settings'));
         Route::post('/settings', [AuthController::class, 'updateProfile']);
+        Route::post('/change-password', [AuthController::class, 'changePassword']);
         Route::get('/profile', function () {
             $user = auth()->user();
             $courseCount = \App\Models\Course::where("user_id", $user->id)->count();

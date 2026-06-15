@@ -30,6 +30,15 @@
                     <option value="Other" @selected(old('category') === 'Other')>Other</option>
                 </select>
             </div>
+            <div id="courseSelectGroup" style="display: none;">
+                <label class="block text-sm font-semibold text-heading mb-1">Select Course *</label>
+                <select name="course_id" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm text-heading font-semibold focus:outline-none focus:border-primary">
+                    <option value="">Select course</option>
+                    @foreach($courses ?? [] as $course)
+                        <option value="{{ $course->id }}" @selected(old('course_id') == $course->id)>{{ $course->title }}</option>
+                    @endforeach
+                </select>
+            </div>
             <div>
                 <label class="block text-sm font-semibold text-heading mb-1">Priority</label>
                 <select name="priority" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm text-heading font-semibold focus:outline-none focus:border-primary">
@@ -46,4 +55,26 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categorySelect = document.querySelector('select[name="category"]');
+        const courseSelectGroup = document.getElementById('courseSelectGroup');
+        const courseSelect = document.querySelector('select[name="course_id"]');
+
+        function toggleCourseSelect() {
+            if (categorySelect.value === 'Course Related') {
+                courseSelectGroup.style.display = 'block';
+                courseSelect.setAttribute('required', 'required');
+            } else {
+                courseSelectGroup.style.display = 'none';
+                courseSelect.removeAttribute('required');
+                courseSelect.value = '';
+            }
+        }
+
+        categorySelect.addEventListener('change', toggleCourseSelect);
+        toggleCourseSelect();
+    });
+</script>
 @endsection

@@ -16,50 +16,35 @@
 
 <section class="py-12 lg:py-16">
     <div class="max-w-7xl mx-auto px-4">
-        <div class="flex flex-col lg:flex-row gap-8">
-            <aside class="lg:w-72 shrink-0">
-                <div class="bg-white rounded-xl p-6 shadow-sm space-y-6">
-                    <div>
-                        <h3 class="font-bold text-heading mb-3">Designation</h3>
-                        <div class="space-y-2">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" class="text-primary rounded focus:ring-primary">
-                                <span class="text-sm text-heading/70">Senior Web Developer (1)</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-heading mb-3">Time Zones</h3>
-                        <div class="space-y-2">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" class="text-primary rounded focus:ring-primary">
-                                <span class="text-sm text-heading/70">Africa/Lusaka</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-heading mb-3">Language</h3>
-                        <div class="space-y-2">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" class="text-primary rounded focus:ring-primary">
-                                <span class="text-sm text-heading/70">English</span>
-                            </label>
-                        </div>
-                    </div>
+        <div class="mb-6 flex items-center justify-between">
+            <p class="text-sm text-heading/60">{{ $instructors->count() }} Instructor{{ $instructors->count() !== 1 ? 's' : '' }} Available</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @forelse($instructors as $instructor)
+            <div class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 p-6 text-center">
+                <div class="w-20 h-20 rounded-full bg-primary-50 flex items-center justify-center mx-auto mb-4">
+                    <i class="ri-user-smile-line text-3xl text-primary"></i>
                 </div>
-            </aside>
-
-            <div class="flex-1">
-                <div class="flex items-center justify-between mb-6">
-                    <p class="text-sm text-heading/60">Showing 1 - 1 of 1 Results</p>
-                    <button class="flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary text-sm font-semibold rounded-full hover:bg-primary hover:text-white transition-all duration-300">
-                        <i class="ri-filter-line"></i> Filter
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <x-instructor-card name="Robert Smith" designation="Senior Web Developer" url="/users/3/profile" />
+                <h3 class="font-bold text-heading text-base group-hover:text-primary transition-colors duration-300">{{ $instructor->full_name }}</h3>
+                <p class="text-sm text-primary font-semibold mt-1">{{ $instructor->designation ?? 'Instructor' }}</p>
+                @if($instructor->bio)
+                <p class="text-xs text-heading/60 mt-2 line-clamp-2">{{ $instructor->bio }}</p>
+                @endif
+                @php
+                    $courseCount = \App\Models\Course::where('user_id', $instructor->id)->where('status', 'Active')->count();
+                    $studentCount = \App\Models\Enrollment::whereIn('course_id', \App\Models\Course::where('user_id', $instructor->id)->pluck('id'))->count();
+                @endphp
+                <div class="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-gray-100 text-xs text-heading/60">
+                    <span class="flex items-center gap-1"><i class="ri-book-open-line"></i> {{ $courseCount }} Courses</span>
+                    <span class="flex items-center gap-1"><i class="ri-group-line"></i> {{ $studentCount }} Students</span>
                 </div>
             </div>
+            @empty
+            <div class="col-span-full text-center py-12 text-heading/40">
+                <i class="ri-user-search-line text-4xl block mb-2"></i>
+                No instructors available yet.
+            </div>
+            @endforelse
         </div>
     </div>
 </section>

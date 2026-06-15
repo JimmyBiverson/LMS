@@ -10,6 +10,7 @@ class SupportTicket extends Model
 {
     protected $fillable = [
         'user_id',
+        'course_id',
         'subject',
         'category',
         'priority',
@@ -20,6 +21,11 @@ class SupportTicket extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class);
     }
 
     public function replies(): HasMany

@@ -238,4 +238,16 @@ class AuthController extends Controller
 
         return $useIntended ? redirect()->intended($url) : redirect($url);
     }
+
+    public function changePassword(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $request->user()->update(['password' => Hash::make($request->password)]);
+
+        return back()->with('status', 'Password changed successfully!');
+    }
 }

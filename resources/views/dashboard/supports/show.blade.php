@@ -7,7 +7,7 @@
 @if(session('success'))<div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm font-semibold">{{ session('success') }}</div>@endif
 
 <div class="mb-6">
-    <a href="{{ auth()->user()->isAdmin() ? '/admin/support-ticket/ticket' : '/dashboard/supports' }}" class="text-sm text-primary hover:underline flex items-center gap-1">
+    <a href="{{ auth()->user()->isAdmin() ? '/admin/support-ticket/ticket' : (auth()->user()->isInstructor() ? '/instructor/supports' : '/dashboard/supports') }}" class="text-sm text-primary hover:underline flex items-center gap-1">
         <i class="ri-arrow-left-line"></i> Back to tickets
     </a>
 </div>

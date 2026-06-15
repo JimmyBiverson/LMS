@@ -9,6 +9,7 @@ use App\Models\Lesson;
 use App\Models\Level;
 use App\Models\Tag;
 use App\Models\User;
+use App\Traits\HandleUploads;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +17,7 @@ use Illuminate\View\View;
 
 class CourseController extends Controller
 {
+    use HandleUploads;
     public function index(): View
     {
         $courses = Course::with('lessons')->where('user_id', auth()->id())->get();
@@ -70,11 +72,11 @@ class CourseController extends Controller
             'outcomes' => ['nullable', 'string'],
             'requirements' => ['nullable', 'string'],
             'payment_type' => ['required', 'in:free,paid'],
-            'price' => ['required_if:payment_type,paid', 'numeric', 'min:0'],
+            'price' => ['required_if:payment_type,paid', 'nullable', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'instructor_id' => ['nullable', 'exists:users,id'],
             'status' => ['required', 'string', 'in:Active,Draft'],
-            'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'thumbnail' => ['nullable', 'image', 'max:20480'],
         ]);
 
         $validated['user_id'] = auth()->id();
@@ -129,11 +131,11 @@ class CourseController extends Controller
             'outcomes' => ['nullable', 'string'],
             'requirements' => ['nullable', 'string'],
             'payment_type' => ['required', 'in:free,paid'],
-            'price' => ['required_if:payment_type,paid', 'numeric', 'min:0'],
+            'price' => ['required_if:payment_type,paid', 'nullable', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'instructor_id' => ['nullable', 'exists:users,id'],
             'status' => ['required', 'string', 'in:Active,Draft'],
-            'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'thumbnail' => ['nullable', 'image', 'max:20480'],
         ]);
 
         if ($validated['payment_type'] === 'free') {
@@ -170,16 +172,31 @@ class CourseController extends Controller
     {
         $course = Course::where('user_id', auth()->id())->findOrFail($courseId);
 
+        $uploadErrors = [];
+        if ($error = $this->getFileUploadErrorMessage('video_file', 'The video file')) {
+            $uploadErrors['video_file'] = $error;
+        }
+        if ($error = $this->getFileUploadErrorMessage('document_file', 'The document file')) {
+            $uploadErrors['document_file'] = $error;
+        }
+
+        if (!empty($uploadErrors)) {
+            return back()->withErrors($uploadErrors)->withInput();
+        }
+
         $validated = $request->validate([
             'title'           => ['required', 'string', 'max:255'],
             'content'         => ['nullable', 'string'],
             'video_url'       => ['nullable', 'url', 'max:500'],
-            'video_file'      => ['nullable', 'file', 'mimes:mp4,mov,avi,webm,ogg', 'max:512000'],
-            'document_file'   => ['nullable', 'file', 'mimes:pdf,doc,docx,ppt,pptx,xls,xlsx', 'max:51200'],
+            'video_file'      => ['nullable', 'file', 'max:512000'],
+            'document_file'   => ['nullable', 'file', 'max:51200'],
             'duration'        => ['nullable', 'string', 'max:50'],
             'order'           => ['nullable', 'integer', 'min:0'],
             'is_free_preview' => ['nullable', 'boolean'],
             'status'          => ['nullable', 'string', 'in:draft,published'],
+        ], [
+            'video_file.uploaded' => 'The video file failed to upload. It may be too large or the upload was interrupted.',
+            'document_file.uploaded' => 'The document file failed to upload. It may be too large or the upload was interrupted.',
         ]);
 
         // Require at least one media source
@@ -198,12 +215,42 @@ class CourseController extends Controller
         $validated['is_free_preview'] = $request->boolean('is_free_preview');
         $validated['status']          = $validated['status'] ?? 'published';
 
+        // Handle video file upload - non-blocking
         if ($request->hasFile('video_file')) {
-            $validated['video_file'] = $request->file('video_file')->store('lessons/videos', 'public');
+            try {
+                $validated['video_file'] = $this->storeVideo($request->file('video_file'));
+            } catch (Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Video file upload failed', [
+                    'course_id' => $course->id,
+                    'file' => $request->file('video_file')->getClientOriginalName(),
+                    'error' => $e->getMessage(),
+                ]);
+                unset($validated['video_file']);
+            }
         }
 
+        // Handle document file upload - non-blocking
         if ($request->hasFile('document_file')) {
-            $validated['document_file'] = $request->file('document_file')->store('lessons/documents', 'public');
+            try {
+                $validated['document_file'] = $this->storeDocument($request->file('document_file'));
+            } catch (Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Document file upload failed', [
+                    'course_id' => $course->id,
+                    'file' => $request->file('document_file')->getClientOriginalName(),
+                    'error' => $e->getMessage(),
+                ]);
+                unset($validated['document_file']);
+            }
+        }
+
+        $hasStoredMedia = !empty($validated['video_url'])
+            || !empty($validated['video_file'])
+            || !empty($validated['document_file']);
+
+        if (!$hasStoredMedia) {
+            return back()
+                ->withErrors(['video_url' => 'Unable to store media. Please verify the uploaded video and/or document files and try again.'])
+                ->withInput();
         }
 
         Lesson::create($validated);

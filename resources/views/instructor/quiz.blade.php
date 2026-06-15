@@ -7,7 +7,16 @@
 <div class="bg-white rounded-xl shadow-sm">
     <div class="p-6 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
         <h3 class="font-bold text-heading">Quizzes</h3>
-        <a href="#" class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all duration-300"><i class="ri-add-line mr-1"></i> Add Quiz</a>
+        @if($courses->count() > 0)
+        <form method="GET" action="/instructor/courses/{{ $courses->first()->id }}/quizzes/create" class="flex items-center gap-2" id="quizCourseForm">
+            <select name="course_id" onchange="document.getElementById('quizCourseForm').action='/instructor/courses/'+this.value+'/quizzes/create'" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary">
+                @foreach($courses as $c)
+                <option value="{{ $c->id }}">{{ $c->title }}</option>
+                @endforeach
+            </select>
+            <button type="submit" class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all duration-300 whitespace-nowrap"><i class="ri-add-line mr-1"></i> Add Quiz</button>
+        </form>
+        @endif
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">

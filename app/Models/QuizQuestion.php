@@ -12,12 +12,9 @@ class QuizQuestion extends Model
 
     protected $fillable = ['quiz_id', 'question', 'type', 'options', 'correct_answer', 'marks', 'order'];
 
-    protected function casts(): array
-    {
-        return [
-            'options' => 'array',
-        ];
-    }
+    protected $casts = [
+        'options' => 'array',
+    ];
 
     public function quiz(): BelongsTo
     {

@@ -27,3 +27,13 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Temporary files
+*.tmp
+~$*
+temp_debug.php
+tmpinfo.php
+.user.ini
+
+# Storage temporary
+/storage/tmp/

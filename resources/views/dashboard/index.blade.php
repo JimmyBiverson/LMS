@@ -39,7 +39,7 @@ $notifUrl = url('dashboard/notifications');
     </div>
     <div class="bg-gradient-to-br from-sky-400 to-sky-600 rounded-xl p-5 shadow-lg text-white">
         <p class="text-sky-100 text-sm font-medium">Wishlist</p>
-        <p class="text-3xl font-extrabold mt-1">0</p>
+        <p class="text-3xl font-extrabold mt-1">{{ \App\Models\Wishlist::where('user_id', auth()->id())->count() }}</p>
         <div class="mt-2 flex items-center gap-1 text-sky-100 text-xs"><i class="ri-heart-line"></i> Saved courses</div>
     </div>
 </div>

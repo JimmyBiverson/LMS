@@ -87,7 +87,7 @@
                     @endforeach
                 </select>
             </div>
-            <div><label class="block text-sm font-semibold text-heading mb-1">Thumbnail</label><input name="thumbnail" type="file" accept="image/jpg,image/jpeg,image/png,image/webp" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
+            <div><label class="block text-sm font-semibold text-heading mb-1">Thumbnail</label><input name="thumbnail" type="file" accept="image/jpeg,image/png,image/webp" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
             <button type="submit" class="px-8 py-3 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300">Update Course</button>
         </form>
     </div>

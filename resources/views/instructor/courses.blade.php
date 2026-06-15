@@ -5,9 +5,13 @@
 @section('sidebar')@include('components.instructor-sidebar')@stop
 @section('content')
 <div class="bg-white rounded-xl shadow-sm">
-    <div class="p-6 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
+    <div class="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
         <h3 class="font-bold text-heading">All Courses</h3>
-        <a href="/instructor/courses/create" class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all duration-300"><i class="ri-add-line mr-1"></i> Add New</a>
+        <div class="flex flex-wrap gap-2">
+            <a href="/instructor/courses/create" class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all duration-300"><i class="ri-add-line mr-1"></i> Add New</a>
+            <a href="/instructor/quiz" class="px-4 py-2 bg-secondary text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all duration-300"><i class="ri-questionnaire-line mr-1"></i> Quizzes</a>
+            <a href="/instructor/assignments" class="px-4 py-2 bg-secondary text-white text-sm font-semibold rounded-full hover:opacity-90 transition-all duration-300"><i class="ri-file-list-3-line mr-1"></i> Assignments</a>
+        </div>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">

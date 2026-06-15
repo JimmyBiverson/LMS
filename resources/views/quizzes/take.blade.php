@@ -6,6 +6,14 @@
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
             <h1 class="text-2xl font-extrabold text-heading mb-2">{{ $quiz->title }}</h1>
             @if($quiz->instructions)<p class="text-heading/70 mb-4">{{ $quiz->instructions }}</p>@endif
+            @if($quiz->instructions_file)
+            <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 class="font-semibold text-heading text-sm mb-2 flex items-center gap-2">
+                    <i class="ri-file-pdf-line text-primary"></i> Quiz Instructions Document
+                </h4>
+                <a href="{{ asset('storage/' . $quiz->instructions_file) }}" target="_blank" class="text-primary hover:underline text-sm font-semibold">Download Instructions</a>
+            </div>
+            @endif
             <div class="flex gap-4 text-sm text-heading/60">
                 <span><i class="ri-time-line mr-1"></i>{{ $quiz->time_limit ? $quiz->time_limit . ' min' : 'No limit' }}</span>
                 <span><i class="ri-question-line mr-1"></i>{{ $quiz->questions->count() }} questions</span>
@@ -17,13 +25,58 @@
             @foreach($quiz->questions as $i => $q)
             <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
                 <h3 class="font-bold text-heading mb-3">{{ $i+1 }}. {{ $q->question }} <span class="text-xs text-heading/50 font-normal">({{ $q->marks }} mark{{ $q->marks>1?'s':'' }})</span></h3>
-                <div class="space-y-2">
-                    @foreach($q->options as $opt)
-                    <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-primary cursor-pointer transition-colors">
-                        <input type="radio" name="answers[{{ $q->id }}]" value="{{ $opt }}" class="text-primary focus:ring-primary">
-                        <span class="text-sm text-heading/80">{{ $opt }}</span>
-                    </label>
-                    @endforeach
+                <div class="space-y-3">
+                    @if(in_array($q->type, ['multiple_choice', 'true_false']))
+                        @foreach($q->options as $opt)
+                        <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-primary cursor-pointer transition-colors">
+                            <input type="radio" name="answers[{{ $q->id }}]" value="{{ $opt }}" class="text-primary focus:ring-primary">
+                            <span class="text-sm text-heading/80">{{ $opt }}</span>
+                        </label>
+                        @endforeach
+                    @elseif($q->type === 'multiple_select')
+                        @foreach($q->options as $opt)
+                        <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-primary cursor-pointer transition-colors">
+                            <input type="checkbox" name="answers[{{ $q->id }}][]" value="{{ $opt }}" class="text-primary focus:ring-primary">
+                            <span class="text-sm text-heading/80">{{ $opt }}</span>
+                        </label>
+                        @endforeach
+                    @elseif($q->type === 'short_answer')
+                        <input type="text" name="answers[{{ $q->id }}]" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Your answer">
+                    @elseif($q->type === 'essay')
+                        <textarea name="answers[{{ $q->id }}]" rows="5" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Write your essay response here..."></textarea>
+                    @elseif($q->type === 'fill_in_blank')
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            @foreach($q->options as $index => $blank)
+                            <label class="space-y-1 text-sm text-heading/80">
+                                Blank {{ $index + 1 }}
+                                <input type="text" name="answers[{{ $q->id }}][]" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Answer for blank {{ $index + 1 }}">
+                            </label>
+                            @endforeach
+                        </div>
+                    @elseif($q->type === 'matching')
+                        @foreach($q->options as $index => $pair)
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
+                            <div>
+                                <label class="block text-sm font-semibold text-heading mb-1">Match for: {{ $pair['key'] }}</label>
+                                <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50" value="{{ $pair['key'] }}" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-heading mb-1">Choose match</label>
+                                <select name="answers[{{ $q->id }}][{{ $index }}]" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    <option value="">Select answer</option>
+                                    @foreach($q->options as $matchOption)
+                                    <option value="{{ $matchOption['value'] }}">{{ $matchOption['value'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        @endforeach
+                    @elseif($q->type === 'ordering')
+                        <label class="block text-sm font-semibold text-heading mb-1">Enter the items in correct order, one item per line</label>
+                        <textarea name="answers[{{ $q->id }}]" rows="{{ max(3, min(8, count($q->options))) }}" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="{{ implode('\n', $q->options) }}"></textarea>
+                    @else
+                        <p class="text-sm text-heading/70">This question type cannot be answered online.</p>
+                    @endif
                 </div>
             </div>
             @endforeach

@@ -139,22 +139,28 @@
 {{-- Stats --}}
 <section class="py-16 bg-[#111827] text-white">
     <div class="max-w-7xl mx-auto px-4">
+        @php
+            $totalStudents = \App\Models\User::where('role', 'student')->where('status', 'active')->count();
+            $totalInstructors = \App\Models\User::where('role', 'instructor')->where('status', 'active')->count();
+            $totalCourses = \App\Models\Course::where('status', 'Active')->count();
+            $totalEnrollments = \App\Models\Enrollment::count();
+        @endphp
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             <div>
-                <span class="text-4xl lg:text-5xl font-extrabold text-secondary">8+</span>
-                <p class="text-white/70 mt-2">Years Experience</p>
+                <span class="text-4xl lg:text-5xl font-extrabold text-secondary">{{ $totalCourses }}+</span>
+                <p class="text-white/70 mt-2">Active Courses</p>
             </div>
             <div>
-                <span class="text-4xl lg:text-5xl font-extrabold text-secondary">2+</span>
+                <span class="text-4xl lg:text-5xl font-extrabold text-secondary">{{ $totalInstructors }}+</span>
                 <p class="text-white/70 mt-2">Expert Tutors</p>
             </div>
             <div>
-                <span class="text-4xl lg:text-5xl font-extrabold text-secondary">2+</span>
-                <p class="text-white/70 mt-2">Satisfied Students</p>
+                <span class="text-4xl lg:text-5xl font-extrabold text-secondary">{{ $totalStudents }}+</span>
+                <p class="text-white/70 mt-2">Enrolled Students</p>
             </div>
             <div>
-                <span class="text-4xl lg:text-5xl font-extrabold text-secondary">2+</span>
-                <p class="text-white/70 mt-2">Upcoming Courses</p>
+                <span class="text-4xl lg:text-5xl font-extrabold text-secondary">{{ $totalEnrollments }}+</span>
+                <p class="text-white/70 mt-2">Total Enrollments</p>
             </div>
         </div>
     </div>

@@ -97,7 +97,7 @@
             </h3>
             <p class="text-xs text-heading/50 mb-5">Upload at least one media: a video or a document.</p>
 
-            <form method="POST" action="{{ route('instructor.dashboard.courses.lessons', $course->id) }}" class="space-y-4" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('instructor.dashboard.courses.lessons.store', $course->id) }}" class="space-y-4" enctype="multipart/form-data">
                 @csrf
                 <div>
                     <label class="block text-sm font-semibold text-heading mb-1">Lesson Title <span class="text-red-500">*</span></label>

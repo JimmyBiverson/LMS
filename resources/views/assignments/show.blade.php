@@ -31,7 +31,7 @@
                     <tr class="hover:bg-gray-50">
                         <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
                         <td class="py-4 px-6 font-semibold text-heading">{{ $s->user?->name ?? 'Unknown' }}</td>
-                        <td class="py-4 px-6 text-heading/70">{{ $s->submitted_at->format('Y-m-d H:i') }}</td>
+                        <td class="py-4 px-6 text-heading/70">{{ $s->created_at->format('Y-m-d H:i') }}</td>
                         <td class="py-4 px-6 text-heading/70">{{ $s->score !== null ? $s->score . '/' . $assignment->total_marks : '--' }}</td>
                         <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $s->status=='graded' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ ucfirst($s->status) }}</span></td>
                         <td class="py-4 px-6 text-right">

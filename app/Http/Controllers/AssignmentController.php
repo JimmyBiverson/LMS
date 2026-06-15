@@ -29,12 +29,18 @@ class AssignmentController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'instructions' => 'nullable|string',
+            'instructions_file' => 'nullable|file|mimes:pdf,doc,docx,txt|max:10240',
             'due_date' => 'nullable|date',
             'total_marks' => 'required|integer|min:1',
             'status' => 'required|in:draft,published',
         ]);
         $validated['course_id'] = $course->id;
         $validated['user_id'] = auth()->id();
+        
+        if ($request->hasFile('instructions_file')) {
+            $validated['instructions_file'] = $request->file('instructions_file')->store('assignments/instructions', 'public');
+        }
+        
         Assignment::create($validated);
         return redirect("/instructor/courses/{$course->id}/assignments")->with('success', 'Assignment created!');
     }
@@ -56,10 +62,20 @@ class AssignmentController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'instructions' => 'nullable|string',
+            'instructions_file' => 'nullable|file|mimes:pdf,doc,docx,txt|max:10240',
             'due_date' => 'nullable|date',
             'total_marks' => 'required|integer|min:1',
             'status' => 'required|in:draft,published',
         ]);
+        
+        if ($request->hasFile('instructions_file')) {
+            // Delete old file if exists
+            if ($assignment->instructions_file && \Storage::disk('public')->exists($assignment->instructions_file)) {
+                \Storage::disk('public')->delete($assignment->instructions_file);
+            }
+            $validated['instructions_file'] = $request->file('instructions_file')->store('assignments/instructions', 'public');
+        }
+        
         $assignment->update($validated);
         return back()->with('success', 'Assignment updated!');
     }
@@ -74,16 +90,38 @@ class AssignmentController extends Controller
     // ─── Student: Submit ──────────────────────────────────────────
     public function submitForm(Assignment $assignment): View
     {
+        // Check if student is enrolled in the course
+        $isEnrolled = \App\Models\Enrollment::where('user_id', auth()->id())
+            ->where('course_id', $assignment->course_id)
+            ->exists();
+        
+        if (!$isEnrolled) {
+            abort(403, 'You are not enrolled in this course.');
+        }
+        
         $assignment->load('course');
         return view('assignments.submit', compact('assignment'));
     }
 
     public function submit(Request $request, Assignment $assignment): RedirectResponse
     {
+        // Check if student is enrolled in the course
+        $isEnrolled = \App\Models\Enrollment::where('user_id', auth()->id())
+            ->where('course_id', $assignment->course_id)
+            ->exists();
+        
+        if (!$isEnrolled) {
+            abort(403, 'You are not enrolled in this course.');
+        }
+        
         $validated = $request->validate([
             'submission_text' => 'nullable|string',
             'file' => 'nullable|file|mimes:pdf,doc,docx,txt,zip|max:10240',
         ]);
+
+        if (empty($validated['submission_text']) && !$request->hasFile('file')) {
+            return back()->withErrors(['submission_text' => 'Please provide submission text or upload a file.'])->withInput();
+        }
 
         $data = [
             'assignment_id' => $assignment->id,

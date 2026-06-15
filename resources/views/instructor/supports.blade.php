@@ -14,6 +14,7 @@
                 <th class="text-left py-4 px-6 font-semibold">Subject</th>
                 <th class="text-left py-4 px-6 font-semibold">Date</th>
                 <th class="text-left py-4 px-6 font-semibold">Status</th>
+                <th class="text-right py-4 px-6 font-semibold">Action</th>
             </tr></thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse($tickets as $ticket)
@@ -23,9 +24,10 @@
                     <td class="py-4 px-6 text-heading/70">{{ $ticket->subject }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $ticket->created_at->format("Y-m-d") }}</td>
                     <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold {{ $ticket->status === "resolved" ? "bg-green-100 text-green-700" : ($ticket->status === "pending" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700") }}">{{ ucfirst($ticket->status) }}</span></td>
+                    <td class="py-4 px-6 text-right"><a href="/dashboard/supports/{{ $ticket->id }}" class="text-primary text-sm font-semibold hover:underline">View</a></td>
                 </tr>
                 @empty
-                <tr><td colspan="5" class="py-12 text-center text-heading/40 text-sm">No support tickets.</td></tr>
+                <tr><td colspan="6" class="py-12 text-center text-heading/40 text-sm">No support tickets.</td></tr>
                 @endforelse
             </tbody>
         </table>

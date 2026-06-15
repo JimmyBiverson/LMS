@@ -22,7 +22,14 @@ class SupportTicketController extends Controller
 
     public function show(SupportTicket $supportTicket): View
     {
-        if ($supportTicket->user_id !== auth()->id() && !auth()->user()?->isAdmin()) {
+        $isInstructorOfCourse = false;
+        if ($supportTicket->course_id) {
+            $isInstructorOfCourse = \App\Models\Course::where('id', $supportTicket->course_id)
+                ->where('user_id', auth()->id())
+                ->exists();
+        }
+
+        if ($supportTicket->user_id !== auth()->id() && !auth()->user()?->isAdmin() && !$isInstructorOfCourse) {
             abort(403);
         }
 
@@ -38,18 +45,29 @@ class SupportTicketController extends Controller
             'category' => ['required', 'string', 'max:255'],
             'priority' => ['required', 'string', 'in:Low,Medium,High'],
             'message' => ['required', 'string'],
+            'course_id' => ['nullable', 'exists:courses,id'],
         ]);
 
         $validated['user_id'] = auth()->id();
 
-        SupportTicket::create($validated);
+        $ticket = SupportTicket::create($validated);
+        
+        // Send notification to instructor and admins
+        \App\Notifications\SupportTicketCreated::send($ticket);
 
         return redirect()->route('dashboard.supports')->with('success', 'Support ticket created successfully!');
     }
 
     public function reply(Request $request, SupportTicket $supportTicket): RedirectResponse
     {
-        if ($supportTicket->user_id !== auth()->id() && !auth()->user()?->isAdmin()) {
+        $isInstructorOfCourse = false;
+        if ($supportTicket->course_id) {
+            $isInstructorOfCourse = \App\Models\Course::where('id', $supportTicket->course_id)
+                ->where('user_id', auth()->id())
+                ->exists();
+        }
+
+        if ($supportTicket->user_id !== auth()->id() && !auth()->user()?->isAdmin() && !$isInstructorOfCourse) {
             abort(403);
         }
 
@@ -66,6 +84,9 @@ class SupportTicketController extends Controller
         if ($supportTicket->status === 'Closed') {
             $supportTicket->update(['status' => 'Open']);
         }
+
+        // Send notification about this reply
+        \App\Notifications\SupportTicketReply::send($supportTicket, auth()->user());
 
         return back()->with('success', 'Reply added successfully.');
     }

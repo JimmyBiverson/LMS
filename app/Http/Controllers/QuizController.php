@@ -31,6 +31,7 @@ class QuizController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'instructions' => 'nullable|string',
+            'instructions_file' => 'nullable|file|mimes:pdf,doc,docx,txt|max:10240',
             'time_limit' => 'nullable|integer|min:1',
             'passing_score' => 'required|integer|min:0|max:100',
             'attempts_limit' => 'nullable|integer|min:1',
@@ -38,6 +39,11 @@ class QuizController extends Controller
         ]);
         $validated['course_id'] = $course->id;
         $validated['user_id'] = auth()->id();
+        
+        if ($request->hasFile('instructions_file')) {
+            $validated['instructions_file'] = $request->file('instructions_file')->store('quizzes/instructions', 'public');
+        }
+        
         Quiz::create($validated);
         return redirect("/instructor/courses/{$course->id}/quizzes")->with('success', 'Quiz created!');
     }
@@ -53,11 +59,21 @@ class QuizController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'instructions' => 'nullable|string',
+            'instructions_file' => 'nullable|file|mimes:pdf,doc,docx,txt|max:10240',
             'time_limit' => 'nullable|integer|min:1',
             'passing_score' => 'required|integer|min:0|max:100',
             'attempts_limit' => 'nullable|integer|min:1',
             'status' => 'required|in:draft,published',
         ]);
+        
+        if ($request->hasFile('instructions_file')) {
+            // Delete old file if exists
+            if ($quiz->instructions_file && \Storage::disk('public')->exists($quiz->instructions_file)) {
+                \Storage::disk('public')->delete($quiz->instructions_file);
+            }
+            $validated['instructions_file'] = $request->file('instructions_file')->store('quizzes/instructions', 'public');
+        }
+        
         $quiz->update($validated);
         return back()->with('success', 'Quiz updated!');
     }
@@ -74,35 +90,181 @@ class QuizController extends Controller
     {
         $validated = $request->validate([
             'question' => 'required|string',
-            'type' => 'required|in:multiple_choice,true_false,matching,short_answer',
-            'options' => 'nullable|array',
-            'options.*' => 'nullable|string',
-            'correct_answer' => 'required|string',
+            'type' => 'required|in:multiple_choice,multiple_select,true_false,matching,short_answer,essay,fill_in_blank,ordering',
+            'options' => 'nullable',
+            'correct_answer' => 'nullable',
             'marks' => 'required|integer|min:1',
         ]);
-        if (in_array($validated['type'], ['multiple_choice', 'true_false'])) {
-            $validated['options'] = array_values($validated['options'] ?? []);
-        }
-        if ($validated['type'] === 'short_answer') {
-            $validated['options'] = null;
-        }
-        if ($validated['type'] === 'matching') {
+
+        if (in_array($validated['type'], ['multiple_choice', 'multiple_select'], true)) {
+            $request->validate([
+                'options' => 'required|string',
+                'correct_answer' => 'required|string',
+            ]);
+        } elseif ($validated['type'] === 'true_false') {
+            $request->validate(['correct_answer' => 'required|in:True,False,true,false']);
+        } elseif ($validated['type'] === 'short_answer') {
+            $request->validate(['correct_answer' => 'required|string']);
+        } elseif ($validated['type'] === 'fill_in_blank') {
+            $request->validate(['blanks' => 'required|array|min:1', 'blanks.*' => 'required|string']);
+        } elseif ($validated['type'] === 'matching') {
             $request->validate(['pairs' => 'required|array|min:2', 'pairs.*.key' => 'required|string', 'pairs.*.value' => 'required|string']);
-            $validated['options'] = $request->pairs;
+        } elseif ($validated['type'] === 'ordering') {
+            $request->validate(['items' => 'required|array|min:2', 'items.*' => 'required|string']);
         }
+
+        match ($validated['type']) {
+            'multiple_choice' => $this->processMCQOptions($validated),
+            'multiple_select' => $this->processMultipleSelectOptions($validated),
+            'true_false' => $this->processTrueFalse($validated),
+            'matching' => $this->processMatching($validated, $request),
+            'short_answer' => $this->processShortAnswer($validated),
+            'essay' => $this->processEssay($validated),
+            'fill_in_blank' => $this->processFillInBlank($validated, $request),
+            'ordering' => $this->processOrdering($validated, $request),
+        };
+
         $validated['quiz_id'] = $quiz->id;
-        $validated['order'] = $quiz->questions()->count() + 1;
+        $validated['order'] = ($quiz->questions()->max('order') ?? 0) + 1;
         QuizQuestion::create($validated);
-        $quiz->increment('total_marks', $validated['marks']);
-        return back()->with('success', 'Question added!');
+
+        if ($this->isScorableQuestion($validated['type'])) {
+            $quiz->increment('total_marks', $validated['marks']);
+        }
+
+        return back()->with('success', 'Question added successfully!');
     }
 
-    public function destroyQuestion(QuizQuestion $question): RedirectResponse
+    protected function processMCQOptions(&$validated): void
     {
-        $quiz = $question->quiz;
-        $quiz->decrement('total_marks', $question->marks);
-        $question->delete();
-        return back()->with('success', 'Question deleted!');
+        $validated['options'] = $this->normalizeLines($validated['options'] ?? '');
+        $validated['correct_answer'] = $this->normalizeSingleAnswer($validated['correct_answer'] ?? '', $validated['options']);
+    }
+
+    protected function processMultipleSelectOptions(&$validated): void
+    {
+        $validated['options'] = $this->normalizeLines($validated['options'] ?? '');
+        $answers = $this->normalizeMultipleAnswer($validated['correct_answer'] ?? '');
+        $validated['correct_answer'] = implode(',', array_values(array_intersect($answers, $validated['options'])));
+    }
+
+    protected function processShortAnswer(&$validated): void
+    {
+        $validated['options'] = null;
+    }
+
+    protected function processEssay(&$validated): void
+    {
+        $validated['options'] = null;
+        $validated['correct_answer'] = null;
+    }
+
+    protected function processTrueFalse(&$validated): void
+    {
+        $validated['options'] = ['True', 'False'];
+        $validated['correct_answer'] = in_array($validated['correct_answer'], ['True', 'False', 'true', 'false'], true)
+            ? ucfirst(strtolower($validated['correct_answer']))
+            : 'True';
+    }
+
+    protected function processMatching(&$validated, Request $request): void
+    {
+        $validated['options'] = array_values($request->input('pairs', []));
+        $validated['correct_answer'] = null;
+    }
+
+    protected function processFillInBlank(&$validated, Request $request): void
+    {
+        $validated['options'] = array_values(array_filter(array_map('trim', $request->input('blanks', [])), 'strlen'));
+        $validated['correct_answer'] = null;
+    }
+
+    protected function processOrdering(&$validated, Request $request): void
+    {
+        $validated['options'] = array_values(array_filter(array_map('trim', $request->input('items', [])), 'strlen'));
+        $validated['correct_answer'] = null;
+    }
+
+    protected function normalizeLines(string $value): array
+    {
+        return array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $value) ?: [], 'strlen')));
+    }
+
+    protected function normalizeSingleAnswer(string $answer, array $options): string
+    {
+        $answer = trim($answer);
+        if ($answer === '' && count($options) > 0) {
+            return $options[0];
+        }
+        return $answer;
+    }
+
+    protected function normalizeMultipleAnswer(string $answer): array
+    {
+        return array_values(array_filter(array_map('trim', preg_split('/,|\r\n|\r|\n/', $answer) ?: []), 'strlen'));
+    }
+
+    protected function isScorableQuestion(string $type): bool
+    {
+        return in_array($type, ['multiple_choice', 'multiple_select', 'true_false', 'short_answer', 'fill_in_blank', 'matching', 'ordering'], true);
+    }
+
+    protected function isCorrectAnswer(QuizQuestion $question, mixed $submitted): bool
+    {
+        if (! $this->isScorableQuestion($question->type) || $question->type === 'essay') {
+            return false;
+        }
+
+        switch ($question->type) {
+            case 'multiple_choice':
+            case 'true_false':
+                return trim((string) $submitted) === trim((string) $question->correct_answer);
+            case 'multiple_select':
+                if (! is_array($submitted)) {
+                    return false;
+                }
+                $expected = array_values(array_filter(array_map('trim', explode(',', (string) $question->correct_answer)), 'strlen'));
+                $given = array_values(array_filter(array_map('trim', $submitted), 'strlen'));
+                sort($expected);
+                sort($given);
+                return $expected === $given;
+            case 'short_answer':
+                return strcasecmp(trim((string) $submitted), trim((string) $question->correct_answer)) === 0;
+            case 'fill_in_blank':
+                if (! is_array($submitted)) {
+                    $submitted = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n|,/', (string) $submitted) ?: []), 'strlen'));
+                }
+                $expected = array_values(array_map('trim', $question->options ?? []));
+                if (count($submitted) !== count($expected)) {
+                    return false;
+                }
+                foreach ($expected as $index => $value) {
+                    if (strcasecmp($value, $submitted[$index]) !== 0) {
+                        return false;
+                    }
+                }
+                return true;
+            case 'matching':
+                if (! is_array($submitted)) {
+                    return false;
+                }
+                $expected = array_values($question->options ?? []);
+                foreach ($expected as $index => $pair) {
+                    if (! array_key_exists($index, $submitted) || strcasecmp(trim((string) $submitted[$index]), trim((string) $pair['value'])) !== 0) {
+                        return false;
+                    }
+                }
+                return true;
+            case 'ordering':
+                if (! is_array($submitted)) {
+                    $submitted = array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', (string) $submitted) ?: []), 'strlen'));
+                }
+                $expected = array_values($question->options ?? []);
+                $actual = array_values(array_map('trim', $submitted));
+                return $expected === $actual;
+        }
+
+        return false;
     }
 
     // ─── Student: Take Quiz ───────────────────────────────────────
@@ -141,7 +303,8 @@ class QuizController extends Controller
         $answers = $request->input('answers', []);
         $score = 0;
         foreach ($quiz->questions as $q) {
-            if (isset($answers[$q->id]) && $answers[$q->id] === $q->correct_answer) {
+            $submittedAnswer = $answers[$q->id] ?? null;
+            if ($this->isCorrectAnswer($q, $submittedAnswer)) {
                 $score += $q->marks;
             }
         }

@@ -57,7 +57,7 @@
     <div>
         <div class="bg-white rounded-xl shadow-sm p-6">
             <h3 class="font-bold text-heading mb-4">Add Lesson</h3>
-            <form method="POST" action="{{ route('org.dashboard.courses.lessons', $course->id) }}" class="space-y-4">
+            <form method="POST" action="{{ route('org.dashboard.courses.lessons.store', $course->id) }}" class="space-y-4" enctype="multipart/form-data">
                 @csrf
                 <div><label class="block text-sm font-semibold text-heading mb-1">Title *</label><input name="title" type="text" value="{{ old('title') }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
                 <div><label class="block text-sm font-semibold text-heading mb-1">Content</label><textarea name="content" rows="3" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary">{{ old('content') }}</textarea></div>

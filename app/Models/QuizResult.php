@@ -12,15 +12,12 @@ class QuizResult extends Model
 
     protected $fillable = ['quiz_id', 'user_id', 'score', 'total_marks', 'answers', 'started_at', 'completed_at', 'passed'];
 
-    protected function casts(): array
-    {
-        return [
-            'answers' => 'array',
-            'started_at' => 'datetime',
-            'completed_at' => 'datetime',
-            'passed' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'answers' => 'array',
+        'started_at' => 'datetime',
+        'completed_at' => 'datetime',
+        'passed' => 'boolean',
+    ];
 
     public function quiz(): BelongsTo
     {

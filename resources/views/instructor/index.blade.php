@@ -40,7 +40,7 @@ $notifUrl = url('instructor/notifications');
     <div class="lg:col-span-2 bg-white rounded-xl shadow-sm">
         <div class="p-6 border-b border-amber-100 flex items-center justify-between">
             <h3 class="font-bold text-heading flex items-center gap-2"><span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>My Courses</h3>
-            <a href="/instructor/courses" class="text-sm text-amber-600 font-semibold hover:underline">Manage Courses</a>
+            <a href="{{ url('instructor/courses') }}" class="text-sm text-amber-600 font-semibold hover:underline">Manage Courses</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -67,7 +67,9 @@ $notifUrl = url('instructor/notifications');
         <div class="bg-white rounded-xl shadow-sm p-6">
             <h3 class="font-bold text-heading mb-4 flex items-center gap-2"><span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>Quick Actions</h3>
             <div class="space-y-3">
-                <a href="/instructor/courses/create" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"><i class="ri-add-circle-line text-lg"></i><span class="font-semibold text-sm">Create New Course</span></a>
+                <a href="{{ url('instructor/courses/create') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"><i class="ri-add-circle-line text-lg"></i><span class="font-semibold text-sm">Create New Course</span></a>
+                <a href="{{ url('instructor/quiz') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"><i class="ri-questionnaire-line text-lg"></i><span class="font-semibold text-sm">Manage Quizzes</span></a>
+                <a href="{{ url('instructor/assignments') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"><i class="ri-file-list-3-line text-lg"></i><span class="font-semibold text-sm">Manage Assignments</span></a>
                 <a href="/instructor/earnings" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"><i class="ri-funds-line text-lg"></i><span class="font-semibold text-sm">View Earnings</span></a>
                 <a href="/instructor/students" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"><i class="ri-group-line text-lg"></i><span class="font-semibold text-sm">My Students</span></a>
                 <a href="/instructor/reviews" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"><i class="ri-star-line text-lg"></i><span class="font-semibold text-sm">Course Reviews</span></a>

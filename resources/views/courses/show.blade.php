@@ -28,8 +28,9 @@
             {{-- Main Content --}}
             <div class="flex-1">
                 <div class="flex items-center gap-1 text-amber-400 text-sm mb-3">
-                    <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i>
-                    <span class="text-heading/60 ml-1">(1) Rating</span>
+                    @php $courseAvgRating = \App\Models\Review::where('course_id', $course->id)->avg('rating') ?? 0; @endphp
+                    @for($s=1;$s<=5;$s++)<i class="{{ $s <= round($courseAvgRating) ? 'ri-star-fill' : 'ri-star-line' }}"></i>@endfor
+                    <span class="text-heading/60 ml-1">({{ \App\Models\Review::where('course_id', $course->id)->count() }} {{ \App\Models\Review::where('course_id', $course->id)->count() === 1 ? 'Review' : 'Reviews' }})</span>
                 </div>
                 <h1 class="text-3xl lg:text-4xl font-extrabold text-heading mb-4">{{ $course->title }}</h1>
                 <p class="text-heading/70 leading-relaxed mb-6">
@@ -61,7 +62,7 @@
                 <div>
                     <h2 class="text-xl font-bold text-heading mb-4">Course Overview</h2>
                     <p class="text-heading/70 leading-relaxed mb-6">
-                        <strong>Web Development</strong> refers to the process of creating, building, and maintaining websites or web applications. It involves coding, designing, and structuring websites to ensure functionality, responsiveness, and an engaging user experience. Web development typically includes frontend development (user interface and visuals), backend development (server-side logic and databases), and web hosting to make the site accessible on the internet. It plays a crucial role in creating dynamic, interactive, and scalable digital platforms for businesses and individuals.
+                        {{ $course->description }}
                     </p>
 
                     @if($course->outcomes)
@@ -90,29 +91,40 @@
                     </ul>
                     @endif
 
-                    <h3 class="text-lg font-bold text-heading mb-3">Course FAQS</h3>
+                    <h3 class="text-lg font-bold text-heading mb-3">Course FAQs</h3>
+                    @php $faqs = \App\Models\Faq::where('status', 'active')->orderBy('order')->take(3)->get(); @endphp
                     <div class="space-y-3 mb-8">
+                        @forelse($faqs as $i => $faq)
                         <details class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                             <summary class="font-bold text-heading cursor-pointer flex items-center justify-between">
-                                1. What is web development?
+                                {{ $i + 1 }}. {{ $faq->question }}
                                 <i class="ri-arrow-down-s-line text-primary"></i>
                             </summary>
-                            <p class="mt-3 text-heading/70">Web development refers to the process of creating websites or web applications for the internet. It involves both front-end development (the user interface) and back-end development (server-side logic and databases).</p>
+                            <p class="mt-3 text-heading/70">{{ $faq->answer }}</p>
+                        </details>
+                        @empty
+                        <details class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                            <summary class="font-bold text-heading cursor-pointer flex items-center justify-between">
+                                1. What will I learn in this course?
+                                <i class="ri-arrow-down-s-line text-primary"></i>
+                            </summary>
+                            <p class="mt-3 text-heading/70">This course covers all the key concepts and practical skills needed to master the subject. By the end, you'll be able to apply your knowledge to real-world projects.</p>
                         </details>
                         <details class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                             <summary class="font-bold text-heading cursor-pointer flex items-center justify-between">
                                 2. Who is this course for?
                                 <i class="ri-arrow-down-s-line text-primary"></i>
                             </summary>
-                            <p class="mt-3 text-heading/70">This course is designed for beginners, intermediate learners, and anyone interested in building websites or web applications. No prior programming experience is required.</p>
+                            <p class="mt-3 text-heading/70">This course is designed for learners at all levels. Whether you're a beginner or looking to advance your skills, you'll find valuable content throughout.</p>
                         </details>
                         <details class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                             <summary class="font-bold text-heading cursor-pointer flex items-center justify-between">
-                                3. How long is the course?
+                                3. How long will I have access?
                                 <i class="ri-arrow-down-s-line text-primary"></i>
                             </summary>
-                            <p class="mt-3 text-heading/70">The course duration is typically 3 weeks (customize based on your course). It consists of video lectures, hands-on projects, and quizzes.</p>
+                            <p class="mt-3 text-heading/70">Once enrolled, you'll have lifetime access to all course materials, including any future updates.</p>
                         </details>
+                        @endforelse
                     </div>
 
                     <h3 class="text-lg font-bold text-heading mb-4">Course Curriculum</h3>
@@ -134,7 +146,16 @@
                                 </form>
                                 @endif
                                 @endauth
-                                <span class="font-bold text-heading text-sm {{ $lessonCompleted ? 'text-green-600' : '' }}">{{ $lesson->title }}</span>
+                                <a href="/courses/{{ $course->slug }}/lessons/{{ $lesson->id }}" class="font-bold text-heading text-sm hover:text-primary transition-colors flex items-center gap-2 {{ $lessonCompleted ? 'text-green-600' : '' }}">
+                                    @if($lesson->video_file || $lesson->video_url)
+                                        <i class="ri-play-circle-line text-lg text-primary"></i>
+                                    @elseif($lesson->document_file)
+                                        <i class="ri-file-text-line text-lg text-primary flex-shrink-0"></i>
+                                    @else
+                                        <i class="ri-book-open-line text-lg text-primary"></i>
+                                    @endif
+                                    {{ $lesson->title }}
+                                </a>
                             </div>
                             <span class="text-xs text-heading/60">{{ $lesson->duration ?? '--' }}</span>
                         </div>
@@ -168,39 +189,58 @@
                     </div>
 
                     <h3 class="text-lg font-bold text-heading mb-4">Course Reviews</h3>
+                    @php
+                        $reviews = \App\Models\Review::with('user')->where('course_id', $course->id)->latest()->get();
+                        $avgRating = $reviews->avg('rating') ?? 0;
+                        $ratingCounts = [5=>0, 4=>0, 3=>0, 2=>0, 1=>0];
+                        foreach($reviews as $r) { if(isset($ratingCounts[$r->rating])) $ratingCounts[$r->rating]++; }
+                    @endphp
+                    @if($reviews->count())
                     <div class="flex items-center gap-4 mb-6">
                         <div class="text-center">
-                            <div class="text-5xl font-extrabold text-heading">5.00</div>
+                            <div class="text-5xl font-extrabold text-heading">{{ number_format($avgRating, 1) }}</div>
                             <div class="flex items-center gap-1 text-amber-400 mt-1">
-                                <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i>
+                                @for($s=1;$s<=5;$s++)<i class="{{ $s <= round($avgRating) ? 'ri-star-fill' : 'ri-star-line' }}"></i>@endfor
                             </div>
+                            <p class="text-xs text-heading/60 mt-1">{{ $reviews->count() }} review{{ $reviews->count()!==1?'s':'' }}</p>
                         </div>
                         <div class="flex-1 space-y-1">
-                            <div class="flex items-center gap-2 text-sm"><span class="w-8 text-heading/60">5</span><div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="h-full bg-amber-400 rounded-full" style="width:100%"></div></div></div>
-                            <div class="flex items-center gap-2 text-sm"><span class="w-8 text-heading/60">4</span><div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="h-full bg-amber-400 rounded-full" style="width:0%"></div></div></div>
-                            <div class="flex items-center gap-2 text-sm"><span class="w-8 text-heading/60">3</span><div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="h-full bg-amber-400 rounded-full" style="width:0%"></div></div></div>
-                            <div class="flex items-center gap-2 text-sm"><span class="w-8 text-heading/60">2</span><div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="h-full bg-amber-400 rounded-full" style="width:0%"></div></div></div>
-                            <div class="flex items-center gap-2 text-sm"><span class="w-8 text-heading/60">1</span><div class="flex-1 h-2 bg-gray-100 rounded-full"><div class="h-full bg-amber-400 rounded-full" style="width:0%"></div></div></div>
+                            @foreach([5,4,3,2,1] as $star)
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="w-8 text-heading/60">{{ $star }}</span>
+                                <div class="flex-1 h-2 bg-gray-100 rounded-full">
+                                    <div class="h-full bg-amber-400 rounded-full" style="width:{{ $reviews->count() > 0 ? round(($ratingCounts[$star]/$reviews->count())*100) : 0 }}%"></div>
+                                </div>
+                            </div>
+                            @endforeach
                         </div>
                     </div>
-
                     <div class="space-y-4">
+                        @foreach($reviews as $review)
                         <div class="flex items-start gap-3">
                             <div class="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center shrink-0">
                                 <i class="ri-user-smile-line text-primary"></i>
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 mb-1">
-                                    <span class="font-bold text-heading text-sm">RobertSmith</span>
-                                    <span class="text-xs text-heading/60">2024-12-09</span>
+                                    <span class="font-bold text-heading text-sm">{{ $review->user?->full_name ?? 'Student' }}</span>
+                                    <span class="text-xs text-heading/60">{{ $review->created_at->format('d M Y') }}</span>
                                 </div>
                                 <div class="flex items-center gap-1 text-amber-400 text-xs mb-1">
-                                    <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i>
+                                    @for($s=1;$s<=5;$s++)<i class="{{ $s <= $review->rating ? 'ri-star-fill' : 'ri-star-line' }}"></i>@endfor
                                 </div>
-                                <p class="text-sm text-heading/70">Very Nice Course</p>
+                                <p class="text-sm text-heading/70">{{ $review->review }}</p>
                             </div>
                         </div>
+                        @endforeach
                     </div>
+                    @else
+                    <div class="py-8 text-center text-heading/40">
+                        <i class="ri-star-line text-3xl block mb-2"></i>
+                        <p class="font-semibold">No reviews yet.</p>
+                        <p class="text-sm mt-1">Be the first to review this course!</p>
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -251,7 +291,7 @@
                         <a href="/dashboard/my-enrolled-course" class="w-full px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:opacity-90 transition-all duration-300 text-center block">
                             Go to Course
                         </a>
-                        <a href="/courses/{{ $course->id }}/discussions" class="w-full px-8 py-3 mt-3 border-2 border-gray-200 text-heading/70 hover:border-primary hover:text-primary font-bold rounded-full transition-all duration-300 text-center block text-sm">
+                        <a href="/courses/{{ $course->slug }}/discussions" class="w-full px-8 py-3 mt-3 border-2 border-gray-200 text-heading/70 hover:border-primary hover:text-primary font-bold rounded-full transition-all duration-300 text-center block text-sm">
                             <i class="ri-question-answer-line mr-1"></i> Discussions
                         </a>
                     @else
