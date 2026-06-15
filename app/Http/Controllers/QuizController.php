@@ -10,6 +10,7 @@ use App\Models\QuizResult;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class QuizController extends Controller
@@ -68,8 +69,8 @@ class QuizController extends Controller
         
         if ($request->hasFile('instructions_file')) {
             // Delete old file if exists
-            if ($quiz->instructions_file && \Storage::disk('public')->exists($quiz->instructions_file)) {
-                \Storage::disk('public')->delete($quiz->instructions_file);
+            if ($quiz->instructions_file && Storage::disk('public')->exists($quiz->instructions_file)) {
+                Storage::disk('public')->delete($quiz->instructions_file);
             }
             $validated['instructions_file'] = $request->file('instructions_file')->store('quizzes/instructions', 'public');
         }

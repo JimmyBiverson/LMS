@@ -7,6 +7,7 @@ use App\Models\AssignmentSubmission;
 use App\Models\Course;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class AssignmentController extends Controller
@@ -70,8 +71,8 @@ class AssignmentController extends Controller
         
         if ($request->hasFile('instructions_file')) {
             // Delete old file if exists
-            if ($assignment->instructions_file && \Storage::disk('public')->exists($assignment->instructions_file)) {
-                \Storage::disk('public')->delete($assignment->instructions_file);
+            if ($assignment->instructions_file && Storage::disk('public')->exists($assignment->instructions_file)) {
+                Storage::disk('public')->delete($assignment->instructions_file);
             }
             $validated['instructions_file'] = $request->file('instructions_file')->store('assignments/instructions', 'public');
         }
