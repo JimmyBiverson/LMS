@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class SupportTicket extends Model
+{
+    protected $fillable = [
+        'user_id',
+        'course_id',
+        'subject',
+        'category',
+        'priority',
+        'message',
+        'status',
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class);
+    }
+
+    public function replies(): HasMany
+    {
+        return $this->hasMany(TicketReply::class, 'support_ticket_id');
+    }
+}

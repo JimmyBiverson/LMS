@@ -1,0 +1,236 @@
+@import 'tailwindcss';
+
+@layer base {
+    [x-cloak] { display: none !important; }
+    html { scroll-behavior: smooth; }
+    body { overflow-x: hidden; }
+    img { max-width: 100%; height: auto; }
+}
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Mulish', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-public: 'Public Sans', ui-sans-serif, system-ui, sans-serif;
+
+    --color-primary: #5F3EED;
+    --color-primary-50: #F7F4FF;
+    --color-primary-100: #E5DEFF;
+    --color-primary-200: #F2ECFE;
+
+    --color-secondary: #F4B826;
+    --color-heading: #111827;
+
+    --color-section: #F7F4FF;
+
+    --color-free: #22c55e;
+    --color-free-50: #f0fdf4;
+    --color-free-100: #dcfce7;
+    --color-free-200: #bbf7d0;
+    --color-free-700: #15803d;
+}
+
+@layer components {
+    .flex-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .flex-center-between {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        flex-shrink: 0;
+        font-weight: 500;
+        text-align: center;
+        line-height: 1;
+        padding: 0.75rem 0.875rem;
+        border-radius: 0.5rem;
+        width: max-content;
+        transition: all 0.3s;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 0.625rem;
+        font-size: 0.875rem;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+
+    .btn-xl {
+        padding: 0.75rem 2rem;
+        border-radius: 12px;
+    }
+
+    @media (min-width: 1320px) {
+        .btn-xl {
+            padding: 1rem 2rem;
+        }
+    }
+
+    .btn-secondary-solid {
+        background-color: var(--color-secondary);
+    }
+
+    .btn-secondary-solid:hover {
+        opacity: 0.9;
+    }
+
+    .btn-secondary-outline {
+        border: 1px solid color-mix(in srgb, var(--color-secondary) 30%, transparent);
+        color: var(--color-secondary);
+    }
+
+    .btn-secondary-outline:hover {
+        background-color: var(--color-secondary);
+        color: var(--color-heading);
+    }
+
+    .btn-primary-light {
+        background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+        color: var(--color-primary);
+    }
+
+    .btn-primary-light:hover,
+    .btn-primary-light.active,
+    .dashkit-tab-btn.active {
+        background-color: var(--color-primary);
+        color: white;
+    }
+
+    .dashkit-tab-btn:not(.active) {
+        background-color: transparent;
+    }
+
+    .b-light {
+        border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+    }
+
+    .form-input {
+        width: 100%;
+        height: 2.75rem;
+        padding: 0.625rem 1rem;
+        background-color: transparent;
+        border: 1px solid color-mix(in srgb, var(--color-heading) 10%, transparent);
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-heading);
+        outline: none;
+        line-height: 1;
+        transition: all 0.3s;
+    }
+
+    .form-input:focus {
+        border-color: var(--color-primary);
+    }
+
+    .form-input.textarea {
+        height: auto;
+        padding: 0.75rem 1rem;
+    }
+
+    .form-label {
+        display: inline-block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-heading);
+        line-height: 1;
+        margin-bottom: 0.625rem;
+    }
+
+    .floating-form-label {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0.75rem !important;
+        margin: 0 !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        background-color: white !important;
+        color: rgb(107 114 128) !important;
+        z-index: 10 !important;
+        transform: translateY(-50%) scale(0.9) !important;
+        font-size: 0.875rem !important;
+        font-weight: 400 !important;
+        pointer-events: none !important;
+        transition: all 0.2s;
+    }
+
+    .checkbox {
+        appearance: none;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid color-mix(in srgb, var(--color-heading) 60%, transparent);
+        border-radius: 0.125rem;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.2s;
+    }
+
+    .checkbox-primary:checked {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .checkbox-primary:checked::before {
+        content: "✓";
+        color: white;
+        font-size: 0.75rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .area-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--color-heading);
+        line-height: 1.22;
+    }
+
+    @media (min-width: 1024px) {
+        .area-title {
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .area-title {
+            font-size: 2.25rem;
+            line-height: 2.5rem;
+        }
+    }
+
+    .area-description {
+        color: color-mix(in srgb, var(--color-heading) 70%, transparent);
+        font-weight: 500;
+    }
+
+    .text-danger {
+        color: #dc2626;
+    }
+
+    .bg-border {
+        background-color: color-mix(in srgb, var(--color-heading) 10%, transparent);
+    }
+}
