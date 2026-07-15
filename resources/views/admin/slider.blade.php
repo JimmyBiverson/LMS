@@ -1,4 +1,4 @@
-﻿@extends('layouts.dashboard')
+@extends('layouts.dashboard')
 @section('title', 'Slider')
 @section('page-title', 'Slider')
 @section('user-name', auth()->user()->name ?? 'Admin')
@@ -48,7 +48,7 @@
                     <td class="py-4 px-6 text-heading/70">{{ $i+1 }}</td>
                     <td class="py-4 px-6">
                         @if($s->image)
-                        <img src="/storage/{{ $s->image }}" alt="{{ $s->title }}" width="64" height="40" loading="lazy" class="w-16 h-10 object-cover rounded">
+                        <img src="{{ asset('storage/' . $s->image) }}" alt="{{ $s->title }}" width="64" height="40" loading="lazy" class="w-16 h-10 object-cover rounded">
                         @else
                         <span class="text-heading/40 text-xs">No image</span>
                         @endif
@@ -103,7 +103,7 @@
             <input type="number" name="duration" placeholder="Duration (seconds)" x-model="slider.duration" min="1" max="3600" class="px-4 py-2.5 border border-gray-200 rounded-lg text-sm">
             <div>
                 <label class="block text-xs text-heading/60 mb-1">Image (leave empty to keep current)</label>
-                <img x-show="slider.image" :src="'/storage/' + slider.image" alt="Current image" class="w-32 h-20 object-cover rounded-lg mb-2 border border-gray-200">
+                <img x-show="slider.image" :src="'{{ asset('storage') }}/' + slider.image" alt="Current image" class="w-32 h-20 object-cover rounded-lg mb-2 border border-gray-200">
                 <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm">
             </div>
             <div class="flex items-center gap-2 pt-2">

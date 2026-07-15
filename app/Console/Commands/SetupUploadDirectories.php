@@ -18,7 +18,14 @@ class SetupUploadDirectories extends Command
             'lessons/videos',
             'lessons/documents',
             'assignments/submissions',
+            'assignments/instructions',
             'quizzes/media',
+            'quizzes/instructions',
+            'settings',
+            'settings/videos',
+            'profiles/images',
+            'sliders',
+            'blogs',
         ];
 
         $extraDirectories = [
@@ -47,11 +54,18 @@ class SetupUploadDirectories extends Command
             if (!file_exists($storagePath)) {
                 $this->info('Creating storage symlink...');
                 try {
-                    symlink($targetPath, $storagePath);
-                    $this->info('✓ Storage symlink created successfully');
+                    // Trigger storage:link artist command which is cross-platform/highly compatible
+                    \Illuminate\Support\Facades\Artisan::call('storage:link');
+                    $this->info(\Illuminate\Support\Facades\Artisan::output());
+                    $this->info('✓ Storage symlink created via storage:link');
                 } catch (\Exception $e) {
-                    $this->error('Failed to create symlink: ' . $e->getMessage());
-                    $this->warn('Please run: mklink /D "' . $storagePath . '" "' . $targetPath . '"');
+                    try {
+                        symlink($targetPath, $storagePath);
+                        $this->info('✓ Storage symlink created successfully');
+                    } catch (\Exception $e2) {
+                        $this->error('Failed to create symlink: ' . $e2->getMessage());
+                        $this->warn('Please run: mklink /D "' . $storagePath . '" "' . $targetPath . '"');
+                    }
                 }
             }
         } elseif (is_link($storagePath)) {

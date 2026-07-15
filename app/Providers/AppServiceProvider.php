@@ -2,9 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\CourseNote;
 use App\Models\SchoolSetting;
+use App\Policies\CourseNotePolicy;
+use App\Services\DatabaseSchemaRepairService;
 use Carbon\Carbon;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -15,7 +19,9 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(DatabaseSchemaRepairService::class, function () {
+            return new DatabaseSchemaRepairService();
+        });
     }
 
     public function boot(): void
@@ -41,6 +47,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->input('email') . '|' . $request->ip());
         });
+
+        Gate::policy(CourseNote::class, CourseNotePolicy::class);
 
         Model::preventLazyLoading(!$this->app->environment('production'));
 

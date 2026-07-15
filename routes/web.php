@@ -12,7 +12,9 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\NoticeboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Dashboard\CourseNoteController as DashboardCourseNoteController;
 use App\Http\Controllers\Instructor\CourseController as InstructorCourseController;
+use App\Http\Controllers\Instructor\CourseNoteController as InstructorCourseNoteController;
 use App\Http\Controllers\MeetProviderController;
 use App\Http\Controllers\Organization\CourseController as OrgCourseController;
 use App\Http\Controllers\PaymentController;
@@ -171,8 +173,13 @@ Route::get('/courses/{slug}/materials', function ($slug) {
     $certificate = \App\Models\Certificate::where('course_id', $course->id)->where('user_id', auth()->id())->first();
 
     $announcements = \App\Models\Announcement::with('user')->where('course_id', $course->id)->latest()->take(5)->get();
+    $courseNotes = \App\Models\CourseNote::where('course_id', $course->id)
+        ->where('status', 'published')
+        ->orderBy('display_order')
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-    return view('courses.materials', compact('course', 'lessonCompletionMap', 'completedLessons', 'totalLessons', 'progressPercent', 'quizzes', 'exams', 'quizResults', 'assignments', 'submissions', 'certificate', 'announcements'));
+    return view('courses.materials', compact('course', 'lessonCompletionMap', 'completedLessons', 'totalLessons', 'progressPercent', 'quizzes', 'exams', 'quizResults', 'assignments', 'submissions', 'certificate', 'announcements', 'courseNotes'));
 })->middleware('auth');
 
 // Lesson viewing route
@@ -526,6 +533,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
         Route::get('/wishlists', [WishlistController::class, 'index']);
         Route::post('/wishlists/toggle/{courseId}', [WishlistController::class, 'toggle']);
+        Route::get('/course-notes', [DashboardCourseNoteController::class, 'index'])->name('dashboard.course-notes.index');
+        Route::get('/course-notes/{courseNote}', [DashboardCourseNoteController::class, 'show'])->name('dashboard.course-notes.show');
+        Route::get('/course-notes/{courseNote}/download', [DashboardCourseNoteController::class, 'download'])->name('dashboard.course-notes.download');
         Route::get('/profile', fn() => view('dashboard.profile'));
         Route::get('/settings', fn() => view('dashboard.settings'));
         Route::post('/settings', function (\Illuminate\Http\Request $request) {
@@ -679,6 +689,13 @@ Route::middleware('auth')->group(function () {
             $enrollment->update(['payment_status' => 'rejected']);
             return back()->with('success', 'Payment rejected.');
         });
+        Route::get('/course-notes', [InstructorCourseNoteController::class, 'index'])->name('course-notes.index');
+        Route::get('/course-notes/create', [InstructorCourseNoteController::class, 'create'])->name('course-notes.create');
+        Route::post('/course-notes', [InstructorCourseNoteController::class, 'store'])->name('course-notes.store');
+        Route::get('/course-notes/{courseNote}', [InstructorCourseNoteController::class, 'show'])->name('course-notes.show');
+        Route::get('/course-notes/{courseNote}/edit', [InstructorCourseNoteController::class, 'edit'])->name('course-notes.edit');
+        Route::put('/course-notes/{courseNote}', [InstructorCourseNoteController::class, 'update'])->name('course-notes.update');
+        Route::delete('/course-notes/{courseNote}', [InstructorCourseNoteController::class, 'destroy'])->name('course-notes.destroy');
         Route::get('/settings', fn() => view('instructor.settings'));
         Route::post('/settings', [AuthController::class, 'updateProfile']);
         Route::post('/change-password', [AuthController::class, 'changePassword']);
@@ -810,12 +827,16 @@ Route::middleware('auth')->group(function () {
             $weeklyLabels = $days;
             $weeklyData = array_map(fn($d) => $weeklyEnrollments[array_search($d, $days)] ?? 0, $days);
 
+            $storagePath = public_path('storage');
+            $symlinkWarning = (!file_exists($storagePath) || !is_link($storagePath));
+
             return view('admin.index', compact(
                 'totalStudents', 'totalCourses', 'totalInstructors', 'totalPendingInstructors',
                 'totalEnrollments', 'totalOrganizations', 'activeCourses', 'totalCertificates',
                 'pendingReviews', 'recent', 'recentCert', 'popular', 'monthlyData',
                 'totalUsers', 'activeCategories', 'publishedBlogs', 'totalRevenue',
-                'courseDistribution', 'roleDistribution', 'weeklyLabels', 'weeklyData'
+                'courseDistribution', 'roleDistribution', 'weeklyLabels', 'weeklyData',
+                'symlinkWarning'
             ));
         })->name('dashboard');
         Route::get('/course', function () {
@@ -939,6 +960,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/lms-module/subscription/{subscriptionPlan}', [SubscriptionController::class, 'update']);
         Route::post('/lms-module/subscription/{subscriptionPlan}/delete', [SubscriptionController::class, 'destroy']);
         Route::get('/search', App\Http\Controllers\Admin\AdminSearchController::class);
+        Route::get('/storage-health', [\App\Http\Controllers\Admin\StorageHealthController::class, 'index']);
+        Route::post('/storage-health/fix', [\App\Http\Controllers\Admin\StorageHealthController::class, 'fix']);
         Route::get('/settings', [SettingsController::class, 'index']);
         Route::get('/theme-setting', fn() => redirect('/admin/settings?tab=theme'));
         Route::post('/theme-setting', [AdminController::class, 'updateThemeSetting']);

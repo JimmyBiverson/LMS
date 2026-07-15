@@ -22,7 +22,10 @@
 <a href="/dashboard/assignments" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/assignments') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-file-list-3-line text-lg"></i><span>Assignment</span>
 </a>
-<a href="/dashboard/course-review" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/course-review') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+<a href="/dashboard/course-notes" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/course-notes*') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-file-paper-2-line text-lg"></i><span>Course Notes</span>
+</a>
+<a href="/dashboard/course-review" class="flex items-center gap-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/course-review') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-star-line text-lg"></i><span>Review</span>
 </a>
 <a href="/dashboard/offline-payment" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/offline-payment') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">

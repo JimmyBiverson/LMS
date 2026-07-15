@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', $school->school_name ?? 'Edulab') - {{ $school->school_name ?? 'Edulab' }}</title>
+    <title>@hasSection('title')@yield('title') - @endif{{ $school->school_name ?? 'Edulab' }}</title>
     @if($school->favicon)
     <link rel="icon" type="{{ \Illuminate\Support\Str::endsWith($school->favicon, '.svg') ? 'image/svg+xml' : 'image/png' }}" href="{{ asset('storage/'.$school->favicon) }}">
     @else
@@ -12,7 +12,7 @@
     <link rel="alternate icon" href="{{ asset('favicon.ico') }}">
     @endif
     <!-- Sharing Links Preview (Open Graph & Twitter) -->
-    <meta property="og:title" content="@yield('title', $school->school_name ?? 'Edulab') - {{ $school->school_name ?? 'Edulab' }}">
+    <meta property="og:title" content="@hasSection('title')@yield('title') - @endif{{ $school->school_name ?? 'Edulab' }}">
     <meta property="og:description" content="Discover, learn, and thrive with us. Experience a smooth and rewarding educational adventure.">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:type" content="website">
@@ -27,7 +27,7 @@
     <meta name="twitter:image" content="{{ asset('favicon.png') }}">
     @endif
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', $school->school_name ?? 'Edulab') - {{ $school->school_name ?? 'Edulab' }}">
+    <meta name="twitter:title" content="@hasSection('title')@yield('title') - @endif{{ $school->school_name ?? 'Edulab' }}">
     <meta name="twitter:description" content="Discover, learn, and thrive with us. Experience a smooth and rewarding educational adventure.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

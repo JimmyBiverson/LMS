@@ -108,6 +108,37 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 space-y-8">
+                {{-- Course Notes Section --}}
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-bold text-heading flex items-center gap-2">
+                            <i class="ri-sticky-note-line text-primary"></i> Course Notes
+                        </h3>
+                        <span class="text-xs text-heading/60 bg-gray-100 px-2 py-1 rounded-full">{{ $courseNotes->count() }} total</span>
+                    </div>
+                    <div class="p-5">
+                        @forelse($courseNotes as $note)
+                        <div class="rounded-xl border p-4 mb-3 bg-gray-50/60">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <p class="font-semibold text-heading text-sm">{{ $note->title }}</p>
+                                    @if($note->summary)
+                                        <p class="text-xs text-heading/60 mt-1">{{ $note->summary }}</p>
+                                    @endif
+                                </div>
+                                <a href="{{ route('dashboard.course-notes.show', $note) }}" class="px-3 py-2 text-sm font-semibold rounded-lg bg-primary text-white hover:opacity-90 transition-opacity">Open</a>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="text-center py-8 text-heading/40">
+                            <i class="ri-sticky-note-line text-3xl block mb-2"></i>
+                            <p class="font-semibold">No notes yet</p>
+                            <p class="text-sm mt-1">Notes published by your instructor will appear here.</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
                 {{-- Quizzes Section --}}
                     {{-- Exams Section --}}
                 @if($exams->isNotEmpty())

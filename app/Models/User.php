@@ -168,6 +168,11 @@ class User extends Authenticatable
         return $this->hasMany(CourseDiscussion::class);
     }
 
+    public function courseNotes(): HasMany
+    {
+        return $this->hasMany(CourseNote::class);
+    }
+
     public function children(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'parent_student', 'parent_id', 'student_id')

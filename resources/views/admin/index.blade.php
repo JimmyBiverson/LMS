@@ -17,6 +17,21 @@ $roleAvatarText = 'text-slate-700';
 $notifUrl = url('admin/notification');
 @endphp
 
+@if($symlinkWarning)
+<div class="mb-6 p-5 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex items-start gap-3 flex-1">
+        <i class="ri-error-warning-fill text-2xl text-amber-500 shrink-0 mt-0.5"></i>
+        <div>
+            <h4 class="font-bold text-sm text-amber-800">Media Storage Link Missing/Broken</h4>
+            <p class="text-xs text-amber-700/90 mt-1">LMS media uploads (logos, thumbnails, profile images) will return 404 errors until the public symlink is connected.</p>
+        </div>
+    </div>
+    <a href="{{ url('admin/storage-health') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition-colors inline-flex items-center gap-1.5 shrink-0 self-start sm:self-auto shadow-sm shadow-amber-600/10">
+        <i class="ri-tools-line"></i> Verify & Fix
+    </a>
+</div>
+@endif
+
 {{-- Stat Cards --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
     <div class="bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl p-5 shadow-lg text-white">

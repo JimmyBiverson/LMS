@@ -58,7 +58,7 @@
                 <div class="flex-1">
                     <div class="relative">
                         <template x-if="slide.image">
-                            <img :src="'/storage/' + slide.image" :alt="slide.title" loading="lazy" class="w-full aspect-[4/3] object-cover rounded-3xl shadow-lg">
+                            <img :src="'{{ asset('storage') }}/' + slide.image" :alt="slide.title" loading="lazy" class="w-full aspect-[4/3] object-cover rounded-3xl shadow-lg">
                         </template>
                         <template x-if="!slide.image">
                             <div class="w-full aspect-[4/3] bg-gradient-to-br from-primary-100 to-primary-50 rounded-3xl flex items-center justify-center">

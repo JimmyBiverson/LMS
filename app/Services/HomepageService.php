@@ -13,6 +13,7 @@ use App\Models\Testimonial;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class HomepageService
 {
@@ -37,9 +38,14 @@ class HomepageService
             Cache::forget($key);
         }
 
-        $value = $callback();
-        Cache::put($key, $value, self::CACHE_TTL);
-        return $value;
+        try {
+            $value = $callback();
+            Cache::put($key, $value, self::CACHE_TTL);
+            return $value;
+        } catch (\Throwable $e) {
+            Cache::forget($key);
+            return collect();
+        }
     }
 
     public function getHeroSections(): Collection
@@ -93,16 +99,32 @@ class HomepageService
 
     public function getBundles(): Collection
     {
-        return $this->safeRemember('homepage.bundles', fn () =>
-            Bundle::withCount('courses')->where('status', 'active')->latest()->take(4)->get()
-        );
+        return $this->safeRemember('homepage.bundles', function () {
+            if (!Schema::hasTable('bundles') || !Schema::hasTable('bundle_course')) {
+                app(DatabaseSchemaRepairService::class)->ensureBundleTables();
+            }
+
+            return Bundle::withCount('courses')->where('status', 'active')->latest()->take(4)->get();
+        });
     }
 
     public function getInstructors(): Collection
     {
-        return $this->safeRemember('homepage.instructors', fn () =>
-            User::where('role', 'instructor')->where('status', 'active')->latest()->take(4)->get()
-        );
+        return $this->safeRemember('homepage.instructors', function () {
+            if (Schema::hasTable('users')) {
+                app(DatabaseSchemaRepairService::class)->ensureUserProfileColumns();
+            }
+
+            $query = User::query();
+            if (Schema::hasColumn('users', 'role')) {
+                $query->where('role', 'instructor');
+            }
+            if (Schema::hasColumn('users', 'status')) {
+                $query->where('status', 'active');
+            }
+
+            return $query->latest()->take(4)->get();
+        });
     }
 
     public function getBlogs(): Collection
