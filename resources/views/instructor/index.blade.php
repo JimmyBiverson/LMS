@@ -43,7 +43,7 @@ $notifUrl = url('instructor/notifications');
             <a href="{{ url('instructor/courses') }}" class="text-sm text-amber-600 font-semibold hover:underline">Manage Courses</a>
         </div>
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full text-sm min-w-[500px]">
                 <thead><tr class="bg-amber-50/50 text-heading/60 text-xs uppercase tracking-wider">
                     <th class="text-left py-3 px-4 font-semibold">Course</th><th class="text-left py-3 px-4 font-semibold">Students</th><th class="text-left py-3 px-4 font-semibold">Price</th><th class="text-left py-3 px-4 font-semibold">Status</th><th class="text-left py-3 px-4 font-semibold">Action</th>
                 </tr></thead>

@@ -19,7 +19,7 @@
         @endif
     </div>
     <div class="overflow-x-auto">
-        <table class="w-full text-sm">
+        <table class="w-full text-sm min-w-[900px]">
             <thead><tr class="bg-gray-50 text-heading/60 text-xs uppercase tracking-wider">
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Quiz / Exam</th>
@@ -64,14 +64,16 @@
                             <span class="px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-500">--</span>
                         @endif
                     </td>
-                    <td class="py-4 px-6 text-right flex items-center justify-end gap-2">
-                        <a href="{{ route("instructor.dashboard.quizzes.edit", $quiz) }}" class="px-3 py-1 text-xs font-semibold rounded-full border border-heading/10 hover:bg-primary hover:text-white transition-all">Edit</a>
-                        @if($quiz->status === 'published' && !$quiz->results_released_at)
-                        <form method="POST" action="/instructor/quizzes/{{ $quiz->id }}/release-results" class="inline">
-                            @csrf
-                            <button type="submit" class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700 hover:bg-green-200 transition-all">Release</button>
-                        </form>
-                        @endif
+                    <td class="py-4 px-6 text-right">
+                        <div class="flex items-center justify-end gap-2 whitespace-nowrap">
+                            <a href="{{ route("instructor.dashboard.quizzes.edit", $quiz) }}" class="px-3 py-1 text-xs font-semibold rounded-full border border-heading/10 hover:bg-primary hover:text-white transition-all">Edit</a>
+                            @if($quiz->status === 'published' && !$quiz->results_released_at)
+                            <form method="POST" action="/instructor/quizzes/{{ $quiz->id }}/release-results" class="inline">
+                                @csrf
+                                <button type="submit" class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700 hover:bg-green-200 transition-all">Release</button>
+                            </form>
+                            @endif
+                        </div>
                     </td>
                 </tr>
                 @empty

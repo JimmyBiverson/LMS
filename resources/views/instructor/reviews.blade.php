@@ -8,7 +8,7 @@
 <div class="bg-white rounded-xl shadow-sm">
     <div class="p-6 border-b border-gray-100"><h3 class="font-bold text-heading">Course Reviews</h3></div>
     <div class="overflow-x-auto">
-        <table class="w-full text-sm">
+        <table class="w-full text-sm min-w-[800px]">
             <thead><tr class="bg-gray-50 text-heading/60 text-xs uppercase tracking-wider">
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Student</th>
@@ -28,7 +28,7 @@
                     <td class="py-4 px-6 text-heading/70 max-w-xs truncate">{{ $review->review ?? "N/A" }}</td>
                     <td class="py-4 px-6 text-heading/70">{{ $review->created_at->format("Y-m-d") }}</td>
                     <td class="py-4 px-6">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 whitespace-nowrap">
                             <span class="px-3 py-1 rounded-full text-xs font-bold {{ $review->is_approved ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">{{ $review->is_approved ? 'Approved' : 'Pending' }}</span>
                             @if(!$review->is_approved)
                             <form method="POST" action="/instructor/reviews/{{ $review->id }}/approve" class="inline">

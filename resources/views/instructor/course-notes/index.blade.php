@@ -15,13 +15,13 @@
         </div>
     </div>
     <div class="p-6 border-b border-gray-100">
-        <form method="GET" class="flex flex-wrap gap-3">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search notes" class="border border-gray-200 rounded-full px-4 py-2 text-sm flex-1 min-w-[220px]">
-            <button class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-full">Search</button>
+        <form method="GET" class="flex flex-col sm:flex-row gap-3">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search notes" class="border border-gray-200 rounded-full px-4 py-2 text-sm flex-1 min-w-0">
+            <button class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-full whitespace-nowrap">Search</button>
         </form>
     </div>
     <div class="overflow-x-auto">
-        <table class="w-full text-sm">
+        <table class="w-full text-sm min-w-[700px]">
             <thead>
                 <tr class="bg-gray-50 text-heading/60 text-xs uppercase tracking-wider">
                     <th class="text-left py-4 px-6 font-semibold">Title</th>

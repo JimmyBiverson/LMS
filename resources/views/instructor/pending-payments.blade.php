@@ -16,7 +16,7 @@
         <p class="text-sm text-heading/50 mt-1">Approve or reject student enrollments made via Airtel / MTN mobile money</p>
     </div>
     <div class="overflow-x-auto">
-        <table class="w-full text-sm">
+        <table class="w-full text-sm min-w-[800px]">
             <thead><tr class="bg-gray-50 text-heading/60 text-xs uppercase tracking-wider">
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Student</th>
@@ -59,7 +59,7 @@
                     </td>
                     <td class="py-4 px-6 text-heading/70">{{ $enrollment->created_at->format('Y-m-d') }}</td>
                     <td class="py-4 px-6">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 whitespace-nowrap">
                             <form method="POST" action="/instructor/pending-payments/{{ $enrollment->id }}/approve">
                                 @csrf
                                 <button type="submit" class="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition-colors">

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jul 15, 2026 at 07:26 AM
+-- Generation Time: Jul 26, 2026 at 06:46 PM
 -- Server version: 8.4.7-7
 -- PHP Version: 8.1.34
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `lms`
 --
+CREATE DATABASE IF NOT EXISTS `lms` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `lms`;
 
 -- --------------------------------------------------------
 
@@ -1210,7 +1212,7 @@ CREATE TABLE `notification_logs` (
 --
 
 INSERT INTO `notification_logs` (`id`, `user_id`, `notification_template_id`, `type`, `subject`, `body`, `channel`, `is_read`, `sent_at`, `created_at`, `updated_at`, `link`) VALUES
-(1, 1, NULL, 'in_app', 'New Instructor Registration', 'dimits dimits (dimits@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-06-29 04:16:18', '2026-06-29 04:16:18', '2026-06-29 04:16:18', 'http://127.0.0.1:8000/admin/settings/approve-instructors'),
+(1, 1, NULL, 'in_app', 'New Instructor Registration', 'dimits dimits (dimits@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 1, '2026-06-29 04:16:18', '2026-06-29 04:16:18', '2026-07-22 10:27:20', 'http://127.0.0.1:8000/admin/settings/approve-instructors'),
 (2, 2, NULL, 'in_app', 'New Instructor Registration', 'dimits dimits (dimits@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-06-29 04:16:18', '2026-06-29 04:16:18', '2026-06-29 04:16:18', 'http://127.0.0.1:8000/admin/settings/approve-instructors'),
 (3, 3, NULL, 'in_app', 'New Instructor Registration', 'dimits dimits (dimits@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-06-29 04:16:18', '2026-06-29 04:16:18', '2026-06-29 04:16:18', 'http://127.0.0.1:8000/admin/settings/approve-instructors'),
 (4, 4, NULL, 'in_app', 'New Instructor Registration', 'dimits dimits (dimits@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-06-29 04:16:18', '2026-06-29 04:16:18', '2026-06-29 04:16:18', 'http://127.0.0.1:8000/admin/settings/approve-instructors'),
@@ -1223,7 +1225,21 @@ INSERT INTO `notification_logs` (`id`, `user_id`, `notification_template_id`, `t
 (11, 20, NULL, 'in_app', 'New Quiz: dfgdfg', 'A new quiz \"dfgdfg\" has been published in your course.', 'in_app', 0, '2026-06-29 18:15:43', '2026-06-29 18:15:43', '2026-06-29 18:15:43', NULL),
 (12, 22, NULL, 'in_app', 'New Quiz: dfgdfg', 'A new quiz \"dfgdfg\" has been published in your course.', 'in_app', 0, '2026-06-29 18:15:43', '2026-06-29 18:15:43', '2026-06-29 18:15:43', NULL),
 (13, 21, NULL, 'in_app', 'Testing Subject', 'Testing this chat\n\n— From: jim jim', 'in_app', 0, '2026-06-30 14:20:44', '2026-06-30 14:20:44', '2026-06-30 14:20:44', 'http://127.0.0.1:8000/dashboard/notifications'),
-(14, 20, NULL, 'in_app', 'Enrolled in test', 'You have successfully enrolled in \"test\". Start learning today!', 'in_app', 0, '2026-07-14 16:12:16', '2026-07-14 16:12:16', '2026-07-14 16:12:16', 'http://127.0.0.1:8000/dashboard/courses/6');
+(14, 20, NULL, 'in_app', 'Enrolled in test', 'You have successfully enrolled in \"test\". Start learning today!', 'in_app', 0, '2026-07-14 16:12:16', '2026-07-14 16:12:16', '2026-07-14 16:12:16', 'http://127.0.0.1:8000/dashboard/courses/6'),
+(15, 1, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyimanamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 1, '2026-07-21 04:55:40', '2026-07-21 04:55:40', '2026-07-22 10:27:19', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(16, 2, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyimanamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-07-21 04:55:40', '2026-07-21 04:55:40', '2026-07-21 04:55:40', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(17, 3, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyimanamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-07-21 04:55:40', '2026-07-21 04:55:40', '2026-07-21 04:55:40', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(18, 4, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyimanamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-07-21 04:55:40', '2026-07-21 04:55:40', '2026-07-21 04:55:40', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(19, 5, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyimanamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-07-21 04:55:40', '2026-07-21 04:55:40', '2026-07-21 04:55:40', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(20, 11, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyimanamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-07-21 04:55:40', '2026-07-21 04:55:40', '2026-07-21 04:55:40', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(21, 1, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 1, '2026-07-21 04:56:36', '2026-07-21 04:56:36', '2026-07-22 10:27:17', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(22, 2, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-07-21 04:56:36', '2026-07-21 04:56:36', '2026-07-21 04:56:36', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(23, 3, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-07-21 04:56:36', '2026-07-21 04:56:36', '2026-07-21 04:56:36', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(24, 4, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-07-21 04:56:36', '2026-07-21 04:56:36', '2026-07-21 04:56:36', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(25, 5, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-07-21 04:56:36', '2026-07-21 04:56:36', '2026-07-21 04:56:36', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(26, 11, NULL, 'in_app', 'New Instructor Registration', 'Hamenyimana Manaseh (hamenyamanaseh@gmail.com) has registered as an instructor and is pending your approval.', 'in_app', 0, '2026-07-21 04:56:36', '2026-07-21 04:56:36', '2026-07-21 04:56:36', 'https://lms-sample.duckdns.org/admin/settings/approve-instructors'),
+(27, 23, NULL, 'in_app', 'Instructor Account Approved', 'Congratulations Hamenyimana Manaseh! Your instructor account has been approved. You can now create courses and manage students.', 'in_app', 0, '2026-07-21 05:01:11', '2026-07-21 05:01:11', '2026-07-21 05:01:11', 'https://lms-sample.duckdns.org/instructor'),
+(28, 24, NULL, 'in_app', 'Instructor Account Approved', 'Congratulations Hamenyimana Manaseh! Your instructor account has been approved. You can now create courses and manage students.', 'in_app', 1, '2026-07-21 05:03:09', '2026-07-21 05:03:09', '2026-07-21 05:06:11', 'https://lms-sample.duckdns.org/instructor');
 
 -- --------------------------------------------------------
 
@@ -1577,7 +1593,7 @@ CREATE TABLE `school_settings` (
 --
 
 INSERT INTO `school_settings` (`id`, `school_name`, `school_email`, `school_phone`, `school_address`, `currency_symbol`, `currency_code`, `currency_position`, `timezone`, `language`, `favicon`, `site_logo`, `primary_color`, `secondary_color`, `accent_color`, `custom_css`, `slider_video`, `created_at`, `updated_at`) VALUES
-(1, 'Walkthrough Test', 'LMS@gmail.com', '+256756371377', 'Nakawa', 'UGX', 'UGX', 'right', 'Africa/Kampala', 'en', NULL, NULL, '#5f3eed', '#f4b826', '#1aebc5', NULL, NULL, '2026-06-28 16:46:49', '2026-07-01 12:33:03');
+(1, 'LMS', 'LMS@gmail.com', '+256756371377', 'Nakawa', 'UGX', 'UGX', 'right', 'Africa/Kampala', 'en', 'settings/XcPcPO6HWW0UBcPJkAp31v0bNBEc2ELWx6qIVyIM.png', 'settings/ks4QcOiG0akPKC5Tqel3k509AFoN9DFWx3y3LgwZ.png', '#5f3eed', '#f4b826', '#1aebc5', NULL, 'settings/videos/GqTcPN0nWxGwz7vLcarNS7E19X5flXEAIdRJiIp9.mp4', '2026-06-28 16:46:49', '2026-07-15 02:35:31');
 
 -- --------------------------------------------------------
 
@@ -1684,7 +1700,9 @@ CREATE TABLE `sliders` (
 --
 
 INSERT INTO `sliders` (`id`, `title`, `subtitle`, `description`, `btn_text`, `btn_link`, `image`, `order`, `status`, `created_at`, `updated_at`, `duration`) VALUES
-(1, 'Welcome to EduLab', 'Start Your Learning Journey', 'Join millions of learners worldwide and gain the skills you need to succeed.', 'Get Started', '/register', NULL, 1, 'active', '2026-06-28 16:52:59', '2026-06-28 16:52:59', 6);
+(1, 'Welcome to EduLab', 'Start Your Learning Journey', 'Join millions of learners worldwide and gain the skills you need to succeed.', 'Get Started', '/register', 'sliders/1784093927_GMbrrwoE.webp', 1, 'active', '2026-06-28 16:52:59', '2026-07-15 02:38:47', 6),
+(2, 'Your Best E-learning platform', 'The home of technology', 'The home of technology in your learning', 'Get Started', '/register', 'sliders/1784094014_T0c6FEy0.webp', 0, 'active', '2026-07-15 02:40:01', '2026-07-15 02:40:14', 6),
+(3, 'Enroll to start learning', 'Choose your best course', 'Enroll to join how the rest of the worlds advances', 'Get Started', '/register', 'sliders/1784094108_UJPRHIYz.webp', 0, 'active', '2026-07-15 02:41:48', '2026-07-15 02:41:48', 6);
 
 -- --------------------------------------------------------
 
@@ -1958,7 +1976,9 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `re
 (19, 'Emily Kipchoge', 'student5@lms.test', '2026-06-28 16:52:57', '$2y$12$VRIOnTFYLxzOWphkeW..ze5mCvFpF7PnFbPENScL4xN9u1pMMMEcm', NULL, '2026-06-28 16:52:57', '2026-06-28 16:52:57', 'Emily', 'Kipchoge', '256700000009', 'student', NULL, NULL, 'active', NULL, NULL, NULL, NULL, NULL, 1, NULL, '#5F3EED', '#F4B826', 0, NULL, NULL),
 (20, 'std std', 'student@gmail.com', '2026-06-28 16:55:16', '$2y$12$odhVzrRfi0HlNGn0bNvvCuVfA.8hbVNuocBGNQ5U5xQT4rP.aJQKW', NULL, '2026-06-28 16:55:16', '2026-06-28 16:55:16', 'std', 'std', '3456', 'student', NULL, NULL, 'active', NULL, NULL, NULL, NULL, NULL, 1, NULL, '#5F3EED', '#F4B826', 0, NULL, NULL),
 (21, 'dimits dimits', 'dimits@gmail.com', '2026-06-29 04:16:18', '$2y$12$rE.2RBcPL2ZLHeikzEA3LO6/BYfCNkr1fBzKw5RfDMC2BMnsVzllO', NULL, '2026-06-29 04:16:18', '2026-06-30 07:22:48', 'dimits', 'dimits', '76544567', 'instructor', 'Kampala', NULL, 'active', NULL, NULL, 'profiles/images/1782814968_wU4e8zBG.JPG', NULL, NULL, 1, NULL, '#5F3EED', '#F4B826', 1, '2026-06-29 04:17:57', NULL),
-(22, 'jim jim', 'jimmy2@gmail.com', '2026-06-29 16:58:48', '$2y$12$acHKmN5p2.Co/O.23ASqOucKF3OZ3wMCC8/3.MctKBtD4rptNwoTq', NULL, '2026-06-29 16:58:48', '2026-07-01 03:36:53', 'jim', 'jim', '345676543', 'student', NULL, NULL, 'active', NULL, NULL, 'profiles/images/1782887809_t5Q0OkvT.png', NULL, NULL, 1, NULL, '#5F3EED', '#F4B826', 0, NULL, NULL);
+(22, 'jim jim', 'jimmy2@gmail.com', '2026-06-29 16:58:48', '$2y$12$acHKmN5p2.Co/O.23ASqOucKF3OZ3wMCC8/3.MctKBtD4rptNwoTq', NULL, '2026-06-29 16:58:48', '2026-07-01 03:36:53', 'jim', 'jim', '345676543', 'student', NULL, NULL, 'active', NULL, NULL, 'profiles/images/1782887809_t5Q0OkvT.png', NULL, NULL, 1, NULL, '#5F3EED', '#F4B826', 0, NULL, NULL),
+(23, 'Hamenyimana Manaseh', 'hamenyimanamanaseh@gmail.com', '2026-07-21 04:55:40', '$2y$12$uXIQAjcKzjeXM4EyiHOhV.VWCQA6myySPzaZGDHnNDYtQ1epNWQv6', NULL, '2026-07-21 04:55:40', '2026-07-21 05:01:11', 'Hamenyimana', 'Manaseh', '0731009352', 'instructor', 'St Gideon Junior School', NULL, 'active', NULL, NULL, NULL, NULL, NULL, 1, NULL, '#5F3EED', '#F4B826', 1, '2026-07-21 05:01:11', NULL),
+(24, 'Hamenyimana Manaseh', 'hamenyamanaseh@gmail.com', '2026-07-21 04:56:36', '$2y$12$qkNjaxgNjp36Z4PVorb5DeJgohajBv5aHv7c9PSfSHlPwZVPC1vD2', NULL, '2026-07-21 04:56:36', '2026-07-21 05:03:09', 'Hamenyimana', 'Manaseh', '0731009352', 'instructor', 'St Gideon Junior School', NULL, 'active', NULL, NULL, NULL, NULL, NULL, 1, NULL, '#5F3EED', '#F4B826', 1, '2026-07-21 05:03:09', NULL);
 
 -- --------------------------------------------------------
 
@@ -2678,7 +2698,7 @@ ALTER TABLE `cities`
 -- AUTO_INCREMENT for table `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `contact_messages`
@@ -2744,7 +2764,7 @@ ALTER TABLE `enrollments`
 -- AUTO_INCREMENT for table `exams`
 --
 ALTER TABLE `exams`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -2822,7 +2842,7 @@ ALTER TABLE `noticeboards`
 -- AUTO_INCREMENT for table `notification_logs`
 --
 ALTER TABLE `notification_logs`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `notification_preferences`
@@ -2924,7 +2944,7 @@ ALTER TABLE `site_languages`
 -- AUTO_INCREMENT for table `sliders`
 --
 ALTER TABLE `sliders`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `states`
@@ -2990,7 +3010,7 @@ ALTER TABLE `timezones`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `user_badges`

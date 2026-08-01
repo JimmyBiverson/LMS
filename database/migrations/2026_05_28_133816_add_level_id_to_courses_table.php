@@ -8,16 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('courses', function (Blueprint $table) {
-            $table->foreignId('level_id')->nullable()->constrained('levels')->nullOnDelete()->after('category_id');
-        });
+        if (!Schema::hasColumn('courses', 'level_id')) {
+            Schema::table('courses', function (Blueprint $table) {
+                $table->foreignId('level_id')->nullable()->constrained('levels')->nullOnDelete()->after('category_id');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('courses', function (Blueprint $table) {
-            $table->dropForeign(['level_id']);
-            $table->dropColumn('level_id');
-        });
+        if (Schema::hasColumn('courses', 'level_id')) {
+            Schema::table('courses', function (Blueprint $table) {
+                $table->dropForeign(['level_id']);
+                $table->dropColumn('level_id');
+            });
+        }
     }
 };

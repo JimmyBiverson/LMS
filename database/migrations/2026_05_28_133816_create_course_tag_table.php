@@ -8,11 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('course_tag', function (Blueprint $table) {
-            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('tag_id')->constrained()->cascadeOnDelete();
-            $table->primary(['course_id', 'tag_id']);
-        });
+        if (!Schema::hasTable('course_tag')) {
+            $tagsExists = Schema::hasTable('tags');
+
+            Schema::create('course_tag', function (Blueprint $table) use ($tagsExists) {
+                $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+                if ($tagsExists) {
+                    $table->foreignId('tag_id')->constrained()->cascadeOnDelete();
+                } else {
+                    $table->unsignedBigInteger('tag_id');
+                }
+                $table->primary(['course_id', 'tag_id']);
+            });
+        }
     }
 
     public function down(): void

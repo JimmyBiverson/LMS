@@ -175,11 +175,11 @@
                 </div>
             </div>
         </header>
-        <main class="flex-1 overflow-y-auto p-4 lg:p-6">
+        <main class="flex-1 min-w-0 overflow-y-auto overflow-x-auto p-4 lg:p-6">
             @if(session('success'))<div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm font-semibold">{{ session('success') }}</div>@endif
             @if(session('error'))<div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm font-semibold">{{ session('error') }}</div>@endif
             @if($errors->any())<div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm"><ul class="list-disc pl-4">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>@endif
-            <main id="main-content">@yield('content')</main>
+            <main id="main-content" class="min-w-0">@yield('content')</main>
         </main>
     </div>
 </div>

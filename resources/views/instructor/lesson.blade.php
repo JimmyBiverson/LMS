@@ -32,7 +32,7 @@
                 </h3>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-sm">
+                <table class="w-full text-sm min-w-[600px]">
                     <thead><tr class="bg-gray-50 text-heading/60 text-xs uppercase tracking-wider">
                         <th class="text-left py-4 px-6 font-semibold">#</th>
                         <th class="text-left py-4 px-6 font-semibold">Lesson</th>
@@ -174,7 +174,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm font-semibold text-heading mb-1">Duration</label>
                         <input name="duration" type="text" value="{{ old('duration') }}"

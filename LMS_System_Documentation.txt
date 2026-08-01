@@ -1,145 +1,1755 @@
 ================================================================================
 EDULAB LEARNING MANAGEMENT SYSTEM
-Comprehensive System Design, Architecture, Database Schema, and User Workflows
+Complete Client Guide & System Documentation
 ================================================================================
-Version: 1.0.0 (Release-Ready)
-Date: June 23, 2026
+Version: 2.0.0 (Release-Ready)
+Date: July 27, 2026
 Prepared By: Antigravity Engineering & AI Systems Group
 Prepared For: Academic & Business Handover
 ================================================================================
 
---------------------------------------------------------------------------------
-1. EXECUTIVE SUMMARY
---------------------------------------------------------------------------------
-EduLab is a modern, enterprise-grade Learning Management System (LMS) designed to democratize high-quality online education and training. Grounded in a highly modular and secure Model-View-Controller (MVC) architecture, the platform bridges the gap between students, educators, corporate organizations, and system administrators.
 
-The primary purpose of EduLab is to provide educational institutions, corporate departments, and individual instructors with a robust platform to create, manage, deliver, and track interactive courses. Unlike traditional platforms that offer a one-size-fits-all approach, EduLab implements an advanced role-based routing model that partitions user interactions into specialized dashboards tailored to each stakeholder's workflows.
+________________________________________________________________________________
+TABLE OF CONTENTS
+________________________________________________________________________________
 
-Key Objectives:
-* Academic Excellence: Provide an intuitive layout for students to engage with video lessons, document materials, quizzes, and assignments.
-* Operational Efficiency for Instructors: Empower educators to create courses, upload lecture media, design automated quizzes, manage grade books, and communicate with students.
-* Multi-Tenant Organization Support: Allow businesses and schools to register as Organization entities to enroll, monitor, and audit their teams' training progress.
-* Comprehensive Administrative Control: Provide administrators with tools to moderate content, audit transactions, track system-wide activities, and manage platform configurations.
+1.  SYSTEM OVERVIEW
+2.  GETTING STARTED - ACCOUNT REGISTRATION
+3.  GETTING STARTED - LOGGING IN
+4.  STUDENT GUIDE - Complete Walkthrough
+5.  INSTRUCTOR GUIDE - Complete Walkthrough
+6.  ORGANIZATION GUIDE - Complete Walkthrough
+7.  ADMIN GUIDE - Complete Walkthrough
+8.  COURSE LIFECYCLE & STATUS EXPLANATION
+9.  PAYMENT SYSTEM & ENROLLMENT FLOW
+10. ASSESSMENT SYSTEM (QUIZZES, EXAMS & ASSIGNMENTS)
+11. PROGRESS TRACKING & CERTIFICATES
+12. FILE UPLOAD REQUIREMENTS & CONSTRAINTS
+13. PASSWORD REQUIREMENTS
+14. NOTIFICATION SYSTEM
+15. SUPPORT TICKET SYSTEM
+16. SYSTEM SETTINGS & CONFIGURATION
+17. TECHNICAL ARCHITECTURE
+18. SECURITY FEATURES
+19. TROUBLESHOOTING FAQ
 
---------------------------------------------------------------------------------
-2. SYSTEM OVERVIEW & ARCHITECTURE
---------------------------------------------------------------------------------
-EduLab is built on top of Laravel 13.8 following strict MVC paradigms. The frontend utilizes Tailwind CSS v4, Alpine.js, and Remixicon icons to deliver a fast-loading and visually premium interface. The application logic is segmented into a presentation layer (Blade templates), a routing/middleware layer, and a service layer that handles complex domain operations to keep controllers maintainable.
 
-Core Operational Workflow:
-* Routing & Middleware Grouping: HTTP requests hit role-based middleware to determine permissions.
-* Controller Dispatching: Controllers validate the request payload and call the required domain service.
-* Service Logic Execution: The service layer performs calculations, writes database updates, triggers events, and fires system notifications.
+________________________________________________________________________________
+1. SYSTEM OVERVIEW
+________________________________________________________________________________
 
---------------------------------------------------------------------------------
-3. USER ROLES & ACCESS CONTROL
---------------------------------------------------------------------------------
-EduLab implements a Role-Based Access Control (RBAC) model. 
+EduLab is a complete Learning Management System (LMS) that connects four types
+of users:
 
-* Student: 
-  Students are the primary consumers. They register, log in, browse the catalog, purchase/enroll in courses, view lessons, complete timed quizzes, submit assignments, track their progress percentage dynamically, and download PDF certificates.
+  - STUDENTS      : Browse, enroll in, and complete courses
+  - INSTRUCTORS   : Create courses, upload lessons, create quizzes and assignments
+  - ORGANIZATIONS : Corporate clients who manage teams and training
+  - ADMINISTRATORS: Full control over the entire platform
 
-* Instructor:
-  Instructors are content creators. They manage courses, structure curriculum sections, upload video lectures and resources, create quizzes with passing marks, manage assignment deadlines, grade submissions, and review course analytics.
+The system is built with Laravel 13.8 (PHP 8.3+), Tailwind CSS v4, Alpine.js,
+and Remixicon. It supports online payments via Paystack and offline payments
+via mobile money (Airtel / MTN).
 
-* Organization:
-  Organizations represent corporate clients. They invite or register team members, assign them to training pathways, customize portal branding, and audit cohort progress via detailed statistical reporting.
+Key URLs:
+  Homepage      : https://your-domain.com
+  Login         : https://your-domain.com/login
+  Register      : https://your-domain.com/register
+  Student Panel : https://your-domain.com/dashboard
+  Instructor    : https://your-domain.com/instructor
+  Organization  : https://your-domain.com/org
+  Admin Panel   : https://your-domain.com/admin
+  Course Catalog: https://your-domain.com/courses
 
-* Administrator:
-  Administrators have full administrative authority over the entire platform. They moderate users, approve or suspend courses, review flagged content, resolve support tickets, configure homepage carousels (sliders), manage SEO categories, and monitor granular platform activity logs.
 
---------------------------------------------------------------------------------
-4. MULTI-TENANT AUTHENTICATION SYSTEM
---------------------------------------------------------------------------------
-Authentication is unified under secure login and register endpoints, utilizing distinct tabs to collect specific data for role-specific flows.
+________________________________________________________________________________
+2. GETTING STARTED - ACCOUNT REGISTRATION
+________________________________________________________________________________
 
-* Registration Flow: Validation depends on the user's role. Instructors require designations, organizations require structural details. Passwords are encrypted using BCrypt.
-* Login & Redirection Flow: Once authenticated, the system uses a dynamic helper method to redirect users to their specific dashboard (/dashboard for students, /instructor for instructors, /org for organizations, and /admin for administrators).
-* Session & Access Control Middleware: Every dashboard route is protected by Laravel's auth middleware and custom role-verification middleware to prevent horizontal privilege escalation.
+Anyone can create an account at /register. The registration page has THREE
+tabs at the top: Student, Instructor, and Organization. Click the tab that
+matches your role.
 
---------------------------------------------------------------------------------
-5. COURSE MANAGEMENT LIFECYCLE
---------------------------------------------------------------------------------
-Instructors and Administrators manage courses through structured pipelines.
+------------------------------------------------------------
+2A. REGISTERING AS A STUDENT (Default Tab)
+------------------------------------------------------------
 
-* Course Lifecycle States: Courses move from Draft (hidden), to Pending (awaiting admin review), and finally to Active (published and purchasable).
-* Asset Processing: Thumbnails are validated and compressed. Preview videos (used for the interactive hover effect) are safely stored. Lesson media supports videos and documents.
-* Enrollment System: Integrating seamless logic to separate public viewers from enrolled students.
+  REQUIRED fields (marked with *):
+    * First Name       - Your legal or display first name
+    * Last Name        - Your legal or display last name
+    * Email Address    - Must be unique (no existing account with this email)
+    * Phone Number     - Any valid phone number
+    * Password         - Minimum 8 characters
+    * Confirm Password - Must match the password exactly
 
---------------------------------------------------------------------------------
-6. INTERACTIVE LEARNING EXPERIENCE WORKFLOW
---------------------------------------------------------------------------------
-* Catalog Discovery: Search and filter courses easily.
-* Interactive Video Previews: Hovering over a course card triggers a lightweight Alpine.js-powered preview video.
-* Enrollment: Users can enroll in free courses with one click or pass through a secure payment gateway for paid courses.
-* Lesson Consumption: The lesson viewer features a collapsible curriculum sidebar, video player, and attached resource downloads.
-* Progress Synchronization & Resume Learning: Video playhead timestamps and completed lesson states are saved dynamically in the database.
+  OPTIONAL fields: None. All student fields are required.
 
---------------------------------------------------------------------------------
-7. ASSESSMENT ENGINE: QUIZZES & ASSIGNMENTS
---------------------------------------------------------------------------------
-* Quiz Timers & Auto-Submission: Quizzes have strict time limits tracked via frontend counters and backend timestamps. They auto-submit when time expires.
-* Auto-Grading: QuizEnhancementService instantly evaluates responses against correct answers, generating percentage scores and determining pass/fail status.
-* Assignment Deadlines: Instructors set due dates. The system detects late submissions and can apply automated penalty deductions.
-* Manual Grading: Instructors review uploaded files and provide manual numeric scores and written feedback.
+  What happens after registration:
+    1. Your account is created instantly with "active" status
+    2. Your email is auto-verified (no email confirmation link needed)
+    3. You are automatically logged in
+    4. You are redirected to your Student Dashboard at /dashboard
 
---------------------------------------------------------------------------------
-8. DATABASE-DRIVEN PROGRESS TRACKING SYSTEM
---------------------------------------------------------------------------------
-Progress tracking keeps students accountable and informs analytics.
-* Lesson Completion: Toggling a lesson as complete updates the lesson_completions table.
-* Percentage Calculation: Progress is calculated dynamically: (Completed Lessons / Total Lessons) * 100.
-* Resume Learning: The system queries the lesson_completions table to find the last accessed lesson and last watched video position to return students exactly where they left off.
+  You can immediately start browsing and enrolling in courses.
 
---------------------------------------------------------------------------------
-9. ADMINISTRATIVE MANAGEMENT PANEL
---------------------------------------------------------------------------------
-* User & Course Oversight: Complete visibility into user lists and course approval queues.
-* Activity Logging: Every administrative action (deleting users, changing settings) is strictly logged with IP, User Agent, and timestamp for absolute security auditing.
-* Dynamic CMS: Admins configure the homepage Hero Sections, interactive Sliders (including setting transition durations), Testimonials, and Noticeboards.
+------------------------------------------------------------
+2B. REGISTERING AS AN INSTRUCTOR
+------------------------------------------------------------
 
---------------------------------------------------------------------------------
-10. FRONTEND ARCHITECTURE & UI/UX FEATURES
---------------------------------------------------------------------------------
-* Design System: Custom-built utilizing Tailwind CSS v4, providing vibrant gradients, glassmorphism elements, and rounded geometries.
-* Interactive Elements: Muted HTML5 hover video previews for courses, animated tab switchers, and fluid collapsible sidebars.
-* Mobile Responsiveness: All layouts degrade gracefully to mobile screens with sliding drawers and touch-optimized navigation menus.
+  Click the "Instructor" tab on the registration page.
 
---------------------------------------------------------------------------------
-11. DETAILED DATABASE & BACKEND STRUCTURE
---------------------------------------------------------------------------------
-* users: Stores core identity, role enum, and hashed credentials.
-* courses: Stores titles, slugs, pricing, thumbnails, and lifecycle status.
-* lessons: Stores curriculum sections, video files, and free-preview boolean flags.
-* enrollments: Pivot table mapping users to the courses they purchased.
-* lesson_completions: Tracks completion timestamps and video playhead positions.
-* quizzes & quiz_results: Stores questions, correct answers, timers, and attempt logs (with composite unique indexes to prevent double submissions).
-* activity_logs: Secure append-only table for administrative audit trails.
+  REQUIRED fields (marked with *):
+    * First Name       - Your legal or display first name
+    * Last Name        - Your legal or display last name
+    * Email Address    - Must be unique
+    * Phone Number     - Any valid phone number
+    * Password         - Minimum 8 characters
+    * Confirm Password - Must match the password exactly
+    * Designation      - Your professional title (e.g. "Web Developer",
+                         "Data Scientist", "Mathematics Professor")
 
---------------------------------------------------------------------------------
-12. CORE TECHNOLOGIES USED
---------------------------------------------------------------------------------
-* Backend: PHP 8.3+, Laravel 13.8 (Eloquent ORM, Middleware routing).
-* Frontend: Tailwind CSS v4, Alpine.js 3, Remixicon, Vite 8 build system.
-* Database: SQLite (Development/Testing) / MySQL (Production).
-* PDF Generation: barryvdh/laravel-dompdf for verifiable certificates.
+  OPTIONAL fields: None. All instructor fields are required.
 
---------------------------------------------------------------------------------
-13. COMPREHENSIVE SECURITY BLUEPRINT
---------------------------------------------------------------------------------
-* Authentication: BCrypt password hashing.
-* Authorization: Strict Role-Based Middleware.
-* Exploit Prevention: Global CSRF token verification for all state-mutating requests, PDO parameter binding to stop SQL Injection, and Blade's automatic HTML escaping to prevent XSS.
-* Access Control: Unique index constraints prevent duplicate enrollments and quiz submissions.
+  What happens after registration:
+    1. Your account is created with "pending approval" status
+    2. ALL admins and staff members receive a notification:
+       "New Instructor Registration - [Your Name] ([email]) has registered
+        as an instructor and is pending your approval."
+    3. You are automatically logged in
+    4. You are redirected to the "Pending Approval" page
+    5. You CANNOT access instructor features until an admin approves you
 
---------------------------------------------------------------------------------
-14. CHALLENGES & SOLUTIONS
---------------------------------------------------------------------------------
-* Dashboard Redirection Bug: Initially, all users were redirected to the student dashboard. Solution: Implemented a robust redirectToDashboard() helper that intelligently parses the user's role and routes them accordingly.
-* Hover Preview Video Failures: The course cards were not loading videos on the public catalog. Solution: Passed the full Eloquent Course model into the blade component instead of isolated strings, allowing dynamic resolution of free-preview lessons and video URLs.
-* 500 Server Errors on Profiles: Accessing public profiles crashed due to accessing relation strings as objects. Solution: Safely implemented null coalescing operators and called relation methods correctly in the Blade templates.
+  IMPORTANT: You MUST wait for admin approval before you can create courses.
+  You will see a "Pending Approval" message with a yellow warning icon.
+  Once approved, you will receive a notification: "Instructor Account
+  Approved" and can access the full instructor dashboard.
 
---------------------------------------------------------------------------------
-15. CONCLUSION
---------------------------------------------------------------------------------
-EduLab represents a complete, secure, and highly scalable Learning Management System. The separation of concerns between thin controllers and dedicated domain services ensures long-term maintainability. With advanced features such as video progress tracking, auto-grading assessment engines, and a multi-tenant architecture, the platform is thoroughly presentation-ready and fully prepared for deployment in active academic or corporate environments.
+  ALTERNATIVE: You can also register as an instructor from the homepage
+  by clicking "Become an Instructor". This form only requires:
+    * First Name, Last Name, Email, Password, Confirm Password
+    * Phone (optional), Designation (optional), About/Bio (optional)
+  This creates the same type of account with pending approval status.
+
+------------------------------------------------------------
+2C. REGISTERING AS AN ORGANIZATION
+------------------------------------------------------------
+
+  Click the "Organization" tab on the registration page.
+
+  REQUIRED fields (marked with *):
+    * Organization Name - Your company/school/institution name
+    * Email Address     - Must be unique
+    * Phone Number      - Any valid phone number
+    * Password          - Minimum 8 characters
+    * Confirm Password  - Must match the password exactly
+
+  OPTIONAL fields:
+    - Address           - Your physical or mailing address
+
+  NOTE: Organizations do NOT need admin approval. You can access your
+  dashboard immediately after registration.
+
+  What happens after registration:
+    1. Your account is created with "active" status
+    2. You are automatically logged in
+    3. You are redirected to your Organization Dashboard at /org
+    4. You can immediately create courses and manage instructors
+
+
+________________________________________________________________________________
+3. GETTING STARTED - LOGGING IN
+________________________________________________________________________________
+
+Visit /login to access the login page.
+
+------------------------------------------------------------
+3A. STUDENT / INSTRUCTOR / ORGANIZATION LOGIN
+------------------------------------------------------------
+
+  The login page has four tabs: Student, Instructor, Organization, Admin.
+  Click the tab that matches your role.
+
+  For Student, Instructor, or Organization:
+    1. Select your role tab (Student, Instructor, or Organization)
+    2. Enter your registered email address
+    3. Enter your password
+    4. Optionally check "Remember Me" to stay logged in
+    5. Click "Login"
+
+  IMPORTANT ROLE CHECK: If you try to log in under the wrong tab, you will
+  get an error: "This account is registered as Student, not Instructor.
+  Please select the correct tab." You MUST select the correct role tab.
+
+  After login you are redirected to your role-specific dashboard:
+    Student      -> /dashboard
+    Instructor   -> /instructor
+    Organization -> /org
+
+  If an instructor is not yet approved, they will be redirected to the
+  "Pending Approval" page regardless of which page they try to access.
+
+------------------------------------------------------------
+3B. ADMIN LOGIN
+------------------------------------------------------------
+
+  Admin login uses a SEPARATE form (not the same as student login):
+
+    1. Click the "Admin" tab on the login page
+    2. Enter the admin email address
+    3. Enter the admin password
+    4. Click "Login"
+
+  You are redirected to the Admin Dashboard at /admin.
+
+  NOTE: Admin accounts CANNOT self-register. Admin and Staff accounts
+  must be created by an existing admin through the Admin Panel.
+
+------------------------------------------------------------
+3C. FORGOTTEN PASSWORD
+------------------------------------------------------------
+
+  1. Click "Forgot Password?" on the login page
+  2. Enter your registered email address
+  3. Click "Send Reset Link"
+  4. Check your email for the password reset link
+  5. Click the link and enter a new password (minimum 8 characters)
+  6. Confirm the new password
+  7. Click "Reset Password"
+  8. You are redirected to the login page to sign in with your new password
+
+
+________________________________________________________________________________
+4. STUDENT GUIDE - COMPLETE WALKTHROUGH
+________________________________________________________________________________
+
+As a student, you have access to a full learning dashboard. Here is everything
+you can do, step by step.
+
+------------------------------------------------------------
+4A. YOUR DASHBOARD (/dashboard)
+------------------------------------------------------------
+
+  When you log in, you see your personalized dashboard with:
+  - 5 stat cards: Enrolled Courses, In Progress, Completed, Certificates,
+    Wishlist count
+  - My Tasks section showing: Pending Assignments, Pending Exams,
+    Available Quizzes, Recent Grades
+  - Latest Enrolled Courses table with progress indicators
+  - Learning Progress circles showing completion percentages
+
+------------------------------------------------------------
+4B. BROWSING COURSES (/courses)
+------------------------------------------------------------
+
+  1. Click "Courses" in the top navigation bar, or visit /courses
+  2. Browse the course catalog with filtering options:
+     - Filter by Type: Free or Paid
+     - Filter by Category: select from available categories
+     - Filter by Level: select difficulty level
+     - Filter by Tag: select from available tags
+  3. Sort courses by: Popular, Newest, Oldest, Price Low-High, Price High-Low
+  4. Courses are displayed as cards with thumbnails
+  5. HOVER over a course card to see an automatic video preview (if the
+     course has a preview video and at least one free preview lesson)
+  6. Click on a course card to see the full course detail page
+
+------------------------------------------------------------
+4C. VIEWING A COURSE (/courses/{slug})
+------------------------------------------------------------
+
+  The course detail page shows:
+  - Course title, description, and thumbnail
+  - Instructor name and profile
+  - Course level and category
+  - Number of enrolled students
+  - Total lessons, quizzes, and assignments
+  - FAQs (top 3)
+  - Student reviews with star ratings (approved reviews only)
+  - Course announcements (top 5)
+
+  If you are NOT enrolled:
+    - You see the course price and an "Enroll Now" or "Add to Cart" button
+    - You can toggle the Wishlist button (heart icon)
+
+  If you ARE enrolled:
+    - You see a full lesson completion map
+    - Quiz and assignment status
+    - Certificate status
+    - "Continue Learning" or "Start Learning" button
+
+------------------------------------------------------------
+4D. ENROLLING IN A FREE COURSE
+------------------------------------------------------------
+
+  Method 1 (Direct):
+    1. On the course detail page, click "Enroll Now" (for free courses)
+    2. You are enrolled immediately
+    3. You can start learning right away
+
+  Method 2 (Cart):
+    1. Click "Add to Cart" on the course
+    2. Go to your cart at /cart
+    3. Click "Checkout"
+    4. Complete the order (no payment needed for free courses)
+    5. You are enrolled immediately
+
+------------------------------------------------------------
+4E. PURCHASING A PAID COURSE
+------------------------------------------------------------
+
+  Step 1 - Add to Cart:
+    1. On the course detail page, click "Add to Cart"
+    2. The course is added to your session cart
+
+  Step 2 - Checkout:
+    1. Go to /cart to review your cart
+    2. (Optional) Enter a coupon code and click "Apply"
+    3. Click "Checkout"
+
+  Step 3 - Payment:
+    The checkout page shows your subtotal, any coupon discount, tax, and total.
+    Choose one of these payment methods:
+
+    Option A - Paystack (Online Payment):
+      1. Click the Paystack button
+      2. You are redirected to the Paystack payment page
+      3. Enter your card details (card number, expiry, CVV)
+      4. Complete the payment
+      5. You are redirected back and enrolled automatically
+
+    Option B - Offline Payment (Mobile Money):
+      1. Select "Offline Payment" or choose Airtel/MTN
+      2. Click "Place Order"
+      3. Your enrollment is created with PENDING status
+      4. The instructor/admin must approve your payment
+      5. You will be notified once approved
+
+  After successful payment:
+    - You receive a "Course Enrolled" notification
+    - You can access the course immediately (or after approval for offline)
+    - The course appears in "My Enrolled Courses" at /dashboard/my-enrolled-course
+
+------------------------------------------------------------
+4F. TAKING COURSES - VIEWING LESSONS
+------------------------------------------------------------
+
+  1. Go to "My Enrolled Courses" at /dashboard/my-enrolled-course
+  2. Click on a course, or click "Continue" to resume where you left off
+  3. You enter the Course Materials Hub at /courses/{slug}/materials
+  4. The hub shows your progress map, all lessons, quizzes, assignments,
+     course notes, and certificate status
+  5. Click on any lesson to view it
+  6. The lesson page has:
+     - A video player (if the lesson has a video URL or video file)
+     - A document viewer/download (if the lesson has a document)
+     - A sidebar showing all lessons with completion checkmarks
+     - Your video resume position is saved automatically
+
+  Marking a Lesson Complete:
+    - Click the "Mark as Complete" toggle on the lesson page
+    - This updates your progress percentage
+    - Video position is tracked so you can resume later
+
+  IMPORTANT: You can ONLY view lessons if:
+    - You are enrolled in the course, OR
+    - The lesson is marked as "Free Preview" (visible without enrollment)
+
+  Lesson Downloads:
+    - You can download lesson videos and documents (requires enrollment)
+
+------------------------------------------------------------
+4G. TAKING QUIZZES
+------------------------------------------------------------
+
+  Step 1 - Find Quizzes:
+    - From the course materials hub, click on a quiz
+    - Or go to /dashboard/quizzes/my-result to see your results
+
+  Step 2 - Instructions Page:
+    - Read the quiz instructions
+    - See the time limit, passing score, and attempt limits
+    - Click "Start Quiz" when ready
+
+  Step 3 - Take the Quiz:
+    - Answer each question
+    - Question types include: Multiple Choice, Multiple Select,
+      True/False, Short Answer, Essay, Fill in the Blank, Matching,
+      and Ordering
+    - A timer counts down if the quiz has a time limit
+    - If time expires, the quiz auto-submits
+
+  Step 4 - Submit:
+    - Click "Submit Quiz" when done
+    - Your answers are auto-graded instantly (except essay questions)
+    - You see your score, pass/fail status, and individual question results
+
+  NOTE: If the instructor has not released results yet, you will see
+  "Awaiting Review" instead of your score. Wait for the instructor to
+  release results.
+
+  EXAMS are quizzes marked as "Exam" by the instructor. They appear
+  under "Exams" in your sidebar (/dashboard/exams) and follow the
+  same process as quizzes.
+
+------------------------------------------------------------
+4H. SUBMITTING ASSIGNMENTS
+------------------------------------------------------------
+
+  Step 1 - Find Assignments:
+    - From the course materials hub, click on an assignment
+    - Or go to /dashboard/assignments
+
+  Step 2 - Read Requirements:
+    - See the assignment title, description, instructions
+    - Note the due date and total marks
+    - Check if the instructor has attached an instructions file
+
+  Step 3 - Submit:
+    1. Type your answer in the text area (optional if uploading a file)
+    2. Upload a file: PDF, DOC, DOCX, or TXT (max 10MB per file)
+    3. You can submit text, a file, or both (at least one required)
+    4. Click "Submit Assignment"
+
+  IMPORTANT DEADLINE RULES:
+    - If the due date has passed and late submissions are NOT allowed,
+      your submission will be REJECTED
+    - If late submissions ARE allowed, a penalty percentage is applied
+      to your score
+    - Check the assignment details for deadline information
+
+  After submission:
+    - Your submission status shows as "Submitted"
+    - The instructor will grade it manually
+    - Once graded, you see your score and feedback
+    - You receive a notification when graded
+
+------------------------------------------------------------
+4I. READING COURSE NOTES
+------------------------------------------------------------
+
+  1. Go to "Course Notes" in the sidebar at /dashboard/course-notes
+  2. See all published notes from your enrolled courses
+  3. Search by title, summary, or content
+  4. Click "View" to read a note
+  5. Download attachments if the instructor allows it
+  6. Click external links to open additional resources
+
+------------------------------------------------------------
+4J. EARNING CERTIFICATES
+------------------------------------------------------------
+
+  Certificates are generated AUTOMATICALLY when you complete ALL lessons
+  in a course.
+
+  The process:
+    1. You mark every lesson as complete in a course
+    2. The system detects 100% completion
+    3. A certificate is automatically created:
+       Title: "Certificate of Completion: [Course Title]"
+    4. Your enrollment status changes to "Completed"
+    5. You receive a "Course Completed" notification
+    6. You can download the certificate as a PDF
+
+  To download your certificate:
+    1. Go to "Certificates" in the sidebar at /dashboard/certificate
+    2. Click "Download" next to the certificate
+    3. A professionally designed PDF certificate is generated with:
+       - Your name
+       - Course title
+       - Date of completion
+       - EduLab seal
+    4. The file downloads as: certificate-{course-slug}.pdf
+
+------------------------------------------------------------
+4K. REVIEWING COURSES
+------------------------------------------------------------
+
+  You can ONLY review courses you have COMPLETED.
+
+  1. Go to "Course Review" in the sidebar at /dashboard/course-review
+  2. Select a completed course
+  3. Rate it from 1 to 5 stars
+  4. (Optional) Write a review text
+  5. Submit the review
+  6. The review requires admin approval before it becomes visible
+
+------------------------------------------------------------
+4L. OTHER STUDENT FEATURES
+------------------------------------------------------------
+
+  Wishlist:
+    - Toggle wishlist from any course card or detail page
+    - View your wishlisted courses at /dashboard/wishlists
+
+  Support Tickets:
+    - Create a ticket at /dashboard/supports/create
+    - Select the relevant course (optional)
+    - Choose a priority: Low, Medium, or High
+    - Write your message
+    - View and reply to tickets at /dashboard/supports
+
+  Course Discussions:
+    - Visit any enrolled course's discussion page
+    - Post questions or replies
+    - Instructors and other students can respond
+
+  Notifications:
+    - View all notifications at /dashboard/notifications
+    - Mark individual or all as read
+    - Send notifications to other users at /notifications/send
+    - Manage notification preferences at /notifications/preferences
+
+  Profile & Settings:
+    - View/edit profile at /dashboard/profile
+    - Change password at /dashboard/settings
+    - Purchase history at /dashboard/purchase-course
+
+
+________________________________________________________________________________
+5. INSTRUCTOR GUIDE - COMPLETE WALKTHROUGH
+________________________________________________________________________________
+
+As an approved instructor, you have a comprehensive dashboard for creating
+and managing courses. Here is everything you can do, step by step.
+
+IMPORTANT: You MUST be approved by an admin before you can access any
+instructor features. If you see a "Pending Approval" page, wait for an
+admin to approve your account.
+
+------------------------------------------------------------
+5A. YOUR DASHBOARD (/instructor)
+------------------------------------------------------------
+
+  The instructor dashboard shows:
+  - 4 stat cards: Total Students, Total Courses, Total Enrollments,
+    Estimated Revenue
+  - My Courses table with student counts, prices, and status
+  - Quick Actions: Create Course, Manage Quizzes, Manage Assignments,
+    View Earnings, My Students, Course Reviews
+  - Course Status overview with active/draft/pending counts
+  - Recent Activity feed from notifications
+
+------------------------------------------------------------
+5B. CREATING A COURSE
+------------------------------------------------------------
+
+  Step 1: Click "Add New" or go to /instructor/courses/create
+
+  Step 2: Fill in the course form:
+
+    REQUIRED fields (marked with *):
+      * Course Title     - The name of your course
+      * Description      - Detailed description of what the course covers
+      * Payment Type     - Select "Free" or "Paid"
+      * Status           - Select "Draft", "Active", or "Pending"
+
+    If Payment Type is "Paid":
+      * Price            - The course price (required for paid courses)
+
+    OPTIONAL fields:
+      - Category         - Select from available categories
+      - Level            - Select difficulty level
+      - Tags             - Check any relevant tags (multiple selection)
+      - Learning Outcomes - What students will learn (one per line)
+      - Requirements     - Prerequisites or required skills (one per line)
+      - Sale Price       - Discounted price (must be less than regular price)
+      - Duration         - e.g. "10 hours"
+      - Thumbnail        - Course cover image (JPEG, PNG, or WebP, max 5MB)
+      - Preview Video    - Course preview video (MP4, MOV, AVI, WebM, max 100MB)
+
+  Step 3: Click "Create Course"
+
+  What happens:
+    - You are redirected to the course EDIT page
+    - A message says: "Course created successfully! Now add lessons."
+    - Your course starts in "Draft" status (hidden from students)
+
+  THUMBNAIL UPLOAD:
+    - Drag and drop an image, or click to browse
+    - Supported formats: JPG, PNG, WebP
+    - Maximum size: 5MB
+    - Recommended dimensions: 300x200 pixels or larger
+    - The image is automatically resized to 1200x675 and converted to WebP
+
+  PREVIEW VIDEO UPLOAD:
+    - Drag and drop a video, or click to browse
+    - Supported formats: MP4, MOV, AVI, WebM, OGG
+    - Maximum size: 100MB (validation) / 500MB (server limit)
+    - This video plays on hover over the course card in the catalog
+
+------------------------------------------------------------
+5C. ADDING LESSONS TO A COURSE
+------------------------------------------------------------
+
+  Step 1: From the course edit page, click "Manage Lessons" or go to
+          /instructor/courses/{courseId}/lessons
+
+  Step 2: The page shows a table of existing lessons (left) and the
+          "Add Lesson" form (right sidebar)
+
+  Step 3: Fill in the lesson form:
+
+    REQUIRED fields:
+      * Lesson Title     - The name of this lesson
+      * At least ONE media source (choose one or more):
+        - Video URL: A YouTube, Vimeo, or direct video link
+        - Video File: Upload a video (MP4, MOV, AVI, WebM, max 500MB)
+        - Document File: Upload a document (PDF, DOC, DOCX, PPT, PPTX,
+          XLS, XLSX, max 50MB)
+
+    OPTIONAL fields:
+      - Lesson Description / Content - Brief overview of the lesson
+      - Duration                     - e.g. "15 min"
+      - Status                       - Published (default) or Draft
+      - Free Preview checkbox        - Allow viewing without enrollment
+
+  Step 4: Click "Add Lesson"
+
+  What happens:
+    - The lesson is added to the course
+    - Lessons are automatically ordered (you can also reorder via AJAX)
+    - You are redirected back to the lesson list
+
+  You can add as many lessons as needed. Repeat for each lesson.
+
+  MEDIA RULES:
+    - You MUST provide at least one media source (URL, video, or document)
+    - You can provide multiple (e.g. both a video URL and a document)
+    - Video files: max 500MB
+    - Document files: max 50MB
+    - If an upload fails, the system logs the error gracefully
+
+  After adding lessons, you can use the "Course Tools" section at the
+  bottom of the page to:
+  - Manage Quizzes for this course
+  - Manage Assignments for this course
+  - Preview the course as a student would see it
+
+------------------------------------------------------------
+5D. CREATING QUIZZES
+------------------------------------------------------------
+
+  Step 1: Go to /instructor/quiz and click "+ Add Quiz / Exam"
+          (or navigate from the course lesson page)
+
+  Step 2: Select quiz type:
+    - Quiz (regular practice assessment)
+    - Exam (formal graded assessment)
+
+  Step 3: Fill in the quiz form:
+
+    REQUIRED fields:
+      * Quiz/Exam Type   - Quiz or Exam (radio button)
+      * Title            - e.g. "Chapter 5 Assessment" or "Final Examination"
+      * Passing Score    - Percentage needed to pass (0-100, default: 50)
+      * Status           - Draft or Published
+
+    OPTIONAL fields:
+      - Instructions         - Text instructions for students
+      - Instructions File    - Upload PDF, DOC, DOCX, or TXT (max 10MB)
+      - Time Limit           - In minutes (leave empty for no time limit)
+      - Attempts Limit       - Max number of attempts (leave empty for unlimited)
+      - Available From       - Schedule when the quiz becomes available
+
+  Step 4: Click "Create"
+
+  ADDING QUESTIONS:
+
+  After creating the quiz, click "Edit" to add questions.
+
+  For each question:
+    * Question Text   - The question students will answer
+    * Question Type   - Choose from 8 types:
+        1. Multiple Choice    - One correct answer from options
+        2. Multiple Select    - Multiple correct answers from options
+        3. True/False         - Simple true or false
+        4. Short Answer       - Brief text response
+        5. Essay              - Long-form response (manual grading)
+        6. Fill in the Blank  - Complete the blank
+        7. Matching           - Match pairs of items
+        8. Ordering           - Put items in correct order
+    * Marks           - Points for this question (min: 1)
+
+  Type-specific fields:
+    - Multiple Choice / Select: Enter options one per line, specify correct answer
+    - True/False: Correct answer is True or False
+    - Short Answer: Specify the correct answer text
+    - Essay: No correct answer (requires manual grading)
+    - Fill in the Blank: Enter correct answers, one per line
+    - Matching: Enter key-value pairs (min 2 pairs)
+    - Ordering: Enter items in the correct order (min 2 items)
+
+  BULK IMPORT:
+    - You can upload a document (PDF, DOC, DOCX, TXT, max 20MB)
+    - The system extracts questions automatically
+    - Review extracted questions before saving
+
+  After adding questions, you can:
+  - Edit individual questions
+  - Delete questions
+  - Release results to students (after grading)
+
+  PUBLISHING THE QUIZ:
+    - Set status to "Published" to make it visible to enrolled students
+    - If you set "Available From", the quiz is scheduled for that date/time
+    - Students receive a notification when a quiz is published
+
+------------------------------------------------------------
+5E. CREATING ASSIGNMENTS
+------------------------------------------------------------
+
+  Step 1: Go to /instructor/assignments and click "+ Add Assignment"
+          (or navigate from the course lesson page)
+
+  Step 2: Select a course from the dropdown
+
+  Step 3: Fill in the assignment form:
+
+    REQUIRED fields:
+      * Title           - The assignment name
+      * Description     - Detailed description of the assignment
+      * Total Marks     - Maximum score (default: 100)
+      * Status          - Draft or Published
+
+    OPTIONAL fields:
+      - Instructions         - Additional instructions text
+      - Instructions File    - Upload PDF, DOC, DOCX, or TXT (max 10MB)
+      - Due Date             - Deadline for submission
+      - Available From       - Schedule when the assignment becomes visible
+
+  Step 4: Click "Create Assignment"
+
+  ADVANCED SETTINGS (available in Edit mode):
+    - Time Limit (minutes)         - How long students have to complete
+    - Max File Size (MB)           - Limit uploaded file sizes (1-50MB)
+    - Allowed File Types           - Restrict file types
+    - Allow Late Submissions       - Whether to accept past-deadline work
+    - Late Penalty Percent         - Deduction for late submissions (0-100%)
+
+  After creation:
+    - If status is "Published", enrolled students receive a notification
+    - If "Available From" is set, students are notified on that date
+
+  GRADING SUBMISSIONS:
+    1. Go to the assignment edit page
+    2. View submitted assignments from students
+    3. Download their uploaded files
+    4. Enter a numeric score (0 to total_marks)
+    5. Write feedback
+    6. Click "Grade"
+    7. The student receives a notification with their grade
+
+------------------------------------------------------------
+5F. CREATING COURSE NOTES
+------------------------------------------------------------
+
+  Step 1: Click "Course Notes" in the sidebar at /instructor/course-notes
+  Step 2: Click "+ Add New Note"
+
+  Step 3: Fill in the note form:
+
+    REQUIRED fields:
+      * Course            - Select one of your courses
+      * Note Title        - The title of the note
+      * Rich Content      - The main content/body of the note (full text)
+      * Status            - Draft or Published
+
+    OPTIONAL fields:
+      - Description/Summary  - A brief summary (max 1000 characters)
+      - Display Order        - Number for ordering (default: 1)
+      - Created Date         - Custom date (default: today)
+      - Attachment           - Upload any file (PDF, DOC, DOCX, PPT, PPTX,
+        XLS, XLSX, ZIP, JPG, PNG, WebP, GIF, BMP - max 20MB)
+      - External Resource Link - URL to an external resource
+      - Allow Downloads      - Yes or No (whether students can download)
+
+  Step 4: Click "Save Note"
+
+  Students see published notes in their Course Notes section.
+
+------------------------------------------------------------
+5G. MANAGING YOUR COURSES
+------------------------------------------------------------
+
+  All Courses: /instructor/courses
+    - View all your courses in a table
+    - Click "Edit" to modify course details
+    - Click "Lessons" to manage lessons for that course
+
+  Edit Course: /instructor/courses/edit/{id}
+    - Update any course field
+    - Replace thumbnail or preview video
+    - Change pricing, status, categories, tags
+    - Click "Update Course" to save
+
+  Delete Course: From the course list, click "Delete" with confirmation
+
+  Lesson Reordering:
+    - On the lessons page, drag and drop lessons to reorder
+    - Changes are saved automatically via AJAX
+
+  Delete Lesson:
+    - On the lessons page, click "Delete" next to any lesson
+
+------------------------------------------------------------
+5H. INSTRUCTOR FINANCIAL FEATURES
+------------------------------------------------------------
+
+  Earnings: /instructor/earnings
+    - See total earnings, this month's earnings, and pending amount
+
+  Pending Payments: /instructor/pending-payments
+    - View offline payment enrollments (Airtel/MTN mobile money)
+    - For each pending payment, you can:
+      - Click "Approve" to confirm the payment and activate enrollment
+      - Click "Reject" to decline the payment
+    - Students are notified of your decision
+
+  Payouts: /instructor/payouts
+    - See total earnings, total paid, and pending balance
+    - Request a payout by filling in:
+      * Amount (up to your pending balance)
+      * Method: Bank Transfer, PayPal, or Stripe
+      * Account Details: Your payment account information
+      * Notes (optional)
+    - View your payout history and status
+
+------------------------------------------------------------
+5I. INSTRUCTOR OTHER FEATURES
+------------------------------------------------------------
+
+  Students: /instructor/students
+    - View all students enrolled in your courses
+
+  Reviews: /instructor/reviews
+    - View all reviews on your courses
+    - Approve or reject pending reviews
+
+  Support Tickets: /instructor/supports
+    - View support tickets from your students
+    - Reply to tickets
+
+  Contact Messages: /instructor/contact-messages
+    - View messages sent to you by students
+    - Mark messages as read
+
+  Notifications: /instructor/notifications
+    - View all system notifications
+    - Mark read or mark all as read
+
+  Settings: /instructor/settings
+    - Update your profile (name, email, designation, profile image)
+    - Change your password
+
+
+________________________________________________________________________________
+6. ORGANIZATION GUIDE - COMPLETE WALKTHROUGH
+________________________________________________________________________________
+
+Organizations (corporate clients, schools, training departments) have a
+dedicated dashboard for managing courses, instructors, and student teams.
+
+------------------------------------------------------------
+6A. YOUR DASHBOARD (/org)
+------------------------------------------------------------
+
+  The organization dashboard shows:
+  - 4 stat cards: Total Students, Total Courses, Total Enrollments,
+    Total Instructors
+  - Organization Courses table with enrollment counts
+  - Quick Actions: Create Course, Manage Instructors, Financial Report,
+    All Students
+  - Organization Overview: course counts, active courses, total revenue
+
+------------------------------------------------------------
+6B. CREATING COURSES
+------------------------------------------------------------
+
+  Similar to instructor course creation, with one additional field:
+    - Instructor: Assign one of your organization's instructors to the course
+
+  Steps:
+    1. Go to /org/courses/create
+    2. Fill in all course fields (same as instructor guide section 5B)
+    3. Select an instructor from your organization's instructor list
+    4. Click "Create Course"
+
+  You can manage lessons for your courses at /org/courses/{id}/lessons
+  (same process as instructor guide section 5C)
+
+------------------------------------------------------------
+6C. MANAGING INSTRUCTORS
+------------------------------------------------------------
+
+  Organization can CREATE instructor accounts for their team:
+
+  1. Go to /org/instructors and click "Add Instructor"
+  2. Fill in:
+    * First Name, Last Name
+    * Email (must be unique)
+    * Password (min 8 characters, confirmed)
+    * Designation (optional)
+  3. Click "Create"
+  4. The instructor is automatically linked to your organization
+  5. These instructors do NOT need admin approval
+
+  View all your instructors at /org/instructors
+
+------------------------------------------------------------
+6D. MANAGING STUDENTS
+------------------------------------------------------------
+
+  View all students enrolled in your courses at /org/students
+  - See student names and enrollment details
+
+------------------------------------------------------------
+6E. FINANCIAL MANAGEMENT
+------------------------------------------------------------
+
+  Financial Report: /org/financial
+    - Total Revenue across all your courses
+    - This Month's revenue
+    - Pending amount
+    - Full transaction log with course, student, amount, date, status
+
+  Payout: /org/financial/payout
+    - Request payouts for your earnings
+
+------------------------------------------------------------
+6F. REVIEW MANAGEMENT
+------------------------------------------------------------
+
+  View and moderate reviews: /org/reviews
+  - Approve or reject student reviews on your courses
+  - Students are notified of approval/rejection
+
+------------------------------------------------------------
+6G. SUPPORT & COMMUNICATION
+------------------------------------------------------------
+
+  Support Tickets: /org/supports
+    - View tickets related to your courses
+    - Create tickets for internal use
+
+  Noticeboard: /org/noticeboard
+    - Create notices with title, content, and active/inactive status
+    - Edit or delete existing notices
+    - Notices are visible to relevant users
+
+  Wishlists: /org/wishlists
+    - View who has wishlisted your courses
+
+------------------------------------------------------------
+6H. PROFILE & SETTINGS
+------------------------------------------------------------
+
+  Profile: /org/profile
+    - View your organization profile with stats
+    - See course count, instructor count, student count
+
+  Settings: /org/settings
+    - Update profile information
+    - Change password (min 8 chars, must include letters, mixed case,
+      numbers, and symbols)
+
+
+________________________________________________________________________________
+7. ADMIN GUIDE - COMPLETE WALKTHROUGH
+________________________________________________________________________________
+
+Administrators have full control over the entire platform. The admin panel
+is accessed at /admin and is protected by role-based authentication.
+
+NOTE: Both "admin" and "staff" roles can access admin routes. Staff members
+have the same access level as admins.
+
+------------------------------------------------------------
+7A. ADMIN DASHBOARD (/admin)
+------------------------------------------------------------
+
+  The dashboard provides a complete platform overview:
+  - 5 stat cards: Total Students, Total Courses, Total Instructors
+    (with pending count), Total Enrollments, Total Revenue
+  - 3 pending-approval links: Pending Instructors, Pending Reviews,
+    System Notifications
+  - 3 charts: Users by Role (doughnut), Courses by Category (pie),
+    This Week Enrollments (bar chart)
+  - Monthly Trends line chart (enrollments + revenue over 6 months)
+  - Platform Overview section
+  - Recent Enrollments and Certificates
+  - Popular Courses with enrollment progress bars
+
+------------------------------------------------------------
+7B. MANAGING USERS
+------------------------------------------------------------
+
+  Instructors (/admin/instructors):
+    - View all instructors in a table
+    - Toggle status: Activate or Deactivate any instructor
+    - Delete instructors (cannot delete yourself)
+
+  Students (/admin/students):
+    - View all students with enrollment counts
+    - Toggle status: Activate or Deactivate
+    - Delete students
+
+  Organizations (/admin/organizations):
+    - View all organization accounts
+    - Toggle status: Activate or Deactivate
+    - Delete organizations
+
+  Staff (/admin/staff):
+    Staff members are limited-admin accounts. You can:
+    CREATE a staff member:
+      1. Go to /admin/staff
+      2. Fill in: Name, Email, Password (min 8, confirmed), Designation
+      3. Click "Add Staff"
+      4. The staff member can now log in and access the admin panel
+
+    EDIT a staff member:
+      1. Click "Edit" on any staff row
+      2. Modify name, email, designation, phone, status
+      3. Optionally change password (leave blank to keep current)
+      4. Click "Update Staff"
+
+    DELETE a staff member:
+      1. Click "Delete" with confirmation
+
+  Toggle Status Logic:
+    - Active accounts can log in and access their role features
+    - Inactive accounts CANNOT log in (they see "Your account has been
+      deactivated. Please contact support.")
+
+------------------------------------------------------------
+7C. INSTRUCTOR APPROVAL
+------------------------------------------------------------
+
+  Location: /admin/settings?tab=instructors
+
+  When a new instructor registers:
+    1. Admin sees them in the "Pending Approval" section
+    2. Shows: Name, Email, Designation, Registration Date
+    3. Click "Approve" to activate their account
+       - Sets is_approved = true, status = active
+       - Sends notification: "Instructor Account Approved"
+    4. Or click "Revoke" to reject their application
+       - Sets is_approved = false, status = inactive
+       - Sends notification: "Instructor Account Rejected"
+
+  Once approved, instructors can access all features in their dashboard.
+  You can revoke approval at any time.
+
+------------------------------------------------------------
+7D. COURSE MANAGEMENT
+------------------------------------------------------------
+
+  View All Courses (/admin/course):
+    - See all courses across all instructors and organizations
+    - Table columns: Title, Instructor, Category, Price, Type (Free/Paid),
+      Students, Status
+    - NOTE: This is a READ-ONLY view. Course creation and status changes
+      are managed by instructors/organizations through their dashboards.
+
+  Course Levels (/admin/course/level):
+    CREATE: Enter name (required), optional display order
+    UPDATE: Change name and order
+    DELETE: Removes level (courses using it lose the level association)
+
+  Course Tags (/admin/course/tag):
+    CREATE: Enter name (required)
+    UPDATE: Change name
+    DELETE: Removes tag from all courses
+
+  Course Bundles (/admin/course/bundle):
+    CREATE: Bundle multiple courses together at a combined price
+    UPDATE: Modify bundle details
+    DELETE: Remove a bundle
+
+------------------------------------------------------------
+7E. CATEGORY & SUBJECT MANAGEMENT
+------------------------------------------------------------
+
+  Categories (/admin/category):
+    - Create: Name (required), Description (optional), Status (active/inactive)
+    - Toggle status or delete
+    - Subjects are listed under each category
+
+  Subjects (/admin/subject):
+    - Create: Name (required), Category (optional), Status
+    - Toggle status or delete
+
+  Blog Categories (/admin/blog/category):
+    - Create: Name, Status
+    - Manage blog post categories
+
+------------------------------------------------------------
+7F. CMS / APPEARANCE MANAGEMENT
+------------------------------------------------------------
+
+  Homepage Sliders (/admin/slider):
+    Create a new slider:
+      * Title (required)
+      - Subtitle, Description, Button Text, Button Link
+      - Image (JPEG/PNG/WebP, max 5MB) - drag-and-drop upload
+      - Display Order (number)
+      * Status (active/inactive)
+      - Duration (1-3600 seconds, default: 6) - auto-advance time
+    Edit: Click "Edit" to open a modal with pre-filled data
+    Delete: Click "Delete" with confirmation
+
+  Hero Sections (/admin/hero):
+    - Create: Title (required), Subtitle, Page (home/courses/about/contact),
+      Status (active/inactive)
+    - Delete with confirmation
+
+  Testimonials (/admin/testimonial):
+    - Create: Client Name (required), Position, Content (required),
+      Rating (1-5 stars), Status, Avatar image
+    - Edit via modal, Delete with confirmation
+
+  Pages (/admin/page):
+    - Create: Title (required), Content (required, HTML supported),
+      Status (draft/published)
+    - Auto-generates slug from title
+
+  FAQs (/admin/faq):
+    - Create: Question (required), Answer (required), Category (optional),
+      Display Order, Status
+    - Edit via modal, Delete with confirmation
+
+------------------------------------------------------------
+7G. BLOG MANAGEMENT
+------------------------------------------------------------
+
+  Blog Posts (/admin/blog):
+    - Create: Title, Content, Excerpt, Category, Status, Featured Image
+    - Image: JPEG/PNG/WebP, max 5MB
+    - Auto-generates slug from title
+
+  Blog Categories (/admin/blog/category):
+    - Create: Name, Status
+
+------------------------------------------------------------
+7H. FINANCE & PAYMENTS
+------------------------------------------------------------
+
+  Sale History (/admin/financial/sale):
+    - View all enrollment transactions
+    - See course, student, amount, date
+
+  Offline Payments (/admin/financial/offline):
+    - View all Airtel/MTN mobile money payments
+    - See payment provider details
+
+  Payout Requests (/admin/financial/payouts):
+    - View all instructor payout requests
+    - Approve or reject pending payouts
+    - Approve: Sets status to "paid", records payment date
+    - Reject: Sets status to "rejected", with optional reason
+
+  Payment Methods (/admin/payment-method):
+    - Create: Name (e.g. "Airtel Money"), Type (Online/Offline),
+      Provider (for offline: airtel/mtn), Status
+    - Manage available payment gateways
+
+  Coupons (/admin/marketing/coupon):
+    - Create: Code (auto-uppercased), Discount amount,
+      Type (percentage/fixed), Max Uses, Min Amount,
+      Expiration Date, Status
+    - Edit or delete
+
+------------------------------------------------------------
+7I. REVIEW MODERATION
+------------------------------------------------------------
+
+  Location: /admin/review/course-review
+
+  - View all course reviews with star ratings
+  - See approval status (Approved/Pending)
+  - Approve pending reviews: Students are notified
+  - Delete reviews: Permanent removal
+
+------------------------------------------------------------
+7J. SUPPORT TICKET MANAGEMENT
+------------------------------------------------------------
+
+  Support Categories (/admin/support-ticket/category):
+    - Create, edit, or delete ticket categories
+
+  Tickets (/admin/support-ticket/ticket):
+    - View all tickets with user, subject, category, priority, status
+    - Priority levels: High (red), Medium (amber), Low (green)
+    - Status: Open (amber), Pending (gray), Closed (green)
+    - Change status via dropdown
+    - View full ticket conversation thread
+    - Reply to tickets (auto-reopens closed tickets)
+    - Delete tickets with confirmation
+
+------------------------------------------------------------
+7K. NOTIFICATION MANAGEMENT
+------------------------------------------------------------
+
+  Notification Templates (/admin/notification):
+    - Create: Type (email/in_app), Template Name, Subject, Body, Status
+    - Send test notifications to yourself
+    - Placeholders: {user_name}, {user_email}, {app_name}
+
+  Notification History (/admin/notification/history):
+    - View all sent notifications with user and template info
+
+  Send Direct Notification (/notifications/send):
+    - Send in-app notification to any active user
+
+------------------------------------------------------------
+7L. ENROLLMENT & CERTIFICATE MANAGEMENT
+------------------------------------------------------------
+
+  All Enrollments (/admin/enrollment/all):
+    - View all enrollments across the platform
+
+  Create Enrollment (/admin/enrollment/new-create):
+    - Manually enroll a student in a course
+    - Select student and course from dropdowns
+    - System handles pricing automatically
+
+  All Certificates (/admin/certificate):
+    - View all earned certificates
+
+  Create Certificate (/admin/certificate/create):
+    - Manually award a certificate
+    - Select course, student (optional), title, description
+
+------------------------------------------------------------
+7M. SYSTEM SETTINGS
+------------------------------------------------------------
+
+  Location: /admin/settings (4-tab interface)
+
+  Tab 1 - School Info:
+    * School Name, Email, Phone, Address
+    * Currency Symbol, Code, Position (left/right)
+    * Timezone, Language
+    * Primary Color (color picker, default #5F3EED)
+    * Secondary Color (color picker, default #F4B826)
+    * Accent Color (color picker, default #1AEBC5)
+    - Custom CSS (advanced)
+    - Site Logo (image upload, max 5MB)
+    - Favicon (image upload, max 2MB)
+    - Slider Background Video (video upload, max 100MB)
+
+  Tab 2 - Theme/Frontend Settings:
+    - Primary Color, Secondary Color
+    - Site Name, Site Description
+
+  Tab 3 - Backend Settings:
+    - App Name, Email, Timezone
+    - Maintenance Mode toggle
+
+  Tab 4 - Instructor Approval:
+    - See section 7C above
+
+------------------------------------------------------------
+7N. SCHOOL MANAGEMENT
+------------------------------------------------------------
+
+  Classes (/admin/school/classes):
+    - Create: Name, Grade, Section, Teacher, Course, Room, Capacity, Status
+
+  Attendance (/admin/school/attendances):
+    - Mark individual attendance: Class, Student, Date, Status
+    - Batch marking: Mark all students in a class at once
+    - Status options: Present, Absent, Late, Excused
+
+  Exams (/admin/school/exams):
+    - Create: Title, Course, Class, Date, Time, Marks, Type, Status
+
+  Results (/admin/school/results):
+    - Enter marks per student per exam
+    - Auto-grading: A+ (90%+), A (80%+), B (70%+), C (60%+), D (50%+), F
+
+  Timetables (/admin/school/timetables):
+    - Schedule: Class, Course, Teacher, Day, Time, Room
+
+  Parents (/admin/school/parents):
+    - Create parent accounts linked to student accounts
+
+------------------------------------------------------------
+7O. LOCALIZATION
+------------------------------------------------------------
+
+  Countries (/admin/localization/country): Name, Code, Status
+  States (/admin/localization/state): Name, Country, Status
+  Cities (/admin/localization/city): Name, State, Status
+  Time Zones (/admin/localization/time-zone): Name, GMT Offset, Status
+
+------------------------------------------------------------
+7P. OTHER ADMIN FEATURES
+------------------------------------------------------------
+
+  Contact Messages (/admin/contact):
+    - View all contact form submissions
+    - Mark as read, delete
+
+  Wishlists (/admin/wishlists):
+    - Read-only view of all user wishlists
+
+  Storage Health (/admin/storage-health):
+    - Diagnose file storage issues
+    - Check symlink, directory writability
+    - Auto-fix missing directories
+
+  Global Search (/admin/search):
+    - Search across courses, users, and lessons
+
+  Site Language (/admin/site-language):
+    - Manage available languages
+    - Set default language
+
+  Currency (/admin/currency):
+    - Manage currencies with exchange rates
+    - Set default currency
+
+  Email Templates (/admin/email-template):
+    - Create and manage email templates
+
+
+________________________________________________________________________________
+8. COURSE LIFECYCLE & STATUS EXPLANATION
+________________________________________________________________________________
+
+Courses go through different statuses:
+
+  DRAFT:
+    - The course is hidden from the public catalog
+    - Only the instructor/owner can see it
+    - Use this status while building your course content
+    - Default status when creating a new course
+
+  PENDING:
+    - The course is visible to admins for review
+    - Useful if you want admin approval before publishing
+    - NOT automatically published after admin review
+
+  ACTIVE:
+    - The course is live and visible in the public catalog
+    - Students can browse, enroll in, and purchase it
+    - Use this status when your course is ready for students
+
+  INSTRUCTOR WORKFLOW:
+    1. Create course in DRAFT status
+    2. Add lessons, quizzes, assignments
+    3. Upload thumbnail and preview video
+    4. Change status to ACTIVE when ready
+    5. Course appears in the catalog for students
+
+  NOTE: Unlike some LMS platforms, EduLab does NOT require admin approval
+  for course publishing. Instructors control their own course status.
+  Admins can VIEW all courses but cannot change their status.
+
+
+________________________________________________________________________________
+9. PAYMENT SYSTEM & ENROLLMENT FLOW
+________________________________________________________________________________
+
+  FREE COURSES:
+    - Students enroll directly with one click
+    - No payment required
+    - Instant access to all lessons
+
+  PAID COURSES (Paystack Online Payment):
+    - Student adds course to cart
+    - Proceeds to checkout
+    - Enters card details on Paystack's secure page
+    - Payment is verified via webhook + callback
+    - Enrollment is created automatically
+    - Student gets instant access
+
+  PAID COURSES (Offline / Mobile Money):
+    - Student adds course to cart
+    - Selects offline payment (Airtel or MTN)
+    - Places the order
+    - Enrollment is created with PENDING payment status
+    - Instructor/admin must approve the payment
+    - Student is notified once approved
+
+  COUPONS:
+    - Admin creates coupons with code, discount type (% or fixed),
+      max uses, min amount, and expiration date
+    - Students apply coupon codes at checkout
+    - Discount is applied to the subtotal before tax
+
+  BUNDLES:
+    - Admin creates course bundles (multiple courses at a combined price)
+    - Students can purchase bundles to get access to all included courses
+    - Enrollment is created for each course in the bundle
+
+  TAX:
+    - Configurable tax rate applied at checkout
+    - Calculated on (subtotal - coupon discount)
+
+
+________________________________________________________________________________
+10. ASSESSMENT SYSTEM (QUIZZES, EXAMS & ASSIGNMENTS)
+________________________________________________________________________________
+
+  QUIZZES vs EXAMS:
+    - Quizzes: Regular practice assessments (is_exam = false)
+    - Exams: Formal graded assessments (is_exam = true)
+    - Both use the same question types and grading system
+    - Exams appear under "Exams" in the student sidebar
+
+  QUESTION TYPES (8 types):
+    1. Multiple Choice    - Select one correct answer
+    2. Multiple Select    - Select multiple correct answers
+    3. True/False         - True or False
+    4. Short Answer       - Brief text (auto-graded, case-insensitive)
+    5. Essay              - Long text (requires manual instructor grading)
+    6. Fill in the Blank  - Complete the missing text
+    7. Matching           - Match pairs of items
+    8. Ordering           - Arrange items in correct order
+
+  AUTO-GRADING:
+    - All types except Essay are auto-graded instantly
+    - QuizEnhancementService compares answers against correct answers
+    - Score is calculated as percentage
+    - Pass/fail determined by passing_score threshold
+
+  TIME LIMITS:
+    - Instructor sets time limit in minutes (optional)
+    - Timer starts when student begins the quiz
+    - If time expires, quiz auto-submits with current answers
+    - Server-side enforcement prevents cheating
+
+  ATTEMPT LIMITS:
+    - Instructor can limit the number of attempts
+    - System tracks attempts per student per quiz
+
+  ASSIGNMENTS:
+    - Manually graded by the instructor
+    - Students can submit text and/or file uploads
+    - Deadline enforcement: late submissions may be rejected or penalized
+    - Instructor sets penalty percentage for late work
+    - Max file size and allowed file types are configurable
+
+  RESULT RELEASE:
+    - Instructor can control when quiz results are visible to students
+    - "Release Results" button sends all results at once
+    - Until released, students see "Awaiting Review"
+
+
+________________________________________________________________________________
+11. PROGRESS TRACKING & CERTIFICATES
+________________________________________________________________________________
+
+  LESSON COMPLETION:
+    - Students toggle each lesson as complete/incomplete
+    - Progress = (Completed Lessons / Total Lessons) x 100%
+    - Video position is tracked for resume functionality
+
+  COURSE COMPLETION:
+    - When ALL lessons are marked complete, the enrollment status
+      changes from "In Progress" to "Completed"
+    - A certificate is AUTOMATICALLY generated
+    - The student receives a "Course Completed" notification
+
+  CERTIFICATES:
+    - Auto-generated on course completion
+    - Title: "Certificate of Completion: {Course Title}"
+    - Contains: Student name, course title, completion date, EduLab seal
+    - Downloadable as a professional PDF
+    - Admins can also manually create certificates
+
+  PROGRESS DISPLAYED:
+    - Dashboard stat cards (enrolled/in-progress/completed counts)
+    - Dashboard progress ring charts
+    - My Enrolled Courses page (progress bars)
+    - Course materials hub (progress bar)
+    - Lesson viewer sidebar (completion checkmarks)
+
+
+________________________________________________________________________________
+12. FILE UPLOAD REQUIREMENTS & CONSTRAINTS
+________________________________________________________________________________
+
+  +------------------+---------------------------+--------+-------------------+
+  | Upload Type      | Allowed Formats           | Max    | Storage Path      |
+  |                  |                           | Size   |                   |
+  +------------------+---------------------------+--------+-------------------+
+  | Course Thumbnail | JPEG, PNG, WebP           | 5 MB   | courses/thumbnails|
+  | Course Preview   | MP4, MOV, AVI, WebM, OGG  | 100 MB | courses/preview-  |
+  |   Video          |                           |        | videos            |
+  | Lesson Video     | MP4, MOV, AVI, WebM, OGG  | 500 MB | lessons/videos    |
+  | Lesson Document  | PDF, DOC, DOCX, PPT, PPTX,| 50 MB  | lessons/documents |
+  |                  | XLS, XLSX                  |        |                   |
+  | Quiz Instructions| PDF, DOC, DOCX, TXT       | 10 MB  | quizzes/          |
+  |   File           |                           |        | instructions      |
+  | Quiz Extraction  | PDF, DOC, DOCX, TXT       | 20 MB  | (not stored)      |
+  |   Document       |                           |        |                   |
+  | Assignment       | PDF, DOC, DOCX, TXT       | 10 MB  | assignments/      |
+  |   Instructions   |                           |        | instructions      |
+  | Assignment       | PDF, DOC, DOCX, TXT, ZIP  | 10 MB  | assignments/      |
+  |   Submission     |                           | (each) | submissions       |
+  | Course Note       | PDF, DOC, DOCX, PPT, PPTX,| 20 MB | course-notes      |
+  |   Attachment     | XLS, XLSX, ZIP, JPG, PNG, |        |                   |
+  |                  | WebP, GIF, BMP             |        |                   |
+  | Profile Image    | Any image format           | 5 MB   | profiles/images   |
+  | Site Logo        | JPEG, PNG, WebP, SVG       | 5 MB   | settings          |
+  | Favicon          | ICO, PNG, SVG              | 2 MB   | settings          |
+  | Slider Image     | JPEG, PNG, WebP            | 5 MB   | sliders           |
+  | Testimonial      | Any image format           | 5 MB   | testimonials      |
+  |   Avatar         |                           |        |                   |
+  | Blog Image       | JPEG, PNG, WebP            | 5 MB   | blogs             |
+  +------------------+---------------------------+--------+-------------------+
+
+  SPECIAL PROCESSING:
+  - Course thumbnails are auto-resized to max 1200x675 and converted
+    to WebP format at 85% quality
+  - All uploads use non-blocking error handling (logged on failure)
+
+
+________________________________________________________________________________
+13. PASSWORD REQUIREMENTS
+________________________________________________________________________________
+
+  Registration Password (all roles):
+    - Minimum 8 characters
+    - Must match confirmation field
+    - No complexity requirements at registration
+
+  Password Reset:
+    - Minimum 8 characters
+    - Must match confirmation field
+
+  Password Change (while logged in):
+    - Must provide current password
+    - Minimum 8 characters
+    - MUST include:
+      * At least one letter
+      * Both uppercase and lowercase letters
+      * At least one number
+      * At least one symbol (!@#$%^&* etc.)
+    - Must match confirmation field
+
+
+________________________________________________________________________________
+14. NOTIFICATION SYSTEM
+________________________________________________________________________________
+
+  EduLab has an in-app notification system. Notifications are created for
+  key events throughout the platform:
+
+  AUTOMATIC NOTIFICATIONS:
+    - New instructor registration -> Sent to all admins/staff
+    - Instructor approved/rejected -> Sent to the instructor
+    - Course enrolled -> Sent to the student
+    - Lesson completed -> Sent to the student
+    - Course completed -> Sent to the student
+    - Quiz published -> Sent to enrolled students
+    - Quiz scheduled -> Sent to enrolled students
+    - Assignment published -> Sent to enrolled students
+    - Assignment graded -> Sent to the student
+    - Quiz results released -> Sent to enrolled students
+    - Support ticket created -> Sent to instructor + admins
+    - Support ticket replied -> Sent to ticket creator
+    - Review approved -> Sent to the student
+
+  NOTIFICATION PREFERENCES:
+    Students can configure per-type channel preferences:
+    - Types: course_enrolled, lesson_completed, course_completed,
+      quiz_result, assignment_graded, discussion_reply
+    - Channels: none, in_app, email, both
+
+  NOTIFICATION MANAGEMENT:
+    - View all notifications at your role's /notifications page
+    - Mark individual notifications as read
+    - Mark all as read
+    - Send notifications to other users
+    - Unread count shown as badge in the sidebar
+
+
+________________________________________________________________________________
+15. SUPPORT TICKET SYSTEM
+________________________________________________________________________________
+
+  Students, instructors, and organizations can create support tickets:
+
+  Creating a Ticket:
+    1. Go to Support > Create Ticket in the sidebar
+    2. Enter a subject
+    3. Select a category (optional)
+    4. Set priority: Low, Medium, or High
+    5. Select the relevant course (optional)
+    6. Write your message
+    7. Submit
+
+  Ticket Lifecycle:
+    1. Student creates ticket -> Status: Open
+    2. Instructor/admin replies -> Status: Open (auto-reopens if closed)
+    3. Issue resolved -> Status: Closed
+
+  Notifications:
+    - When a ticket is created, the instructor and all admins are notified
+    - When someone replies, the ticket creator is notified
+    - When a ticket is closed, all participants can see the resolution
+
+
+________________________________________________________________________________
+16. SYSTEM SETTINGS & CONFIGURATION
+________________________________________________________________________________
+
+  PLATFORM BRANDING:
+    Admins can customize:
+    - School/Platform name (displayed in header, certificates)
+    - Site logo and favicon
+    - Primary color (default: #5F3EED - purple)
+    - Secondary color (default: #F4B826 - gold)
+    - Accent color (default: #1AEBC5 - teal)
+    - Custom CSS for advanced styling
+
+  HOMEPAGE CONTENT:
+    Admins can configure:
+    - Hero sections for different pages (home, courses, about, contact)
+    - Sliders/banners with images, text, and auto-advance timing
+    - Testimonials from satisfied students
+    - FAQs organized by category
+    - Static pages (Terms of Service, Privacy Policy, etc.)
+
+  PAYMENT CONFIGURATION:
+    - Payment gateways (Paystack for online, Airtel/MTN for offline)
+    - Currency settings (symbol, code, position)
+    - Tax rate (configured in application config)
+
+  NOTIFICATION TEMPLATES:
+    - Create email and in-app notification templates
+    - Use placeholders: {user_name}, {user_email}, {app_name}
+    - Send test notifications
+
+
+________________________________________________________________________________
+17. TECHNICAL ARCHITECTURE
+________________________________________________________________________________
+
+  BACKEND:
+    - PHP 8.3+
+    - Laravel 13.8 (MVC framework)
+    - Eloquent ORM for database operations
+    - Service layer for complex business logic
+
+  FRONTEND:
+    - Blade templating engine
+    - Tailwind CSS v4 (utility-first CSS)
+    - Alpine.js 3 (lightweight JavaScript interactivity)
+    - Remixicon (icon library)
+    - Vite 8 (build tool)
+
+  DATABASE:
+    - SQLite for development/testing
+    - MySQL for production
+
+  KEY SERVICES:
+    - QuizEnhancementService: Quiz creation, grading, attempt management
+    - AssignmentEnhancementService: Assignment submission, grading, deadlines
+    - CourseEnhancementService: Course media handling
+    - ProfileManagementService: Profile and password management
+    - ContentManagementService: CMS content management
+    - ActivityMonitoringService: Admin activity logging
+
+  FILE STORAGE:
+    - Local filesystem via Laravel's Storage facade
+    - Public disk for uploaded content
+    - Automatic thumbnail processing (resize + WebP conversion)
+
+  PDF GENERATION:
+    - barryvdh/laravel-dompdf for certificate generation
+
+  PAYMENT:
+    - Paystack API integration for online payments
+    - Webhook + callback verification for payment confirmations
+
+
+________________________________________________________________________________
+18. SECURITY FEATURES
+________________________________________________________________________________
+
+  AUTHENTICATION:
+    - BCrypt password hashing (irreversible)
+    - Session-based authentication
+    - Session regeneration after login (prevents session fixation)
+    - Session invalidation on logout
+    - "Remember Me" token support
+
+  AUTHORIZATION:
+    - Role-Based Access Control (RBAC) with 5 roles
+    - Custom middleware: role verification, instructor approval check
+    - Horizontal privilege prevention (users cannot access other roles)
+    - Instructor approval system (admin-gated)
+
+  PROTECTION:
+    - CSRF token verification on all forms (prevents cross-site request forgery)
+    - PDO parameter binding (prevents SQL injection)
+    - Blade automatic HTML escaping (prevents XSS attacks)
+    - Rate limiting on login attempts (prevents brute force)
+    - Unique index constraints (prevents duplicate enrollments and submissions)
+
+  AUDIT:
+    - Activity logging for admin actions
+    - IP address and User Agent tracking
+    - Notification history
+    - Payment transaction records
+
+
+________________________________________________________________________________
+19. TROUBLESHOOTING FAQ
+________________________________________________________________________________
+
+Q: I registered as an instructor but cannot create courses.
+A: You need admin approval. Check your notifications for approval status.
+   Contact the platform administrator if you have been waiting too long.
+
+Q: I tried to log in and got "This account is registered as Student,
+   not Instructor."
+A: You selected the wrong role tab on the login page. Click the correct
+   role tab (Student, Instructor, or Organization) that matches your
+   registration.
+
+Q: I uploaded a course but students cannot see it.
+A: Check your course status. It must be "Active" to appear in the catalog.
+   "Draft" courses are hidden. Change it to Active via the course edit page.
+
+Q: Students say they cannot see the "Add Assignment" or "Add Quiz" button.
+A: Make sure the course is in Active status and you are viewing the correct
+   page. The buttons appear on the course-specific quiz/assignment pages,
+   not the overview pages.
+
+Q: My uploaded video is not playing.
+A: Check the file format (MP4, MOV, AVI, WebM, OGG) and size (max 100MB
+   for preview, 500MB for lessons). Ensure the server has sufficient
+   storage space.
+
+Q: I cannot submit an assignment.
+A: Check the due date. If the deadline has passed and late submissions are
+   not allowed, you cannot submit. Also ensure you are providing at least
+   one of: text content or a file upload.
+
+Q: My certificate was not generated after completing all lessons.
+A: Ensure you have marked ALL lessons as complete. The system auto-generates
+   the certificate when the last lesson is completed. If it still fails,
+   contact admin to create one manually at /admin/certificate/create.
+
+Q: The "Pending Approval" page won't go away.
+A: An admin needs to approve your instructor account. Go to /admin/settings
+   (as admin), click the "Instructor Approval" tab, and approve the
+   instructor.
+
+Q: How do I change my password?
+A: Go to Settings in your sidebar. Enter your current password and new
+   password. The new password must be at least 8 characters with letters,
+   mixed case, numbers, and symbols.
+
+Q: I cannot see the course notes from my instructor.
+A: Ensure you are enrolled in the course AND the note is published.
+   Only published notes are visible to students.
+
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================

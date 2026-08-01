@@ -19,7 +19,7 @@
         @endif
     </div>
     <div class="overflow-x-auto">
-        <table class="w-full text-sm">
+        <table class="w-full text-sm min-w-[700px]">
             <thead><tr class="bg-gray-50 text-heading/60 text-xs uppercase tracking-wider">
                 <th class="text-left py-4 px-6 font-semibold">#</th>
                 <th class="text-left py-4 px-6 font-semibold">Assignment</th>
