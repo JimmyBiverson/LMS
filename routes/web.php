@@ -546,6 +546,14 @@ Route::middleware('auth')->group(function () {
             auth()->user()->update(['password' => Hash::make($request->password)]);
             return back()->with('status', 'Password changed successfully!');
         });
+        Route::prefix('zoom')->name('zoom.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Zoom\ZoomMeetingController::class, 'index'])->name('index');
+            Route::get('/calendar', [\App\Http\Controllers\Zoom\ZoomMeetingController::class, 'calendar'])->name('calendar');
+            Route::get('/calendar/ics', [\App\Http\Controllers\Zoom\ZoomMeetingController::class, 'calendarIcs'])->name('calendar.ics');
+            Route::get('/meetings/{meeting}', [\App\Http\Controllers\Zoom\ZoomMeetingController::class, 'show'])->name('show');
+            Route::post('/meetings/{meeting}/join', [\App\Http\Controllers\Zoom\ZoomMeetingController::class, 'join'])->name('join');
+            Route::get('/meetings/{meeting}/ics', [\App\Http\Controllers\Zoom\ZoomMeetingController::class, 'ics'])->name('ics');
+        });
     });
 
     Route::prefix('dashboard')->group(function () {
@@ -1045,6 +1053,46 @@ Route::middleware('auth')->group(function () {
         Route::post('/noticeboard/{noticeboard}', [NoticeboardController::class, 'update']);
         Route::post('/noticeboard/{noticeboard}/delete', [NoticeboardController::class, 'destroy']);
     });
+
+    // Instructor Zoom (standalone so route names are zoom.instructor.*)
+    Route::middleware(['role:' . User::ROLE_INSTRUCTOR, 'instructor_approved'])->prefix('instructor/zoom')->name('zoom.instructor.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'store'])->name('store');
+        Route::get('/calendar', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'calendar'])->name('calendar');
+        Route::get('/calendar/ics', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'calendarIcs'])->name('calendar.ics');
+        Route::get('/meetings/{meeting}', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'show'])->name('show');
+        Route::get('/meetings/{meeting}/edit', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'edit'])->name('edit');
+        Route::put('/meetings/{meeting}', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'update'])->name('update');
+        Route::post('/meetings/{meeting}/start', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'start'])->name('start');
+        Route::post('/meetings/{meeting}/cancel', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'cancel'])->name('cancel');
+        Route::post('/meetings/{meeting}/recording', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'toggleRecording'])->name('recording');
+        Route::post('/meetings/{meeting}/notify', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'notify'])->name('notify');
+        Route::get('/meetings/{meeting}/attendance', [\App\Http\Controllers\Zoom\ZoomAttendanceController::class, 'show'])->name('attendance');
+        Route::get('/meetings/{meeting}/attendance/export', [\App\Http\Controllers\Zoom\ZoomAttendanceController::class, 'export'])->name('attendance.export');
+    });
+
+    // Admin Zoom (standalone so route names are zoom.admin.*)
+    Route::middleware('role:' . User::ROLE_ADMIN . ',' . User::ROLE_STAFF)->prefix('admin/zoom')->name('zoom.admin.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Zoom\ZoomAdminController::class, 'index'])->name('index');
+        Route::get('/settings', [\App\Http\Controllers\Zoom\ZoomAdminController::class, 'settings'])->name('settings');
+        Route::post('/settings', [\App\Http\Controllers\Zoom\ZoomSettingsController::class, 'update'])->name('settings.update');
+        Route::get('/settings/test', [\App\Http\Controllers\Zoom\ZoomSettingsController::class, 'test'])->name('settings.test');
+        Route::get('/create', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'store'])->name('store');
+        Route::get('/calendar', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'calendar'])->name('calendar');
+        Route::get('/calendar/ics', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'calendarIcs'])->name('calendar.ics');
+        Route::get('/meetings/{meeting}', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'show'])->name('show');
+        Route::get('/meetings/{meeting}/edit', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'edit'])->name('edit');
+        Route::put('/meetings/{meeting}', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'update'])->name('update');
+        Route::post('/meetings/{meeting}/start', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'start'])->name('start');
+        Route::post('/meetings/{meeting}/cancel', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'cancel'])->name('cancel');
+        Route::post('/meetings/{meeting}/recording', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'toggleRecording'])->name('recording');
+        Route::post('/meetings/{meeting}/notify', [\App\Http\Controllers\Zoom\ZoomScheduleController::class, 'notify'])->name('notify');
+        Route::get('/meetings/{meeting}/attendance', [\App\Http\Controllers\Zoom\ZoomAttendanceController::class, 'show'])->name('attendance');
+        Route::get('/meetings/{meeting}/attendance/export', [\App\Http\Controllers\Zoom\ZoomAttendanceController::class, 'export'])->name('attendance.export');
+    });
 });
+
 
 

@@ -3,6 +3,11 @@
     <i class="ri-dashboard-line text-lg"></i><span>Dashboard</span>
 </a>
 
+<a href="/admin/zoom"
+   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('admin/zoom*') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-video-on-line text-lg"></i><span>Zoom Classroom</span>
+</a>
+
 <div x-data="{ open: localStorage.getItem('sidebarGroup_academics') === 'true' }" :class="open ? 'mb-2' : ''">
     <button @click="open = !open; localStorage.setItem('sidebarGroup_academics', open)"
             class="flex items-center justify-between w-full px-3 py-2 mt-2 text-xs font-bold text-heading/40 uppercase tracking-wider hover:text-heading/70 transition-colors">
@@ -150,3 +155,4 @@
         <a href="/admin/enrollment/new-create" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->is('admin/enrollment/new-create') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300 font-semibold"><i class="ri-add-circle-line text-lg"></i><span>New Enrollment</span></a>
     </div>
 </div>
+

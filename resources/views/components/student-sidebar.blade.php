@@ -1,6 +1,9 @@
 <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-dashboard-line text-lg"></i><span>Dashboard</span>
 </a>
+<a href="/dashboard/zoom" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/zoom*') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-video-on-line text-lg"></i><span>Zoom Classes</span>
+</a>
 <a href="/dashboard/my-enrolled-course" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard/my-enrolled-course') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-book-open-line text-lg"></i><span>My Enrolled Course</span>
 </a>

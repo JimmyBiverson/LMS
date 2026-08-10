@@ -61,6 +61,8 @@ $notifUrl = url('admin/notification');
     </div>
 </div>
 
+@include('components.zoom-dashboard-widget')
+
 {{-- Pending Approvals --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
     <a href="{{ url('admin/settings/approve-instructors') }}" class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-amber-500 hover:shadow-md transition-shadow">
@@ -386,3 +388,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endpush
+

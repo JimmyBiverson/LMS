@@ -44,6 +44,8 @@ $notifUrl = url('dashboard/notifications');
     </div>
 </div>
 
+@include('components.zoom-dashboard-widget')
+
 {{-- My Tasks Widget --}}
 @if($pendingAssignments->isNotEmpty() || $pendingQuizzes->isNotEmpty() || $pendingExams->isNotEmpty() || $recentGraded->isNotEmpty())
 <div class="bg-white rounded-xl shadow-sm mb-8">

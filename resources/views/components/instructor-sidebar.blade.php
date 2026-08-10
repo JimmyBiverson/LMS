@@ -1,6 +1,9 @@
 <a href="/instructor" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('instructor') && request()->path() == 'instructor' ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
     <i class="ri-dashboard-line text-lg"></i><span>Dashboard</span>
 </a>
+<a href="/instructor/zoom" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('instructor/zoom*') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">
+    <i class="ri-video-on-line text-lg"></i><span>Zoom Classes</span>
+</a>
 <div class="pt-3 mt-3 border-t border-gray-100">
     <p class="px-3 text-xs font-semibold text-heading/40 uppercase tracking-wider mb-2">Course Manage</p>
     <a href="/instructor/courses" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('instructor/courses') && !request()->is('instructor/courses/create') ? 'bg-primary-50 text-primary' : 'text-heading/70 hover:bg-primary-50 hover:text-primary' }} transition-all duration-300">

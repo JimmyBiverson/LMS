@@ -36,6 +36,8 @@ $notifUrl = url('instructor/notifications');
     </div>
 </div>
 
+@include('components.zoom-dashboard-widget')
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 bg-white rounded-xl shadow-sm">
         <div class="p-6 border-b border-amber-100 flex items-center justify-between">
@@ -108,3 +110,4 @@ $notifUrl = url('instructor/notifications');
     </div>
 </div>
 @endsection
+
