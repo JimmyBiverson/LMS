@@ -1,0 +1,8 @@
+﻿<form method="POST" action="/admin/backend-setting" class="space-y-4">
+            @csrf
+            <div><label class="block text-sm font-semibold text-heading mb-1">Application Name</label><input name="app_name" type="text" value="{{ old('app_name', config('app.name')) }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
+            <div><label class="block text-sm font-semibold text-heading mb-1">Email Address</label><input name="email" type="email" value="{{ old('email', config('app.email')) }}" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"></div>
+            <div><label class="block text-sm font-semibold text-heading mb-1">Timezone</label><select name="timezone" class="w-full px-4 py-3 rounded-lg border border-heading/10 text-sm focus:outline-none focus:border-primary"><option value="UTC" @selected(old('timezone', config('app.timezone')) === 'UTC')>UTC</option><option value="America/New_York" @selected(old('timezone', config('app.timezone')) === 'America/New_York')>America/New_York</option><option value="Europe/London" @selected(old('timezone', config('app.timezone')) === 'Europe/London')>Europe/London</option></select></div>
+            <div><label class="flex items-center gap-2"><input name="maintenance_mode" type="checkbox" value="1" class="w-5 h-5 rounded border-heading/20 text-primary" @checked(old('maintenance_mode', app()->isDownForMaintenance()))><span class="text-sm text-heading font-semibold">Enable maintenance mode</span></label></div>
+            <button type="submit" class="px-8 py-3 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all">Save Settings</button>
+        </form>
