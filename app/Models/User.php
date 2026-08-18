@@ -56,6 +56,14 @@ class User extends Authenticatable
         'primary_color',
         'secondary_color',
         'class_id',
+        'school_fees_paid',
+        'can_upload_reports',
+    ];
+
+    protected $casts = [
+        'school_fees_paid' => 'boolean',
+        'can_upload_reports' => 'boolean',
+        'is_approved' => 'boolean',
     ];
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
@@ -114,6 +122,11 @@ class User extends Authenticatable
             return $this->first_name . ' ' . $this->last_name;
         }
         return $this->name;
+    }
+
+    public function canManageStudentReports(): bool
+    {
+        return $this->isAdmin() || $this->isStaff() || (bool) $this->can_upload_reports;
     }
 
     public function enrollments(): HasMany

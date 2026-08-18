@@ -141,4 +141,19 @@ class SettingsController extends Controller
 
         return back()->with('success', "{$user->name} has been disapproved.");
     }
+
+    public function toggleSuperInstructor(User $user): RedirectResponse
+    {
+        if ($user->role !== User::ROLE_INSTRUCTOR) {
+            return back()->with('error', 'User is not an instructor.');
+        }
+
+        $user->update([
+            'can_upload_reports' => ! $user->can_upload_reports,
+        ]);
+
+        return back()->with('success', $user->can_upload_reports
+            ? "{$user->name} now has super-instructor report upload rights."
+            : "{$user->name} no longer has super-instructor report upload rights.");
+    }
 }

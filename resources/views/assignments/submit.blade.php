@@ -6,7 +6,7 @@
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
             <h1 class="text-2xl font-extrabold text-heading mb-2">{{ $assignment->title }}</h1>
             <p class="text-heading/70 mb-4">{{ $assignment->description }}</p>
-            <div class="flex gap-4 text-sm text-heading/60">
+            <div class="flex gap-4 text-sm text-heading/60 flex-wrap">
                 <span>Due: {{ $assignment->due_date?->format('Y-m-d') ?? 'No deadline' }}</span>
                 <span>Marks: {{ $assignment->total_marks }}</span>
             </div>
@@ -25,15 +25,38 @@
             </div>
             @endif
         </div>
-        <form method="POST" action="/dashboard/assignments/{{ $assignment->id }}/submit" enctype="multipart/form-data" class="bg-white rounded-xl shadow-sm p-6">
-            @csrf
-            <div class="space-y-4">
-                <div><label class="block text-sm font-semibold text-heading mb-1">Submission Text</label><textarea name="submission_text" rows="8" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm" placeholder="Write your assignment content here..."></textarea></div>
-                <div><label class="block text-sm font-semibold text-heading mb-1">Upload File</label><input type="file" name="file" accept=".pdf,.doc,.docx,.txt,.zip" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"></div>
-                <p class="text-sm text-heading/60">Provide either a typed submission or upload a file. At least one is required.</p>
-                <button type="submit" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300">Submit Assignment</button>
+
+        @if(!empty($submissionClosed))
+            <div class="bg-red-50 border border-red-200 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-start gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+                        <i class="ri-time-line text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-extrabold text-red-700">Submission time ran out</p>
+                        <p class="mt-2 text-sm text-red-700/80">{{ $submissionReason ?? 'This assignment is no longer available for submission.' }}</p>
+                    </div>
+                </div>
+                <div class="mt-5 rounded-xl border border-dashed border-red-200 bg-white/60 p-4 text-sm text-red-700">
+                    The submit button has been removed because the deadline expired and late submission is not permitted for this task.
+                </div>
+                <div class="mt-6 blur-[2px] pointer-events-none select-none">
+                    <button type="button" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full opacity-50">
+                        Submit Assignment
+                    </button>
+                </div>
             </div>
-        </form>
+        @else
+            <form method="POST" action="/dashboard/assignments/{{ $assignment->id }}/submit" enctype="multipart/form-data" class="bg-white rounded-xl shadow-sm p-6">
+                @csrf
+                <div class="space-y-4">
+                    <div><label class="block text-sm font-semibold text-heading mb-1">Submission Text</label><textarea name="submission_text" rows="8" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm" placeholder="Write your assignment content here..."></textarea></div>
+                    <div><label class="block text-sm font-semibold text-heading mb-1">Upload File</label><input type="file" name="file" accept=".pdf,.doc,.docx,.txt,.zip" class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"></div>
+                    <p class="text-sm text-heading/60">Provide either a typed submission or upload a file. At least one is required.</p>
+                    <button type="submit" class="w-full px-8 py-4 bg-primary text-white font-bold rounded-full hover:opacity-90 transition-all duration-300">Submit Assignment</button>
+                </div>
+            </form>
+        @endif
     </div>
 </section>
 @endsection

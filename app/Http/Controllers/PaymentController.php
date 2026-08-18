@@ -203,6 +203,8 @@ class PaymentController extends Controller
                     'user_id' => $user->id,
                     'course_id' => $course->id,
                     'amount_paid' => $price,
+                    'payment_status' => $price > 0 ? 'paid' : 'approved',
+                    'approval_status' => 'pending',
                     'status' => 'in_progress',
                 ]);
                 \App\Notifications\CourseEnrolled::send($user, $course);
@@ -217,6 +219,8 @@ class PaymentController extends Controller
                         'user_id' => $user->id,
                         'course_id' => $course->id,
                         'amount_paid' => $price ?? 0,
+                        'payment_status' => ($price ?? 0) > 0 ? 'paid' : 'approved',
+                        'approval_status' => 'pending',
                         'status' => 'in_progress',
                     ]);
                     \App\Notifications\CourseEnrolled::send($user, $course);
@@ -296,6 +300,8 @@ class PaymentController extends Controller
                     'user_id' => $user->id,
                     'course_id' => $course->id,
                     'amount_paid' => $price,
+                    'payment_status' => $price > 0 ? 'paid' : 'approved',
+                    'approval_status' => 'pending',
                     'status' => 'in_progress',
                 ]);
                 \App\Notifications\CourseEnrolled::send($user, $course);
@@ -310,6 +316,8 @@ class PaymentController extends Controller
                         'user_id' => $user->id,
                         'course_id' => $course->id,
                         'amount_paid' => $course->payment_type === 'free' ? 0 : ($course->sale_price ?? $course->price),
+                        'payment_status' => $course->payment_type === 'free' ? 'approved' : 'paid',
+                        'approval_status' => 'pending',
                         'status' => 'in_progress',
                     ]);
                     \App\Notifications\CourseEnrolled::send($user, $course);

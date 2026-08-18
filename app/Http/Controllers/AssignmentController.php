@@ -150,9 +150,12 @@ class AssignmentController extends Controller
         if (!$assignment->isAvailable()) {
             return view('quizzes.locked', ['quiz' => null, 'assignment' => $assignment]);
         }
+
+        $submissionClosed = $assignment->due_date && $assignment->isDeadlinePassed() && !$assignment->late_submission_allowed;
+        $submissionReason = $submissionClosed ? 'Submission time ran out. This assignment is no longer available for submission.' : null;
         
         $assignment->load('course');
-        return view('assignments.submit', compact('assignment'));
+        return view('assignments.submit', compact('assignment', 'submissionClosed', 'submissionReason'));
     }
 
     public function submit(Request $request, Assignment $assignment): RedirectResponse
@@ -168,6 +171,10 @@ class AssignmentController extends Controller
 
         if (!$assignment->isAvailable()) {
             abort(403, 'This assignment is not yet available.');
+        }
+
+        if ($assignment->due_date && $assignment->isDeadlinePassed() && !$assignment->late_submission_allowed) {
+            return back()->withErrors(['assignment' => 'Submission time ran out. This assignment is no longer available.'])->withInput();
         }
         
         $validated = $request->validate([

@@ -317,6 +317,8 @@ Route::middleware('auth')->group(function () {
             'user_id' => auth()->id(),
             'course_id' => $course->id,
             'amount_paid' => $amountPaid,
+            'payment_status' => $amountPaid > 0 ? 'pending' : 'approved',
+            'approval_status' => $amountPaid > 0 ? 'pending' : 'approved',
             'status' => 'in_progress',
         ]);
         \App\Notifications\CourseEnrolled::send(auth()->user(), $course);
@@ -471,6 +473,15 @@ Route::middleware('auth')->group(function () {
                 ->where('user_id', auth()->id())->latest()->get();
             return view('dashboard.purchase-course', compact('purchases'));
         });
+        Route::get('/term-reports', function () {
+            $reports = \App\Models\StudentTermReport::with(['student', 'instructor', 'authorizedBy'])
+                ->where('student_id', auth()->id())
+                ->latest()->get()
+                ->filter(fn ($report) => $report->canStudentSee())
+                ->values();
+
+            return view('dashboard.term-reports', compact('reports'));
+        })->name('dashboard.term-reports');
         Route::get('/bundle-course', function () {
             $bundles = \App\Models\Bundle::with('courses')->latest()->get();
             return view('dashboard.bundle-course', compact('bundles'));
@@ -480,6 +491,7 @@ Route::middleware('auth')->group(function () {
                 ->where('user_id', auth()->id())->latest()->get();
             return view('dashboard.certificate', compact('certificates'));
         });
+        Route::get('/certificate/{certificate}/preview', [CertificateController::class, 'preview'])->name('certificate.preview');
         Route::get('/certificate/{certificate}/download', [CertificateController::class, 'download'])->name('certificate.download');
         Route::get('/quizzes/my-result', [QuizController::class, 'myResults'])->name('quizzes.my-result');
         Route::get('/quizzes/{quiz}/instructions', [QuizController::class, 'instructions']);
@@ -686,9 +698,42 @@ Route::middleware('auth')->group(function () {
             if (!in_array($enrollment->course_id, $courseIds->toArray())) {
                 return back()->with('error', 'Unauthorized.');
             }
-            $enrollment->update(['payment_status' => 'approved']);
+            $enrollment->update([
+                'payment_status' => 'approved',
+                'approval_status' => 'approved',
+                'approved_by' => auth()->id(),
+                'approved_at' => now(),
+            ]);
             return back()->with('success', 'Payment approved. Student now has full access.');
         });
+        Route::post('/enrollments/{enrollment}/approve', function (\Illuminate\Http\Request $request, \App\Models\Enrollment $enrollment) {
+            $courseIds = \App\Models\Course::where('user_id', auth()->id())->pluck('id');
+            if (!in_array($enrollment->course_id, $courseIds->toArray())) {
+                return back()->with('error', 'Unauthorized.');
+            }
+
+            $enrollment->update([
+                'approval_status' => 'approved',
+                'payment_status' => 'approved',
+                'approved_by' => auth()->id(),
+                'approved_at' => now(),
+            ]);
+
+            return back()->with('success', 'Enrollment approved. The student can now access the paid course.');
+        })->name('enrollments.approve');
+        Route::post('/enrollments/{enrollment}/reject', function (\Illuminate\Http\Request $request, \App\Models\Enrollment $enrollment) {
+            $courseIds = \App\Models\Course::where('user_id', auth()->id())->pluck('id');
+            if (!in_array($enrollment->course_id, $courseIds->toArray())) {
+                return back()->with('error', 'Unauthorized.');
+            }
+
+            $enrollment->update([
+                'approval_status' => 'rejected',
+                'payment_status' => 'rejected',
+            ]);
+
+            return back()->with('success', 'Enrollment rejected. The student remains blocked until the instructor reviews it again.');
+        })->name('enrollments.reject');
         Route::post('/pending-payments/{enrollment}/reject', function (\Illuminate\Http\Request $request, \App\Models\Enrollment $enrollment) {
             $courseIds = \App\Models\Course::where("user_id", auth()->id())->pluck("id");
             if (!in_array($enrollment->course_id, $courseIds->toArray())) {
@@ -978,6 +1023,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/settings/approve-instructors', fn() => redirect('/admin/settings?tab=instructors'));
         Route::post('/settings/instructors/{user}/approve', [SettingsController::class, 'approveInstructor']);
         Route::post('/settings/instructors/{user}/disapprove', [SettingsController::class, 'disapproveInstructor']);
+        Route::post('/settings/instructors/{user}/toggle-super', [SettingsController::class, 'toggleSuperInstructor'])->name('settings.instructors.toggle-super');
         Route::get('/site-language', [AdminCrudController::class, 'siteLanguages']);
         Route::post('/site-language', [AdminCrudController::class, 'storeSiteLanguage']);
         Route::post('/site-language/{siteLanguage}/update', [AdminCrudController::class, 'updateSiteLanguage']);

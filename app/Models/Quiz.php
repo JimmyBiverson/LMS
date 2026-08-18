@@ -227,9 +227,15 @@ class Quiz extends Model
      */
     public function getUserAttemptCount(int $userId): int
     {
-        return $this->quizAttempts()
+        $attemptCount = $this->quizAttempts()
             ->where('user_id', $userId)
             ->count();
+
+        $resultCount = $this->results()
+            ->where('user_id', $userId)
+            ->count();
+
+        return max($attemptCount, $resultCount);
     }
 
     /**
@@ -241,6 +247,9 @@ class Quiz extends Model
     public function canUserAttempt(int $userId): array
     {
         $attemptsUsed = $this->getUserAttemptCount($userId);
+        $remaining = ($this->attempts_limit && $this->attempts_limit > 0) 
+            ? max(0, $this->attempts_limit - $attemptsUsed)
+            : null;
 
         // If no attempts limit is set, user can always attempt
         if ($this->attempts_limit === null || $this->attempts_limit <= 0) {
@@ -249,6 +258,8 @@ class Quiz extends Model
                 'reason' => null,
                 'attempts_used' => $attemptsUsed,
                 'attempts_limit' => null,
+                'remaining' => null,
+                'limit' => null,
             ];
         }
 
@@ -259,6 +270,8 @@ class Quiz extends Model
                 'reason' => "Maximum attempts ({$this->attempts_limit}) reached",
                 'attempts_used' => $attemptsUsed,
                 'attempts_limit' => $this->attempts_limit,
+                'remaining' => 0,
+                'limit' => $this->attempts_limit,
             ];
         }
 
@@ -267,6 +280,8 @@ class Quiz extends Model
             'reason' => null,
             'attempts_used' => $attemptsUsed,
             'attempts_limit' => $this->attempts_limit,
+            'remaining' => $remaining,
+            'limit' => $this->attempts_limit,
         ];
     }
 }

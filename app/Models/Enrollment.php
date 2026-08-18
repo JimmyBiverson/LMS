@@ -17,6 +17,9 @@ class Enrollment extends Model
         'payment_provider',
         'payment_reference',
         'payment_status',
+        'approval_status',
+        'approved_by',
+        'approved_at',
         'status',
         'completed_at',
     ];
@@ -42,5 +45,26 @@ class Enrollment extends Model
     public function paymentMethod(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class);
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function isApprovedForAccess(): bool
+    {
+        if ($this->relationLoaded('course') && $this->course) {
+            $paidCourse = $this->course->payment_type === 'paid';
+        } else {
+            $paidCourse = $this->course?->payment_type === 'paid';
+        }
+
+        if (!$paidCourse) {
+            return true;
+        }
+
+        return in_array($this->approval_status, ['approved', 'auto_approved'], true)
+            && in_array($this->payment_status ?? 'approved', ['approved', 'paid'], true);
     }
 }

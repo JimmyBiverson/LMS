@@ -37,18 +37,19 @@
                 }
             "></div>
             @foreach($quiz->questions as $i => $q)
+            @php($questionOptions = is_array($q->options) ? $q->options : [])
             <div class="bg-white rounded-xl shadow-sm p-6 mb-4">
                 <h3 class="font-bold text-heading mb-3">{{ $i+1 }}. {{ $q->question }} <span class="text-xs text-heading/50 font-normal">({{ $q->marks }} mark{{ $q->marks>1?'s':'' }})</span></h3>
                 <div class="space-y-3">
                     @if(in_array($q->type, ['multiple_choice', 'true_false']))
-                        @foreach($q->options as $opt)
+                        @foreach($questionOptions as $opt)
                         <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-primary cursor-pointer transition-colors">
                             <input type="radio" name="answers[{{ $q->id }}]" value="{{ $opt }}" class="text-primary focus:ring-primary">
                             <span class="text-sm text-heading/80">{{ $opt }}</span>
                         </label>
                         @endforeach
                     @elseif($q->type === 'multiple_select')
-                        @foreach($q->options as $opt)
+                        @foreach($questionOptions as $opt)
                         <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-primary cursor-pointer transition-colors">
                             <input type="checkbox" name="answers[{{ $q->id }}][]" value="{{ $opt }}" class="text-primary focus:ring-primary">
                             <span class="text-sm text-heading/80">{{ $opt }}</span>
@@ -60,7 +61,7 @@
                         <textarea name="answers[{{ $q->id }}]" rows="5" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Write your essay response here..."></textarea>
                     @elseif($q->type === 'fill_in_blank')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            @foreach($q->options as $index => $blank)
+                            @foreach($questionOptions as $index => $blank)
                             <label class="space-y-1 text-sm text-heading/80">
                                 Blank {{ $index + 1 }}
                                 <input type="text" name="answers[{{ $q->id }}][]" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="Answer for blank {{ $index + 1 }}">
@@ -68,18 +69,19 @@
                             @endforeach
                         </div>
                     @elseif($q->type === 'matching')
-                        @foreach($q->options as $index => $pair)
+                        @foreach($questionOptions as $index => $pair)
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
                             <div>
-                                <label class="block text-sm font-semibold text-heading mb-1">Match for: {{ $pair['key'] }}</label>
-                                <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50" value="{{ $pair['key'] }}" readonly>
+                                <label class="block text-sm font-semibold text-heading mb-1">Match for: {{ is_array($pair) ? ($pair['key'] ?? '') : $pair }}</label>
+                                <input type="text" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50" value="{{ is_array($pair) ? ($pair['key'] ?? '') : $pair }}" readonly>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-heading mb-1">Choose match</label>
                                 <select name="answers[{{ $q->id }}][{{ $index }}]" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                     <option value="">Select answer</option>
-                                    @foreach($q->options as $matchOption)
-                                    <option value="{{ $matchOption['value'] }}">{{ $matchOption['value'] }}</option>
+                                    @foreach($questionOptions as $matchOption)
+                                    @php($matchValue = is_array($matchOption) ? ($matchOption['value'] ?? '') : $matchOption)
+                                    <option value="{{ $matchValue }}">{{ $matchValue }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -87,7 +89,7 @@
                         @endforeach
                     @elseif($q->type === 'ordering')
                         <label class="block text-sm font-semibold text-heading mb-1">Enter the items in correct order, one item per line</label>
-                        <textarea name="answers[{{ $q->id }}]" rows="{{ max(3, min(8, count($q->options))) }}" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="{{ implode('\n', $q->options) }}"></textarea>
+                        <textarea name="answers[{{ $q->id }}]" rows="{{ max(3, min(8, count($questionOptions))) }}" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="{{ implode('\n', $questionOptions) }}"></textarea>
                     @else
                         <p class="text-sm text-heading/70">This question type cannot be answered online.</p>
                     @endif

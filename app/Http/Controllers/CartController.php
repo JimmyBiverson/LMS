@@ -191,6 +191,7 @@ class CartController extends Controller
                                 'payment_method_id' => $paymentMethodId,
                                 'payment_provider' => $paymentProvider,
                                 'payment_status' => 'pending',
+                                'approval_status' => 'pending',
                                 'status' => 'in_progress',
                             ]);
                             \App\Notifications\CourseEnrolled::send($user, $course);
@@ -230,6 +231,7 @@ class CartController extends Controller
                                     'payment_method_id' => $paymentMethodId,
                                     'payment_provider' => $paymentProvider,
                                     'payment_status' => 'pending',
+                                    'approval_status' => 'pending',
                                     'status' => 'in_progress',
                                 ]);
                                 \App\Notifications\CourseEnrolled::send($user, $course);

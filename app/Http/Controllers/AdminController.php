@@ -39,6 +39,8 @@ class AdminController extends Controller
 
         Enrollment::create(array_merge($validated, [
             'amount_paid' => $amountPaid,
+            'payment_status' => $amountPaid > 0 ? 'pending' : 'approved',
+            'approval_status' => $amountPaid > 0 ? 'pending' : 'approved',
             'status' => 'in_progress',
         ]));
 

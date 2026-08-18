@@ -39,10 +39,13 @@ class EnrollmentController extends Controller
             return response()->json(['message' => 'Already enrolled.'], 409);
         }
 
+        $amountPaid = $course->payment_type === 'free' ? 0 : ($course->sale_price ?? $course->price);
         $enrollment = Enrollment::create([
             'user_id' => $request->user()->id,
             'course_id' => $course->id,
-            'amount_paid' => $course->payment_type === 'free' ? 0 : ($course->sale_price ?? $course->price),
+            'amount_paid' => $amountPaid,
+            'payment_status' => $amountPaid > 0 ? 'pending' : 'approved',
+            'approval_status' => $amountPaid > 0 ? 'pending' : 'approved',
             'status' => 'in_progress',
         ]);
 
