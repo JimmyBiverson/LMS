@@ -36,11 +36,9 @@
                     <!-- Certificate Mini Preview -->
                     <div class="mt-4 pt-4 border-t border-gray-100">
                         <p class="text-xs uppercase tracking-[0.25em] text-heading/60 font-bold mb-2">Preview</p>
-                        <div class="relative bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-3 border border-gray-200 h-32 flex items-center justify-center overflow-hidden">
-                            <div class="text-center text-xs">
-                                <div class="font-bold text-heading text-sm">{{ auth()->user()->full_name }}</div>
-                                <div class="text-heading/60 mt-1">{{ $certificate->course?->title ?? 'Course' }}</div>
-                                <div class="text-heading/40 mt-1">{{ $certificate->created_at->format('M d, Y') }}</div>
+                        <div class="relative rounded-xl border border-gray-200 bg-gradient-to-br from-violet-50 via-white to-sky-50 p-2 overflow-hidden shadow-inner">
+                            <div class="w-full h-36 rounded-lg overflow-hidden border border-violet-100 bg-white">
+                                <iframe src="{{ route('certificate.preview', $certificate) }}" class="w-full h-full border-0 bg-white" title="Certificate preview for {{ $certificate->course?->title ?? 'Course' }}"></iframe>
                             </div>
                         </div>
                     </div>
@@ -75,11 +73,11 @@
                 <i class="ri-close-line text-2xl"></i>
             </button>
         </div>
-        <div class="flex-1 overflow-auto p-6 bg-gray-50 flex items-center justify-center">
-            <iframe id="certificateFrame" src="" class="w-full h-full border-0" style="min-height: 600px;"></iframe>
+        <div class="flex-1 overflow-auto bg-gray-50 p-4 md:p-6 flex items-center justify-center">
+            <iframe id="certificateFrame" src="" class="w-full h-[72vh] border-0 rounded-xl shadow-md bg-white" style="min-height: 600px;" title="Certificate preview"></iframe>
         </div>
         <div class="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
-            <p class="text-sm text-heading/60">Landscape orientation certificate preview</p>
+            <p class="text-sm text-heading/60">Landscape certificate preview</p>
             <a id="downloadBtn" href="#" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors">
                 <i class="ri-download-2-line"></i> Download PDF
             </a>
@@ -92,15 +90,17 @@ function openCertificateModal(certificateId) {
     const modal = document.getElementById('certificateModal');
     const frame = document.getElementById('certificateFrame');
     const downloadBtn = document.getElementById('downloadBtn');
-    
-    frame.src = `/dashboard/certificate/${certificateId}/download`;
+
+    frame.src = `/dashboard/certificate/${certificateId}/preview`;
     downloadBtn.href = `/dashboard/certificate/${certificateId}/download`;
-    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 }
 
 function closeCertificateModal(event) {
     if (event && event.target.id !== 'certificateModal') return;
-    document.getElementById('certificateModal').style.display = 'none';
+    document.getElementById('certificateModal').classList.add('hidden');
+    document.getElementById('certificateModal').classList.remove('flex');
     document.getElementById('certificateFrame').src = '';
 }
 

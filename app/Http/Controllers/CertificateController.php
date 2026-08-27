@@ -8,12 +8,26 @@ use Illuminate\Http\Response;
 
 class CertificateController extends Controller
 {
+    public function preview(Certificate $certificate): Response
+    {
+        if ($certificate->user_id !== auth()->id() && !auth()->user()?->isAdmin()) {
+            abort(403);
+        }
+
+        return $this->renderPdf($certificate, 'inline');
+    }
+
     public function download(Certificate $certificate): Response
     {
         if ($certificate->user_id !== auth()->id() && !auth()->user()?->isAdmin()) {
             abort(403);
         }
 
+        return $this->renderPdf($certificate, 'download');
+    }
+
+    protected function renderPdf(Certificate $certificate, string $mode): Response
+    {
         $certificate->load('user', 'course');
 
         $pdf = Pdf::loadView('pdfs.certificate', [
@@ -22,6 +36,10 @@ class CertificateController extends Controller
             'course' => $certificate->course,
         ]);
 
-        return $pdf->download("certificate-{$certificate->course->slug}.pdf");
+        $filename = "certificate-{$certificate->course->slug}.pdf";
+
+        return $mode === 'inline'
+            ? $pdf->stream($filename)
+            : $pdf->download($filename);
     }
 }

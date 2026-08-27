@@ -480,6 +480,7 @@ Route::middleware('auth')->group(function () {
                 ->where('user_id', auth()->id())->latest()->get();
             return view('dashboard.certificate', compact('certificates'));
         });
+        Route::get('/certificate/{certificate}/preview', [CertificateController::class, 'preview'])->name('certificate.preview');
         Route::get('/certificate/{certificate}/download', [CertificateController::class, 'download'])->name('certificate.download');
         Route::get('/quizzes/my-result', [QuizController::class, 'myResults'])->name('quizzes.my-result');
         Route::get('/quizzes/{quiz}/instructions', [QuizController::class, 'instructions']);

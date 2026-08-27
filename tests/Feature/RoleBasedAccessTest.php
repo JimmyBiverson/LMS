@@ -28,6 +28,7 @@ use App\Models\Testimonial;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
@@ -130,6 +131,13 @@ class RoleBasedAccessTest extends TestCase
         $this->actingAs($this->student)->get('/instructor')->assertStatus(403);
         $this->actingAs($this->student)->get('/admin')->assertStatus(403);
         $this->actingAs($this->student)->get('/org')->assertStatus(403);
+    }
+
+    public function test_zoom_dashboard_does_not_cache_model_collections(): void
+    {
+        $this->actingAs($this->student)->get('/dashboard/zoom')->assertOk();
+
+        $this->assertFalse(Cache::has('zoom.user.' . $this->student->id . '.upcoming'));
     }
 
     public function test_guest_cannot_access_any_dashboard(): void

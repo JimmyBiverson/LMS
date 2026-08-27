@@ -31,13 +31,11 @@ class ZoomMeetingController extends Controller
     {
         $user = $request->user();
 
-        $upcoming = Cache::remember('zoom.user.'.$user->id.'.upcoming', config('zoom.cache_ttl'), function () use ($user) {
-            return ZoomMeeting::with(['course', 'lesson', 'instructor'])
-                ->visibleTo($user)
-                ->whereIn('status', [ZoomMeeting::STATUS_SCHEDULED, ZoomMeeting::STATUS_STARTING_SOON, ZoomMeeting::STATUS_LIVE])
-                ->orderBy('start_time')
-                ->get();
-        });
+        $upcoming = ZoomMeeting::with(['course', 'lesson', 'instructor'])
+            ->visibleTo($user)
+            ->whereIn('status', [ZoomMeeting::STATUS_SCHEDULED, ZoomMeeting::STATUS_STARTING_SOON, ZoomMeeting::STATUS_LIVE])
+            ->orderBy('start_time')
+            ->get();
 
         $liveNow = $upcoming->filter(fn (ZoomMeeting $m) => $m->computeStatus() === ZoomMeeting::STATUS_LIVE && $m->isJoinableNow())->values();
         $today = $upcoming->filter(fn (ZoomMeeting $m) => $m->start_time->isToday())->values();

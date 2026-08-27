@@ -1,6 +1,9 @@
 @extends('layouts.dashboard')
 
 @section('title', 'My Zoom Classes')
+@section('page-title', 'Zoom Classes')
+@section('user-name', auth()->user()->full_name ?? 'Student')
+@section('sidebar')@include('components.student-sidebar')@stop
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
